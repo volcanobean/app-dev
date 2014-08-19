@@ -1,0 +1,42 @@
+characterName
+torsoItem
+torsoR
+torsoG
+torsoB
+torsoA
+
+face:
+
+skin
+eyes
+nose
+mouth
+ears?
+
+head
+torso
+waist
+hands
+legs
+feet
+back
+powers
+
+-- Tables
+-- In Lua the use of {} always denotes the beginning and end of a table, 
+-- even when used as arguments in a function.
+
+-- Create a new blank table for character data.
+
+local character = {}
+
+-- Set default values for all character data.
+
+character.name = "Name Here"
+
+character.torso.item = 0
+character.torso.red = 1
+character.torso.green = 1
+character.torso.blue = 1
+character.torso.alpha = 1
+
