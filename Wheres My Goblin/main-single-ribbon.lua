@@ -25,12 +25,10 @@ local nextBlockSnap
 
 -- DEBUG
 
-local blockCountText = display.newText( "Block Count: " .. blockCount, display.contentCenterX, 50, native.systemFont, 30 )
-
---local ribbonXText = display.newText( "Ribbon X: " .. ribbonX, display.contentCenterX, 50, native.systemFont, 30 )
---local ribbonStartXText = display.newText( "Ribbon Start X: " .. ribbonStartX, display.contentCenterX, 90, native.systemFont, 30 )
-local activeBlockText = display.newText( "Active Block: " .. activeBlock, display.contentCenterX, 90, native.systemFont, 30 )
---local activeBlockSnapText = display.newText( "Active Block Snap: " .. activeBlockSnap, display.contentCenterX, 170, native.systemFont, 30 )
+local ribbonXText = display.newText( "Ribbon X: " .. ribbonX, display.contentCenterX, 50, native.systemFont, 30 )
+local ribbonStartXText = display.newText( "Ribbon Start X: " .. ribbonStartX, display.contentCenterX, 90, native.systemFont, 30 )
+local activeBlockText = display.newText( "Active Block: " .. activeBlock, display.contentCenterX, 130, native.systemFont, 30 )
+local activeBlockSnapText = display.newText( "Active Block Snap: " .. activeBlockSnap, display.contentCenterX, 170, native.systemFont, 30 )
 local touchStartXText = display.newText( "touchStartX: " .. touchStartX, display.contentCenterX, 950, native.systemFont, 30 )
 local touchEndXText = display.newText( "touchEndX: " .. touchEndX, display.contentCenterX, 990, native.systemFont, 30 )
 
@@ -88,7 +86,7 @@ local function getActiveBlock( currentX )
     end
     -- debug
     activeBlockText.text = "Active Block: " .. activeBlock
-    -- activeBlockSnapText.text = "Active Block Snap: " .. activeBlockSnap
+    activeBlockSnapText.text = "Active Block Snap: " .. activeBlockSnap
 end
 
 
@@ -122,7 +120,7 @@ local function ribbonScroll( event )
             -- Check for active block
             getActiveBlock( event.target.x )
             -- debug
-            --ribbonXText.text = "Ribbon X: " .. event.target.x
+            ribbonXText.text = "Ribbon X: " .. event.target.x
             touchEndXText.text = "touchEndX: " .. touchEndX
 
         -- ON RELEASE: 
@@ -140,9 +138,6 @@ local function ribbonScroll( event )
                     if(activeBlock ~= blockCount) then
                         nextBlockSnap = activeBlock + 1
                         transition.to( event.target, { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap] } )
-                        -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
-                        activeBlock = nextBlockSnap
-                        activeBlockText.text = "Active Block: " .. activeBlock
                     else
                         -- snap to nearest block
                         transition.to( event.target, { time=150, x=activeBlockSnap } )     
@@ -152,8 +147,6 @@ local function ribbonScroll( event )
                     if(activeBlock ~= 1) then
                         nextBlockSnap = activeBlock - 1
                         transition.to( event.target, { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap] } )     
-                        activeBlock = nextBlockSnap
-                        activeBlockText.text = "Active Block: " .. activeBlock
                     else
                         -- snap to nearest block
                         transition.to( event.target, { time=150, x=activeBlockSnap } ) 
