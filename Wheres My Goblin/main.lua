@@ -6,11 +6,9 @@ local blockMargin = 15
 
 
 -- more local variables, don't touch
---local ribbonLength = (blockWidth + blockMargin)*blockCount
 local ribbonX = (display.contentWidth - blockWidth)/2 - blockMargin
 local ribbonY = 600
 local ribbonStartX = ribbonX -- store starting X value for future reference
---local ribbonEndX = (ribbonLength - display.contentWidth + blockMargin) * -1
 local activeBlock = 1
 local activeBlockSnap = ribbonX
 
@@ -94,15 +92,6 @@ local function ribbonScroll( event )
             --debug
             ribbonXText.text = "Ribbon X: " .. event.target.x
 
-            -- Scroll constraints:
-                -- Snap to beginning
-                --if ( event.target.x > ribbonStart ) then
-                --    transition.to( event.target, { time=0, x=ribbonStart } ) 
-                --end
-                -- Snap to end
-                --if ( event.target.x < ribbonEnd ) then
-                --    transition.to( event.target, { time=0, x=ribbonEnd } ) 
-                --end
         -- ON RELEASE: 
         elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
             -- snap to nearest block
@@ -126,8 +115,8 @@ centerHitArea:setFillColor( 0, 1, 1, 0.25 )
 -- Create scrollable ribbon group
 local ribbon = display.newGroup()
 ribbon:addEventListener( "touch", ribbonScroll )
-ribbon.x = ribbonX
-ribbon.y = ribbonY
+ribbon.x = ribbonX -- use variables from top
+ribbon.y = ribbonY -- use variables from top
 
 
 -- Create blocks - Generate blocks based on block count
