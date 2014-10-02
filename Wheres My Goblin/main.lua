@@ -1,23 +1,25 @@
 -- local variables, adjust these settings as needed
 local blockCount = 5
-local blockWidth = 600
+local blockWidth = 500
 local blockHeight = blockWidth/1.5
 local blockMargin = 15
+
+
+-- more local variables, don't touch
 --local ribbonLength = (blockWidth + blockMargin)*blockCount
 local ribbonX = (display.contentWidth - blockWidth)/2 - blockMargin
 local ribbonY = 600
--- store strating X value for future reference
-local ribbonStartX = ribbonX
+local ribbonStartX = ribbonX -- store starting X value for future reference
 --local ribbonEndX = (ribbonLength - display.contentWidth + blockMargin) * -1
 local activeBlock = 1
-local activeBlockCenter
+local activeBlockSnap = ribbonX
 
 
 -- DEBUG
 local ribbonXText = display.newText( "Ribbon X: " .. ribbonX, display.contentCenterX, 50, native.systemFont, 30 )
 local ribbonStartXText = display.newText( "Ribbon Start X: " .. ribbonStartX, display.contentCenterX, 100, native.systemFont, 30 )
---local ribbonLengthText = display.newText( "Ribbon Length: " .. ribbonLength, display.contentCenterX, 150, native.systemFont, 30 )
-local activeBlockText = display.newText( "ActiveBlock: " .. activeBlock, display.contentCenterX, 200, native.systemFont, 30 )
+local activeBlockText = display.newText( "Active Block: " .. activeBlock, display.contentCenterX, 150, native.systemFont, 30 )
+local activeBlockSnapText = display.newText( "Active Block Snap: " .. activeBlockSnap, display.contentCenterX, 200, native.systemFont, 30 )
 
 
 -- Hit Check - rectangle-based collision detection
@@ -33,7 +35,7 @@ local function hasCollided( obj1, obj2 )
 end
 
 
--- Generate Block End Values
+-- Generate Block End values
 -- Since we can't dynamically generate variable names, we create a table/array to store and retrieve values
 local blockEnd = {}
 -- our first block end requires a different formula than the others because it starts with a positive X value and not at 0
@@ -46,23 +48,34 @@ for i=2, blockCount do
 end
 
 
--- Active block check
-local function getActiveBlock( currentX )
-    if ( currentX < blockEnd[3] ) and ( currentX > blockEnd[4] ) then
-        activeBlock = 4
-    elseif ( currentX < blockEnd[2] ) and ( currentX > blockEnd[3] ) then
-        activeBlock = 3
-    elseif ( currentX < blockEnd[1] ) and ( currentX > blockEnd[2] ) then
-        activeBlock = 2
-    elseif ( currentX > blockEnd[1] ) then
-        activeBlock = 1
-    end
-    -- debug
-    activeBlockText.text = "ActiveBlock: " .. activeBlock
+-- Generate Block Center values
+local blockSnap = {}
+for i=1, blockCount do
+    blockSnap[i] = blockEnd[i] + (blockWidth/2) + blockMargin;
+    print( blockSnap[i] )
 end
 
 
--- Event function for icon button interaction
+-- Active block check, compare ribbon's current x pos to block end positions to determine active block
+local function getActiveBlock( currentX )
+    for i=1, blockCount do
+        -- first block needs conditions to be checked
+        if ( i == 1 ) and ( currentX > blockEnd[1] ) then
+            activeBlock =  i
+            activeBlockSnap = blockSnap[i]
+        -- all other blocks follow same pattern
+        elseif ( i ~= 1 ) and ( currentX < blockEnd[i-1] ) and ( currentX > blockEnd[i] ) then
+            activeBlock = i
+            activeBlockSnap = blockSnap[i]
+        end
+    end
+    -- debug
+    activeBlockText.text = "Active Block: " .. activeBlock
+    activeBlockSnapText.text = "Active Block Snap: " .. activeBlockSnap
+end
+
+
+-- Event function for ribbon interaction
 local function ribbonScroll( event )
     -- ON PRESS:
     if ( event.phase == "began" ) then
@@ -91,13 +104,15 @@ local function ribbonScroll( event )
                 --    transition.to( event.target, { time=0, x=ribbonEnd } ) 
                 --end
         -- ON RELEASE: 
-        elseif ( event.phase == "ended" or event.phase == "cancelled" ) then        
+        elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
+            -- snap to nearest block
+            transition.to( event.target, { time=150, x=activeBlockSnap } )        
             -- remove button focus once finger is lifted from screen
             display.getCurrentStage():setFocus( nil )
             event.target.isFocus = false 
         end
     end
-    -- on event functions, always return true to prevent touch propagation to underlying objects
+    -- for event functions, always return true to prevent touch propagation to underlying objects
     return true  
 end
 
@@ -115,20 +130,13 @@ ribbon.x = ribbonX
 ribbon.y = ribbonY
 
 
--- Automatically calculate block layout within parent group based on height, width and margin values.
-local function createBlock( blockName, blockNum )
-    local blockName = display.newRect( blockWidth/2, 0, blockWidth, blockHeight )
-    blockName.x = (( blockMargin + blockWidth ) * blockNum) - blockWidth/2
-    -- Add to group with a separate function so that x, y values are relative to top, left
-    blockName.group = ribbon
-    blockName.group:insert( blockName )
-end
-
-
--- Generate actual blocks using For loop, once for each block in the blockCount variable
--- for i=minVal, max value do
+-- Create blocks - Generate blocks based on block count
+local block = {}
 for i=1, blockCount do
-    local blockTitle = "block" .. i
-    --print ( blockTitle )
-    createBlock( blockTitle, i )
+    -- Automatically calculate block layout within parent group based on height, width and margin values.
+    block[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight )
+    block[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
+    -- Add to group, x, y values are relative to top, left
+    ribbon:insert( block[i] )
 end
+
