@@ -1,0 +1,45 @@
+3 ribbons - top, middle, bottom (head, body, legs)
+swipe left or right, ribbon moves
+ribbon needs to stop with body part centered on screen
+
+ipad screen dimensions 640x960 ?
+image width 600
+image height 300
+images per ribbon 10
+
+
+centerHitArea
+
+on button press 
+	get button ID
+on release,
+	if any part of button is touching center hit area
+		use button ID to determine where group must move to in order to 'snap' to center
+		ribbon has 10 divisions. If button 2 is touching move ribbon to division 2 center
+	elseif button is not touching
+		see if button is to left (x less than) or right (x greater than) of center
+		if button is left, move to next right button center
+		if button is right, move to previous left button center
+
+
+transition.moveTo()
+on slow drag, on release - snap to nearest center (left/right)
+on swipe (left/right) - move to next center point (left/right)
+
+
+local blockWidth = 450
+local blockMargin = 15
+local blockCount = 5
+local blockXWidth = (blockWidth + blockMargin) * -1
+
+start 0
+b1Start: 0 
+b1End: blockXWidth
+b2Start: b1End
+b2End: b2Start + blockXWidth
+b3Start: b2End
+b3End: b3Start + blockXWidth
+b4Start: b3End
+b4End: 
+block 5: end of block 4 to (450 + margin)
+
