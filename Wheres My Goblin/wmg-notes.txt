@@ -45,3 +45,13 @@ b4Start: b3End
 b4End: 
 block 5: end of block 4 to (450 + margin)
 
+TO DO:
+
+Randomize button 
+	generate three random numbers
+	store values as correct answer
+	move ribbons to appropriate randomized block
+Submit button
+	compare current user selections (3 vars) to correct answer blocks
+	return right/wrong message (audio)
+
