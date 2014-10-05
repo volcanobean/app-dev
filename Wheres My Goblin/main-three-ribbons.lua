@@ -1,10 +1,10 @@
 -- local variables
 -- Block settings - adjust these settings as needed
 
-local blockCount = 25
-local blockWidth = 600
-local blockHeight = 250
-local blockMargin = 30
+local blockCount = 5
+local blockWidth = 500
+local blockHeight = blockWidth/2
+local blockMargin = 15
 
 -- Adjust y position of ribbons
 
@@ -188,23 +188,6 @@ local function ribbonScroll( event )
     -- for event functions, always return true to prevent touch propagation to underlying objects
     return true  
 end
-
-
--- Randomize function
-
-local function randomizeBlocks()  
-    local ribbonCount = 3
-    for i=1, 3 do
-        local randomNum = math.random( blockCount )
-        print( randomNum )
-        ribbon[i].activeBlock = randomNum
-        ribbon[i].debug.text = "R" .. i .. " Active Block: " .. ribbon[i].activeBlock
-        transition.to( ribbon[i], { time=800, x=blockEnd[randomNum] + blockWidth/2 + blockMargin } )
-    end
-end
-
-local randomizeBtn = display.newText( "--RANDOMIZE--", 200, 150, native.systemFont, 30 )
-randomizeBtn:addEventListener( "tap", randomizeBlocks )
 
 
 -- Create guide for center of screen
