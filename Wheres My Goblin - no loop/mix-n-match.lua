@@ -7,8 +7,6 @@
 local composer = require( "composer" )
 local scene = composer.newScene()
 
-local _myG = composer.myGlobals
-
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
 -- -----------------------------------------------------------------------------------------------------------------
@@ -26,22 +24,37 @@ local _myG = composer.myGlobals
 function scene:create( event )
     local sceneGroup = self.view
 
-    -- My global variables (_myG.) - The following variables are all assigned in the main.lua file for this project:
-    -- blockCount, blockWidth, blockHeight, blockMargin, ribbonY1, ribbonY2, ribbonY3, ribbonLooping
+    -- local variables
+    -- Block settings - adjust these settings as needed
 
-    -- create ribbon table/array for storage of ribbon pieces/variables later in this file
+    local blockCount = 10
+    local blockWidth = 600
+    local blockHeight = 250
+    local blockMargin = 15
+
+    -- Adjust y position of ribbons
+
+    local ribbonY1 = 320
+    local ribbonY2 = 585
+    local ribbonY3 = 850
+
+    -- Set whether ribbon images should repeat, ie. scroll continuiosly
+
+    local ribbonLooping = true
+
+    -- create ribbon table/array for storage of multiple ribbon variables later
 
     local ribbon = {}
 
-    -- more local variables
+    -- more local variables, don't touch
 
-    local ribbonX = (display.contentWidth - _myG.blockWidth)/2 - _myG.blockMargin
+    local ribbonX = (display.contentWidth - blockWidth)/2 - blockMargin
     local ribbonStartX = ribbonX -- store starting X value for future reference
     local activeBlock = 1
     local activeBlockSnap = ribbonX
     local activeRibbon = 1
 
-    -- Swipe variables
+    -- Create swipe variables
 
     local touchStartX = 0
     local touchEndX = 0
@@ -52,17 +65,11 @@ function scene:create( event )
 
     -- DEBUG
 
-    --local blockCountText = display.newText( "Block Count: " .. _myG.blockCount, 200, 50, native.systemFont, 30 )
-    --sceneGroup:insert( blockCountText )
+    local blockCountText = display.newText( "Block Count: " .. blockCount, 200, 50, native.systemFont, 30 )
+    sceneGroup:insert( blockCountText )
     
     local activeRibbonText = display.newText( "Active Ribbon: " .. activeRibbon, 200, 90, native.systemFont, 30 )
     sceneGroup:insert( activeRibbonText )
-
-    local matchBlocksText = display.newText( "Head: " .. _myG.matchBlocks[1] .. ", Body: " .. _myG.matchBlocks[2] .. ", Legs: " .. _myG.matchBlocks[3], 575, 1000, native.systemFont, 30 )
-    sceneGroup:insert( matchBlocksText )
-
-    local activeBlocksText
-
     --local ribbonXText = display.newText( "Ribbon X: " .. ribbonX, display.contentCenterX, 50, native.systemFont, 30 )
     --local ribbonStartXText = display.newText( "Ribbon Start X: " .. ribbonStartX, display.contentCenterX, 90, native.systemFont, 30 )
     --local activeBlockSnapText = display.newText( "Active Block Snap: " .. activeBlockSnap, display.contentCenterX, 170, native.systemFont, 30 )
@@ -75,11 +82,11 @@ function scene:create( event )
     -- Since we can't dynamically generate variable names, we create a table/array to store and retrieve values
     local blockEnd = {}
     -- our first block end requires a different formula than the others because it starts with a positive X value and not at 0
-    blockEnd[1] = (_myG.blockWidth/2 + _myG.blockMargin - ribbonStartX) * -1
+    blockEnd[1] = (blockWidth/2 + blockMargin - ribbonStartX) * -1
     -- print( blockEnd[1] )
     -- starting with block 2 generate block end values, for use in finding the current active block based on parent group's x position
-    for i=2, _myG.blockCount do
-        blockEnd[i] = blockEnd[1] - ((_myG.blockWidth + _myG.blockMargin) * (i - 1))
+    for i=2, blockCount do
+        blockEnd[i] = blockEnd[1] - ((blockWidth + blockMargin) * (i - 1))
         -- print( blockEnd[i] )
     end
 
@@ -87,8 +94,8 @@ function scene:create( event )
     -- Generate Block Center values
 
     local blockSnap = {}
-    for i=1, _myG.blockCount do
-        blockSnap[i] = blockEnd[i] + (_myG.blockWidth/2) + _myG.blockMargin;
+    for i=1, blockCount do
+        blockSnap[i] = blockEnd[i] + (blockWidth/2) + blockMargin;
         -- print( blockSnap[i] )
     end
 
@@ -110,7 +117,7 @@ function scene:create( event )
     -- Active block check, compare current ribbon's current x pos to block end positions to determine active block
 
     local function getActiveBlock( currentX, ribbonNum )
-        for i=1, _myG.blockCount do
+        for i=1, blockCount do
             -- first block needs unique conditions to be checked
             if ( i == 1 ) and ( currentX > blockEnd[1] ) then
                 ribbon[ribbonNum].activeBlock =  i
@@ -123,7 +130,7 @@ function scene:create( event )
         end
         -- debug
         activeRibbonText.text = "Active Ribbon: " .. ribbonNum
-        activeBlocksText.text = "Head: " .. ribbon[1].activeBlock .. ", Body: " .. ribbon[2].activeBlock .. ", Legs: " .. ribbon[3].activeBlock
+        ribbon[ribbonNum].debug.text = "R" .. ribbonNum .. " Active Block: " .. ribbon[ribbonNum].activeBlock
     end
 
 
@@ -178,13 +185,13 @@ function scene:create( event )
                     -- if releasing a swipe:
                     if  ( touchEndX < touchStartX) then
                         -- swipe left
-                        if(ribbon[activeRibbon].activeBlock ~= _myG.blockCount) then
+                        if(ribbon[activeRibbon].activeBlock ~= blockCount) then
                             nextBlockSnap = ribbon[activeRibbon].activeBlock + 1
                             transition.to( event.target, { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap] } )
                             -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
                             ribbon[activeRibbon].activeBlock = nextBlockSnap
                             -- debug
-                            activeBlocksText.text = "Head: " .. ribbon[1].activeBlock .. ", Body: " .. ribbon[2].activeBlock .. ", Legs: " .. ribbon[3].activeBlock
+                            ribbon[activeRibbon].debug.text = "R" .. activeRibbon .. " Active Block: " .. ribbon[activeRibbon].activeBlock
                         else
                             -- snap to nearest block
                             transition.to( event.target, { time=150, x=activeBlockSnap } )     
@@ -196,7 +203,7 @@ function scene:create( event )
                             transition.to( event.target, { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap] } )     
                             ribbon[activeRibbon].activeBlock = nextBlockSnap
                             --debug
-                            activeBlocksText.text = "Head: " .. ribbon[1].activeBlock .. ", Body: " .. ribbon[2].activeBlock .. ", Legs: " .. ribbon[3].activeBlock
+                            ribbon[activeRibbon].debug.text = "R" .. activeRibbon .. " Active Block: " .. ribbon[activeRibbon].activeBlock
                         else
                             -- snap to nearest block
                             transition.to( event.target, { time=150, x=activeBlockSnap } ) 
@@ -219,16 +226,16 @@ function scene:create( event )
 
     local function randomizeBlocks()  
         local ribbonCount = 3
-        for i=1, ribbonCount do
-            local randomNum = math.random( _myG.blockCount )
+        for i=1, 3 do
+            local randomNum = math.random( blockCount )
             --print( randomNum )
             ribbon[i].activeBlock = randomNum
-            transition.to( ribbon[i], { time=800, x=blockEnd[randomNum] + _myG.blockWidth/2 + _myG.blockMargin } )
+            ribbon[i].debug.text = "R" .. i .. " Active Block: " .. ribbon[i].activeBlock
+            transition.to( ribbon[i], { time=800, x=blockEnd[randomNum] + blockWidth/2 + blockMargin } )
         end
-        activeBlocksText.text = "Head: " .. ribbon[1].activeBlock .. ", Body: " .. ribbon[2].activeBlock .. ", Legs: " .. ribbon[3].activeBlock
     end
 
-    local randomizeBtn = display.newText( "--RANDOMIZE--", 575, 75, native.systemFont, 30 )
+    local randomizeBtn = display.newText( "--RANDOMIZE--", 200, 150, native.systemFont, 30 )
     randomizeBtn:addEventListener( "tap", randomizeBlocks )
     sceneGroup:insert( randomizeBtn )
 
@@ -246,73 +253,71 @@ function scene:create( event )
     ribbon[1] = display.newGroup()
     ribbon[1]:addEventListener( "touch", ribbonScroll )
     ribbon[1].x = ribbonX -- use variables from top
-    ribbon[1].y = _myG.ribbonY1
+    ribbon[1].y = ribbonY1
     ribbon[1].id = 1
     ribbon[1].activeBlock = 1
+    ribbon[1].debug = display.newText( "R1 Active Block: " .. ribbon[1].activeBlock, 560, 50, native.systemFont, 30 )
     sceneGroup:insert( ribbon[1] )
+    sceneGroup:insert( ribbon[1].debug )
 
     ribbon[2] = display.newGroup()
     ribbon[2]:addEventListener( "touch", ribbonScroll )
     ribbon[2].x = ribbonX
-    ribbon[2].y = _myG.ribbonY2
+    ribbon[2].y = ribbonY2
     ribbon[2].id = 2
     ribbon[2].activeBlock = 1
+    ribbon[2].debug = display.newText( "R2 Active Block: " .. ribbon[2].activeBlock, 560, 90, native.systemFont, 30 )
     sceneGroup:insert( ribbon[2] )
+    sceneGroup:insert( ribbon[2].debug )
 
     ribbon[3] = display.newGroup()
     ribbon[3]:addEventListener( "touch", ribbonScroll )
     ribbon[3].x = ribbonX
-    ribbon[3].y = _myG.ribbonY3
+    ribbon[3].y = ribbonY3
     ribbon[3].id = 3
     ribbon[3].activeBlock = 1
+    ribbon[3].debug = display.newText( "R3 Active Block: " .. ribbon[3].activeBlock, 560, 130, native.systemFont, 30 )
     sceneGroup:insert( ribbon[3] )
-
-    activeBlocksText = display.newText( "Head: " .. ribbon[1].activeBlock .. ", Body: " .. ribbon[2].activeBlock .. ", Legs: " .. ribbon[3].activeBlock, 575, 25, native.systemFont, 30 )
-    sceneGroup:insert( activeBlocksText )
+    sceneGroup:insert( ribbon[3].debug )
 
     -- Create blocks - Generate blocks based on block count
     -- populate blocks with images at a later date
 
-    local block1a = {}
-    for i=1, _myG.blockCount do
+    local block = {}
+    for i=1, blockCount do
         -- Automatically calculate block layout within parent group based on height, width and margin values.
-        block1a[i] = display.newRect( _myG.blockWidth/2, 0, _myG.blockWidth, _myG.blockHeight )
-        block1a[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth/2
+        block[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight )
+        block[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
         -- Add to group, x, y values are relative to top, left
-        ribbon[1]:insert( block1a[i] )
+        ribbon[1]:insert( block[i] )
     end
 
     local block2 = {}
-    for i=1, _myG.blockCount do
+    for i=1, blockCount do
         -- Automatically calculate block layout within parent group based on height, width and margin values.
-        block2[i] = display.newRect( _myG.blockWidth/2, 0, _myG.blockWidth, _myG.blockHeight )
-        block2[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth/2
+        block2[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight )
+        block2[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
         -- Add to group, x, y values are relative to top, left
         ribbon[2]:insert( block2[i] )
     end
 
     local block3 = {}
-    for i=1, _myG.blockCount do
+    for i=1, blockCount do
         -- Automatically calculate block layout within parent group based on height, width and margin values.
-        block3[i] = display.newRect( _myG.blockWidth/2, 0, _myG.blockWidth, _myG.blockHeight )
-        block3[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth/2
+        block3[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight )
+        block3[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
         -- Add to group, x, y values are relative to top, left
         ribbon[3]:insert( block3[i] )
     end
 
-    -- create block comparison button
-    local function compareBlocks() 
-        --composer.gotoScene( "start-screen", "fade", 400 )
-        if( _myG.matchBlocks[1] == ribbon[1].activeBlock ) and ( _myG.matchBlocks[2] == ribbon[2].activeBlock ) and ( _myG.matchBlocks[3] == ribbon[3].activeBlock ) then
-            print ( "Match!" )
-        else
-            print ( "Not a match." )
-        end
+    -- create back to start button
+    local function backToStart() 
+        composer.gotoScene( "start-screen", "fade", 400 )
     end
 
-    local compareBtn = display.newText( "--compare--", 100, 1000, native.systemFont, 30 )
-    compareBtn:addEventListener( "tap", compareBlocks )
-    sceneGroup:insert( compareBtn )
+    local backBtn = display.newText( "<--BACK TO START", display.contentCenterX, 1000, native.systemFont, 30 )
+    backBtn:addEventListener( "tap", backToStart )
+    sceneGroup:insert( backBtn )
 
 end
 
