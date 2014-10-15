@@ -1,10 +1,24 @@
+-- Block settings - adjust these settings as needed
+
 local scrollGroupX = 0
 local scrollGroupXText = display.newText( "X: " .. scrollGroupX, display.contentCenterX, 50, native.systemFont, 30 )
 
 local blockGroup1 
 local blockGroup2
 
-local blockWidth = 900
+local blockCount = 3
+local blockWidth = 300
+local blockHeight = 250
+local blockMargin = 15
+
+local ribbonX = (display.contentWidth - blockWidth)/2 - blockMargin
+local ribbonStartX = ribbonX -- store starting X value for future reference
+
+local blockGroupWidth = (blockWidth+blockMargin)*blockCount
+local blockGroupCenter = ribbonStartX - ( blockGroupWidth/2 - blockWidth/2 - blockMargin/2 )
+
+local blockGroupText = display.newText( "Start X: " .. ribbonStartX .. ", Width: " .. blockGroupWidth .. ", Center: " .. blockGroupCenter, display.contentCenterX, 90, native.systemFont, 30 )
+
 
 -- Event function for ribbon drag/scroll interactions
 
@@ -28,12 +42,12 @@ local function scrollMe( event )
             scrollGroupXText.text = "X: " .. event.target.x
 
             -- group swap
-            if ( event.target.x > 10 ) then
+            if ( event.target.x > blockGroupCenter ) then
                 -- invert blockGroup2 to the left
-                blockGroup2.x = blockWidth/2 * -1
-            elseif ( event.target.x < -120 ) then
+                blockGroup2.x = -blockGroupWidth
+            elseif ( event.target.x < blockGroupCenter ) then
                 -- move blockGroup2 back to the right
-                blockGroup2.x = blockWidth/2 + blockWidth
+               blockGroup2.x = blockGroupWidth
             end
 
         -- ON RELEASE: 
@@ -50,30 +64,43 @@ end
 -- Create guide for center of screen
 
 --display.newRect( parent, x, y, width, height )
-local centerArea = display.newRect( display.contentCenterX, 500, 10, 1000 )
-centerArea:setFillColor( 0, 1, 1, 0.25 )
+local centerRule = display.newRect( display.contentCenterX, 500, 10, 1000 )
+centerRule:setFillColor( 0, 1, 1, 0.25 )
 
 local scrollGroup = display.newGroup()
 scrollGroup:addEventListener( "touch", scrollMe )
 scrollGroup.y = 400
-scrollGroup.x = 0
+scrollGroup.x = ribbonX
 --scrollGroup.x = (display.contentWidth - blockWidth)/2
 
 -- block groups inside scroll group
 blockGroup1 = display.newGroup()
 scrollGroup:insert( blockGroup1 )
-blockGroup1.x = blockWidth/2
+blockGroup1.x = 0
+--blockGroup1.x = blockGroupWidth/2
 
 blockGroup2 = display.newGroup()
 scrollGroup:insert( blockGroup2 )
-blockGroup2.x = blockWidth/2 + blockWidth
+blockGroup2.x = -blockGroupWidth
+--blockGroup2.x = blockGroupWidth/2 + blockGroupWidth
 --blockGroup2.x = blockWidth/2 * -1
 
--- colored block placeholders
-local blockMock1 = display.newRect( 0, 0, blockWidth, 200 )
-blockMock1:setFillColor( 0, 1, 1, 0.25 )
-blockGroup1:insert( blockMock1 )
+local blocks1 = {}
+for i=1, blockCount do
+    -- Automatically calculate block layout within parent group based on height, width and margin values.
+    blocks1[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight )
+    blocks1[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
+    blocks1[i]:setFillColor( 0, 1, 1, 0.25 )
+    -- Add to group, x, y values are relative to top, left
+    blockGroup1:insert( blocks1[i] )
+end
 
-local blockMock2 = display.newRect( 0, 0, blockWidth, 200 )
-blockMock2:setFillColor( 1, 0, 1, 0.25 )
-blockGroup2:insert( blockMock2 )
+local blocks2 = {}
+for i=1, blockCount do
+    -- Automatically calculate block layout within parent group based on height, width and margin values.
+    blocks2[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight )
+    blocks2[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
+    blocks2[i]:setFillColor( 1, 0, 1, 0.25 )
+    -- Add to group, x, y values are relative to top, left
+    blockGroup2:insert( blocks2[i] )
+end
