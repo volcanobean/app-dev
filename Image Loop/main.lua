@@ -13,8 +13,10 @@ local blockMargin = 15
 
 local activeBlock = 1
 local activeBlockSnap = ribbonX
-local activeBlockText = display.newText( "Active Block: " .. activeBlock, display.contentCenterX, 130, native.systemFont, 30 )
+local blockRegion = "center"
+local activeBlockText = display.newText( "Active Block: " .. activeBlock .. ", Region: " .. blockRegion, display.contentCenterX, 130, native.systemFont, 30 )
 
+local shiftTimer
 
 local ribbonX = (display.contentWidth - blockWidth)/2 - blockMargin
 -- store starting X value for future reference
@@ -60,10 +62,10 @@ for i=1, blockCount do
 end
 
 
--- Active block check, compare current x pos to block end positions to determine active block
+-- Active block check, compare current x pos to block end positions to determine active block (left, right or center)
 
 local function getActiveBlock( currentX )
-    -- if we're to the right of the main blocks
+    -- if we're to the right of the main blocks (negative x pos)
     if( currentX < blockEnd[blockCount] ) then
         for i=1, blockCount do
             -- first block needs unique conditions to be checked
@@ -76,10 +78,11 @@ local function getActiveBlock( currentX )
                 activeBlockSnap = blockSnapRight[i]
             end
         end
+        blockRegion = "right"
         -- debug
-        activeBlockText.text = "Active Block: " .. activeBlock .. " ->"
+        activeBlockText.text = "Active Block: " .. activeBlock .. " ->" .. ", Region: " .. blockRegion
     
-    -- if we're to the left of the main blocks
+    -- if we're to the left of the main blocks (positive x pos)
     elseif( currentX > (ribbonStartX + blockWidth/2)) then
          for i=1, blockCount do
             -- first block needs unique conditions to be checked
@@ -92,8 +95,9 @@ local function getActiveBlock( currentX )
                 activeBlockSnap = blockSnapLeft[i]
             end
         end
+        blockRegion = "left"
         -- debug
-        activeBlockText.text = "<- Active Block: " .. activeBlock
+        activeBlockText.text = "<- Active Block: " .. activeBlock .. ", Region: " .. blockRegion
 
     -- if x pos is in the main block area
     else
@@ -108,9 +112,41 @@ local function getActiveBlock( currentX )
                 activeBlockSnap = blockSnap[i]
             end
         end
+        blockRegion = "center"
         -- debug
-        activeBlockText.text = "Active Block: " .. activeBlock
+        activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion
     end
+    print ( blockRegion )
+end
+
+-- Shift position of scond group to right or left side of main group depending on X pos
+
+local function groupSwap( target )
+    if ( target.x > blockGroupCenter ) then
+        -- invert blockGroup2 to the left
+        blockGroup2.x = -blockGroupWidth
+    elseif ( target.x < blockGroupCenter ) then
+        -- move blockGroup2 back to the right
+        blockGroup2.x = blockGroupWidth
+    end
+end
+
+-- Move scrollGroup to center X pos if coming from left or right
+
+local function shiftToCenter( target )
+    local shiftX
+    if ( blockRegion == "right" ) then
+        shiftX = activeBlockSnap + blockGroupWidth
+    elseif  ( blockRegion == "left" ) then
+        shiftX = activeBlockSnap - blockGroupWidth
+    end
+    -- move scrollGroup to relative center X pos
+    target.x=shiftX
+    -- recheck active block values
+    getActiveBlock( target.x )
+    -- swap groups as needed
+    groupSwap( target )
+    --activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion 
 end
 
 
@@ -135,14 +171,8 @@ local function scrollMe( event )
             -- debug
             scrollGroupXText.text = "X: " .. event.target.x
 
-            -- group swap
-            if ( event.target.x > blockGroupCenter ) then
-                -- invert blockGroup2 to the left
-                blockGroup2.x = -blockGroupWidth
-            elseif ( event.target.x < blockGroupCenter ) then
-                -- move blockGroup2 back to the right
-               blockGroup2.x = blockGroupWidth
-            end
+            -- Swap groups as needed
+            groupSwap( event.target )
 
             -- Check for active block
             getActiveBlock( event.target.x )
@@ -153,7 +183,12 @@ local function scrollMe( event )
             display.getCurrentStage():setFocus( nil )
             event.target.isFocus = false
 
-            transition.to( event.target, { time=150, x=activeBlockSnap } )
+            -- if we have stopped on a block in the right or left area, shift back to center
+            if( blockRegion ~= "center" ) then
+                transition.to( event.target, { time=150, x=activeBlockSnap, onComplete=shiftToCenter } )
+            else
+                transition.to( event.target, { time=150, x=activeBlockSnap } )
+            end
         end
     end
     -- for event functions, always return true to prevent touch propagation to underlying objects
