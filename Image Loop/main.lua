@@ -27,11 +27,21 @@ local blockGroupWidth = (blockWidth+blockMargin)*blockCount
 local blockGroupCenter = ribbonStartX - ( blockGroupWidth/2 - blockWidth/2 - blockMargin/2 )
 local blockGroupText = display.newText( "Start X: " .. ribbonStartX .. ", Width: " .. blockGroupWidth .. ", Center: " .. blockGroupCenter, display.contentCenterX, 90, native.systemFont, 30 )
 
-
 -- Generate Block End values for center, left and right group positions
 local blockEnd = {}
 local blockEndRight = {}
 local blockEndLeft = {}
+
+
+-- Create swipe variables
+
+local touchStartX = 0
+local touchEndX = 0
+local touchTimer
+local touching
+local touchCommand
+local nextBlockSnap
+    
 
 -- block 1 requires a different formula than the others because it starts with a positive X value and not at 0
 blockEnd[1] = (blockWidth/2 + blockMargin - ribbonStartX) * -1
@@ -61,6 +71,18 @@ for i=1, blockCount do
     print( "Snap: " .. blockSnap[i] )
 end
 
+-- Function to check for a swipe vs a touch and drag
+
+local function swipeTimer()
+    -- On completion of timer...
+    -- It is a swipe if the user moves their finger left or right and then releases before the countdown ends.
+    if ( touchEndX ~= touchStartX ) and ( touching == false ) then
+       touchCommand = "swipe"
+    -- It is a drag if the user moves their finger up or down and does not release before the timer ends.
+    elseif ( touching == true ) then
+       touchCommand = "drag" 
+    end
+end
 
 -- Active block check, compare current x pos to block end positions to determine active block (left, right or center)
 
@@ -80,7 +102,7 @@ local function getActiveBlock( currentX )
         end
         blockRegion = "right"
         -- debug
-        activeBlockText.text = "Active Block: " .. activeBlock .. " ->" .. ", Region: " .. blockRegion
+        activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion
     
     -- if we're to the left of the main blocks (positive x pos)
     elseif( currentX > (ribbonStartX + blockWidth/2)) then
@@ -97,7 +119,7 @@ local function getActiveBlock( currentX )
         end
         blockRegion = "left"
         -- debug
-        activeBlockText.text = "<- Active Block: " .. activeBlock .. ", Region: " .. blockRegion
+        activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion
 
     -- if x pos is in the main block area
     else
@@ -159,9 +181,19 @@ local function scrollMe( event )
         display.getCurrentStage():setFocus( event.target )
         event.target.isFocus = true
         
+        -- touch has started. start timer
+        touching = true
+        touchTimer = timer.performWithDelay( 300, swipeTimer )
+        
         -- get touch position offset to prevent awkward snapping of ribbon to user's finger
         event.target.offset = event.x - event.target.x
         scrollGroupXText.text = "X: " .. event.target.x
+
+        -- get initial touch positions to measure swipe
+        touchStartX = event.xStart
+        touchEndX = event.x
+
+        
 
     -- ON MOVE:
     elseif ( event.target.isFocus ) then
@@ -170,6 +202,9 @@ local function scrollMe( event )
             event.target.x = event.x - event.target.offset
             -- debug
             scrollGroupXText.text = "X: " .. event.target.x
+
+            -- track x and y movement, store as last positions touched
+            touchEndX = event.x
 
             -- Swap groups as needed
             groupSwap( event.target )
@@ -183,12 +218,50 @@ local function scrollMe( event )
             display.getCurrentStage():setFocus( nil )
             event.target.isFocus = false
 
-            -- if we have stopped on a block in the right or left area, shift back to center
-            if( blockRegion ~= "center" ) then
-                transition.to( event.target, { time=150, x=activeBlockSnap, onComplete=shiftToCenter } )
+            -- touch has ended
+            touching = false
+
+            -- check for swipe vs drag
+            if ( touchCommand == "swipe" ) then
+                -- if releasing a swipe:
+                if  ( touchEndX < touchStartX) then
+                    -- swipe left
+                    if(activeBlock ~= blockCount) then
+                        nextBlockSnap = activeBlock + 1
+                        transition.to( event.target, { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap] } )
+                        -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
+                        activeBlock = nextBlockSnap
+                        -- debug
+                        activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion
+                    else
+                        -- snap to nearest block
+                        transition.to( event.target, { time=150, x=activeBlockSnap } )     
+                    end
+                elseif ( touchEndX > touchStartX) then
+                    -- swipe right
+                    if(activeBlock ~= 1) then
+                        nextBlockSnap = activeBlock - 1
+                        transition.to( event.target, { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap] } )     
+                       activeBlock = nextBlockSnap
+                        --debug
+                        activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion
+                    else
+                        -- snap to nearest block
+                        transition.to( event.target, { time=150, x=activeBlockSnap } ) 
+                    end
+                end
             else
-                transition.to( event.target, { time=150, x=activeBlockSnap } )
+                -- Standard drag 
+                if( blockRegion ~= "center" ) then
+                    -- if we have stopped on a block in the right or left area, shift back to center
+                    transition.to( event.target, { time=150, x=activeBlockSnap, onComplete=shiftToCenter } )
+                else
+                    --  snap to nearest block
+                    transition.to( event.target, { time=150, x=activeBlockSnap } )
+                end
             end
+            -- clear touchCommand so it's not set incorrecty on the next button press
+            touchCommand = nil
         end
     end
     -- for event functions, always return true to prevent touch propagation to underlying objects
