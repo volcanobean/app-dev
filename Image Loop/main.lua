@@ -1,26 +1,30 @@
--- Block settings - adjust these settings as needed
+-- Block and ribbon settings - adjust these settings as needed.
 
-local scrollGroupX = 0
-local scrollGroupXText = display.newText( "X: " .. scrollGroupX, display.contentCenterX, 50, native.systemFont, 30 )
+local blockCount = 6
+local blockWidth = 600 -- replace with % instead of pixels later (responsive)
+local blockHeight = 350
+local blockMargin = 15
+
+local ribbonY1 = 400
+local ribbonY2 = 585
+local ribbonY3 = 850
+
+-- Local settings. Don't touch.
+
+local ribbon = {}
+
+local ribbonX = (display.contentWidth - blockWidth)/2 - blockMargin
+local ribbonStartX = ribbonX -- store starting X value for future reference
+local ribbonXText = display.newText( "X: " .. ribbonX, display.contentCenterX, 50, native.systemFont, 30 )
 
 local blockGroup1 
 local blockGroup2
 
-local blockCount = 10
-local blockWidth = 600 -- replace with % instead of pixels later
-local blockHeight = 250
-local blockMargin = 15
-
+local blockRegion = "center"
+local activeRibbon = 1
 local activeBlock = 1
 local activeBlockSnap = ribbonX
-local blockRegion = "center"
 local activeBlockText = display.newText( "Active Block: " .. activeBlock .. ", Region: " .. blockRegion, display.contentCenterX, 130, native.systemFont, 30 )
-
-local shiftTimer
-
-local ribbonX = (display.contentWidth - blockWidth)/2 - blockMargin
--- store starting X value for future reference
-local ribbonStartX = ribbonX 
 
 local blockGroupWidth = (blockWidth+blockMargin)*blockCount
 -- Get center point of block group, taking into account starting position X offset
@@ -32,9 +36,7 @@ local blockEnd = {}
 local blockEndRight = {}
 local blockEndLeft = {}
 
-
 -- Create swipe variables
-
 local touchStartX = 0
 local touchEndX = 0
 local touchTimer
@@ -102,7 +104,6 @@ local function getActiveBlock( currentX )
             end
         end
         blockRegion = "right"
-        --print( "C: " .. currentX )
         -- debug
         activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion
     
@@ -155,7 +156,7 @@ local function groupSwap( target )
     end
 end
 
--- Move scrollGroup to center X pos if coming from left or right
+-- Move ribbon to center X pos if coming from left or right
 
 local function shiftToCenter( target )
     local shiftX
@@ -165,7 +166,7 @@ local function shiftToCenter( target )
     elseif  ( blockRegion == "left" ) then
         shiftX = activeBlockSnap - blockGroupWidth
     end
-    -- move scrollGroup to relative center X pos
+    -- move ribbon to relative center X pos
     target.x=shiftX
     -- recheck active block values
     getActiveBlock( target.x )
@@ -173,13 +174,6 @@ local function shiftToCenter( target )
     groupSwap( target )
     --activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion 
      print("R after: " .. blockRegion)
-end
-
-local function swipeShiftToCenter( target, region )
-    print("R before: " .. blockRegion)
-    blockRegion = region
-    print("R before2: " .. blockRegion)
-    shiftToCenter( target )
 end
 
 
@@ -198,13 +192,11 @@ local function scrollMe( event )
         
         -- get touch position offset to prevent awkward snapping of ribbon to user's finger
         event.target.offset = event.x - event.target.x
-        scrollGroupXText.text = "X: " .. event.target.x
+        ribbonXText.text = "X: " .. event.target.x
 
         -- get initial touch positions to measure swipe
         touchStartX = event.xStart
         touchEndX = event.x
-
-        
 
     -- ON MOVE:
     elseif ( event.target.isFocus ) then
@@ -212,7 +204,7 @@ local function scrollMe( event )
             -- START DRAG:
             event.target.x = event.x - event.target.offset
             -- debug
-            scrollGroupXText.text = "X: " .. event.target.x
+            ribbonXText.text = "X: " .. event.target.x
 
             -- track x and y movement, store as last positions touched
             touchEndX = event.x
@@ -298,26 +290,46 @@ end
 local centerRule = display.newRect( display.contentCenterX, 500, 10, 1000 )
 centerRule:setFillColor( 0, 1, 1, 0.25 )
 
-local scrollGroup = display.newGroup()
-scrollGroup:addEventListener( "touch", scrollMe )
-scrollGroup.y = 400
-scrollGroup.x = ribbonX
+-- Create scrollable ribbon group
+
+ribbon[1] = display.newGroup()
+ribbon[1]:addEventListener( "touch", scrollMe )
+ribbon[1].x = ribbonX
+ribbon[1].y = ribbonY1
+ribbon[1].id = 1
+ribbon[1].activeBlock = 1
+--ribbon[1].debug = display.newText( "R1 Active Block: " .. ribbon[1].activeBlock, 560, 50, native.systemFont, 30 )
+--sceneGroup:insert( ribbon[1] )
+--sceneGroup:insert( ribbon[1].debug )
+
+-- add ribbon[2] and [3] here later
+
+
+-- Image sheets for body parts
+
+local headCount = 6
+local headSheet = graphics.newImageSheet( "images/head-sheet.png", { width=blockWidth, height=blockHeight, numFrames=headCount, sheetContentWidth=blockWidth, sheetContentHeight=blockHeight*headCount } )
+local headFrames =  { start=1, count=headCount }
+
+
 
 -- block groups inside scroll group
 blockGroup1 = display.newGroup()
-scrollGroup:insert( blockGroup1 )
+ribbon[1]:insert( blockGroup1 )
 blockGroup1.x = 0
 
 blockGroup2 = display.newGroup()
-scrollGroup:insert( blockGroup2 )
+ribbon[1]:insert( blockGroup2 )
 blockGroup2.x = -blockGroupWidth
 
 local blocks1 = {}
 for i=1, blockCount do
     -- Automatically calculate block layout within parent group based on height, width and margin values.
-    blocks1[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight )
+    blocks1[i] = display.newSprite( headSheet, headFrames )
+    blocks1[i]:setFrame(i)
+    -- blocks1[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight )
     blocks1[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
-    blocks1[i]:setFillColor( 0, 1, 1, 0.25 )
+    --blocks1[i]:setFillColor( 0, 1, 1, 0.25 )
     -- Add to group, x, y values are relative to top, left
     blockGroup1:insert( blocks1[i] )
 end
@@ -325,9 +337,9 @@ end
 local blocks2 = {}
 for i=1, blockCount do
     -- Automatically calculate block layout within parent group based on height, width and margin values.
-    blocks2[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight )
+    blocks2[i] = display.newSprite( headSheet, headFrames )
+    blocks2[i]:setFrame(i)
     blocks2[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
-    blocks2[i]:setFillColor( 1, 0, 1, 0.25 )
     -- Add to group, x, y values are relative to top, left
     blockGroup2:insert( blocks2[i] )
 end
