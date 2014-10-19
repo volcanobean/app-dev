@@ -2,11 +2,13 @@
 
 local blockCount = 6
 local blockWidth = 600 -- replace with % instead of pixels later (responsive)
-local blockHeight = 350
 local blockMargin = 15
 
-local ribbonY1 = 400
-local ribbonY2 = 585
+local blockHeight1 = 350
+local blockHeight2 = 250
+local blockHeight3 = 250
+local ribbonY1 = 350
+local ribbonY2 = 575
 local ribbonY3 = 850
 
 -- Local settings. Don't touch.
@@ -17,14 +19,15 @@ local ribbonX = (display.contentWidth - blockWidth)/2 - blockMargin
 local ribbonStartX = ribbonX -- store starting X value for future reference
 local ribbonXText = display.newText( "X: " .. ribbonX, display.contentCenterX, 50, native.systemFont, 30 )
 
-local blockGroup1 
-local blockGroup2
+-- duplicate image blocks for the purpose of x pos swapping to simulate loop
+local blockGroupA = {}
+local blockGroupB = {}
 
 local blockRegion = "center"
 local activeRibbon = 1
-local activeBlock = 1
+local activeBlock = 1 -- temp placeholder
 local activeBlockSnap = ribbonX
-local activeBlockText = display.newText( "Active Block: " .. activeBlock .. ", Region: " .. blockRegion, display.contentCenterX, 130, native.systemFont, 30 )
+local activeBlockText = display.newText( "ARibbon: " .. activeRibbon .. ", ABlock: " .. activeBlock .. ", Region: " .. blockRegion, display.contentCenterX, 130, native.systemFont, 30 )
 
 local blockGroupWidth = (blockWidth+blockMargin)*blockCount
 -- Get center point of block group, taking into account starting position X offset
@@ -89,70 +92,70 @@ end
 
 -- Active block check, compare current x pos to block end positions to determine active block (left, right or center)
 
-local function getActiveBlock( currentX )
+local function getActiveBlock( currentX, ribbonNum )
     -- if we're to the right of the main blocks (negative x pos)
     if( currentX < blockEnd[blockCount] ) then
         for i=1, blockCount do
             -- first block needs unique conditions to be checked
             if ( i == 1 ) and ( currentX > blockEndRight[1] ) then
-                activeBlock =  i
+                ribbon[ribbonNum].activeBlock =  i
                 activeBlockSnap = blockSnapRight[i]
             -- all other blocks follow same pattern
             elseif ( i ~= 1 ) and ( currentX < blockEndRight[i-1] ) and ( currentX > blockEndRight[i] ) then
-                activeBlock = i
+                ribbon[ribbonNum].activeBlock = i
                 activeBlockSnap = blockSnapRight[i]
             end
         end
         blockRegion = "right"
         -- debug
-        activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion
+        activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
     
     -- if we're to the left of the main blocks (positive x pos)
     elseif( currentX > (ribbonStartX + blockWidth/2)) then
          for i=1, blockCount do
             -- first block needs unique conditions to be checked
             if ( i == 1 ) and ( currentX > blockEndLeft[1] ) then
-                activeBlock =  i
+                ribbon[ribbonNum].activeBlock =  i
                 activeBlockSnap = blockSnapLeft[i]
             -- all other blocks follow same pattern
             elseif ( i ~= 1 ) and ( currentX < blockEndLeft[i-1] ) and ( currentX > blockEndLeft[i] ) then
-                activeBlock = i
+                ribbon[ribbonNum].activeBlock = i
                 activeBlockSnap = blockSnapLeft[i]
             end
         end
         blockRegion = "left"
         -- debug
-        activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion
+        activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
 
     -- if x pos is in the main block area
     else
         for i=1, blockCount do
             -- first block needs unique conditions to be checked
             if ( i == 1 ) and ( currentX > blockEnd[1] ) then
-                activeBlock =  i
+                ribbon[ribbonNum].activeBlock =  i
                 activeBlockSnap = blockSnap[i]
             -- all other blocks follow same pattern
             elseif ( i ~= 1 ) and ( currentX < blockEnd[i-1] ) and ( currentX > blockEnd[i] ) then
-                activeBlock = i
+                ribbon[ribbonNum].activeBlock = i
                 activeBlockSnap = blockSnap[i]
             end
         end
         blockRegion = "center"
         -- debug
-        activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion
+        activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
     end
     --print ( blockRegion )
 end
 
 -- Shift position of scond group to right or left side of main group depending on X pos
 
-local function groupSwap( target )
+local function groupSwap( target, ribbonNum )
     if ( target.x > blockGroupCenter ) then
         -- invert blockGroup2 to the left
-        blockGroup2.x = -blockGroupWidth
+        blockGroupB[ribbonNum].x = -blockGroupWidth
     elseif ( target.x < blockGroupCenter ) then
         -- move blockGroup2 back to the right
-        blockGroup2.x = blockGroupWidth
+        blockGroupB[ribbonNum].x = blockGroupWidth
     end
 end
 
@@ -169,9 +172,9 @@ local function shiftToCenter( target )
     -- move ribbon to relative center X pos
     target.x=shiftX
     -- recheck active block values
-    getActiveBlock( target.x )
+    getActiveBlock( target.x, activeRibbon )
     -- swap groups as needed
-    groupSwap( target )
+    groupSwap( target, activeRibbon )
     --activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion 
      print("R after: " .. blockRegion)
 end
@@ -198,6 +201,9 @@ local function scrollMe( event )
         touchStartX = event.xStart
         touchEndX = event.x
 
+        -- set active ribbon
+        activeRibbon = event.target.id
+
     -- ON MOVE:
     elseif ( event.target.isFocus ) then
         if ( event.phase == "moved" ) then
@@ -210,16 +216,18 @@ local function scrollMe( event )
             touchEndX = event.x
 
             -- Swap groups as needed
-            groupSwap( event.target )
+            groupSwap( event.target, activeRibbon )
 
             -- Check for active block
-            getActiveBlock( event.target.x )
+            getActiveBlock( event.target.x, activeRibbon )
 
         -- ON RELEASE: 
         elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
             -- remove button focus once finger is lifted from screen
             display.getCurrentStage():setFocus( nil )
             event.target.isFocus = false
+            -- touch has ended
+            touching = false
 
             -- check for swipe vs drag
             if ( touchCommand == "swipe" ) then
@@ -227,41 +235,41 @@ local function scrollMe( event )
                 if  ( touchEndX < touchStartX) then
                     -- swipe left
                     -- if at end of block region
-                    if(activeBlock == blockCount) then
+                    if(ribbon[activeRibbon].activeBlock == blockCount) then
                         blockRegion = "right"
                         activeBlockSnap = blockSnapRight[1]
                         transition.to( event.target, { time=300, transition=easing.outSine, x=activeBlockSnap, onComplete=shiftToCenter } )
                         -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
-                        activeBlock = 1
+                        ribbon[activeRibbon].activeBlock = 1
                          print("Active a: " .. activeBlockSnap )
-                        activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion
+                        activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                     else
                         -- standard swipe
-                        nextBlockSnap = activeBlock + 1
+                        nextBlockSnap = ribbon[activeRibbon].activeBlock + 1
                         transition.to( event.target, { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap] } )
                         -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
-                        activeBlock = nextBlockSnap
+                        ribbon[activeRibbon].activeBlock = nextBlockSnap
                         -- debug
-                        activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion
+                        activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                     end
                 elseif ( touchEndX > touchStartX) then
                     -- swipe right
                     -- if at start of block region
-                    if( activeBlock == 1) then
+                    if( ribbon[activeRibbon].activeBlock == 1) then
                         blockRegion = "left"
                         activeBlockSnap = blockSnapLeft[blockCount]
                         transition.to( event.target, { time=300, transition=easing.outSine, x=activeBlockSnap, onComplete=shiftToCenter } )
                         -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
-                        activeBlock = blockCount
+                        ribbon[activeRibbon].activeBlock = blockCount
                         print("Active a: " .. activeBlockSnap )
-                        activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion
+                        activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                     else
                         -- standard swipe
-                        nextBlockSnap = activeBlock - 1
+                        nextBlockSnap = ribbon[activeRibbon].activeBlock - 1
                         transition.to( event.target, { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap] } )     
-                        activeBlock = nextBlockSnap
+                        ribbon[activeRibbon].activeBlock = nextBlockSnap
                         --debug
-                        activeBlockText.text = "Active Block: " .. activeBlock .. ", Region: " .. blockRegion
+                        activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                     end
                 end
             else
@@ -274,8 +282,6 @@ local function scrollMe( event )
                     transition.to( event.target, { time=150, x=activeBlockSnap } )
                 end
             end
-            -- touch has ended
-            touching = false
             -- clear touchCommand so it's not set incorrecty on the next button press
             touchCommand = nil
         end
@@ -290,7 +296,21 @@ end
 local centerRule = display.newRect( display.contentCenterX, 500, 10, 1000 )
 centerRule:setFillColor( 0, 1, 1, 0.25 )
 
--- Create scrollable ribbon group
+-- Create scrollable ribbon group (last one shows up on top)
+
+ribbon[3] = display.newGroup()
+ribbon[3]:addEventListener( "touch", scrollMe )
+ribbon[3].x = ribbonX
+ribbon[3].y = ribbonY3
+ribbon[3].id = 3
+ribbon[3].activeBlock = 1
+
+ribbon[2] = display.newGroup()
+ribbon[2]:addEventListener( "touch", scrollMe )
+ribbon[2].x = ribbonX
+ribbon[2].y = ribbonY2
+ribbon[2].id = 2
+ribbon[2].activeBlock = 1
 
 ribbon[1] = display.newGroup()
 ribbon[1]:addEventListener( "touch", scrollMe )
@@ -302,44 +322,120 @@ ribbon[1].activeBlock = 1
 --sceneGroup:insert( ribbon[1] )
 --sceneGroup:insert( ribbon[1].debug )
 
--- add ribbon[2] and [3] here later
-
-
 -- Image sheets for body parts
 
 local headCount = 6
-local headSheet = graphics.newImageSheet( "images/head-sheet.png", { width=blockWidth, height=blockHeight, numFrames=headCount, sheetContentWidth=blockWidth, sheetContentHeight=blockHeight*headCount } )
+local headSheet = graphics.newImageSheet( "images/head-sheet.png", { width=blockWidth, height=blockHeight1, numFrames=headCount, sheetContentWidth=blockWidth, sheetContentHeight=blockHeight1*headCount } )
 local headFrames =  { start=1, count=headCount }
 
+--[[
+local torsoCount = 6
+local torsoSheet = graphics.newImageSheet( "images/torso-sheet.png", { width=blockWidth, height=blockHeight2, numFrames=torsoCount, sheetContentWidth=blockWidth, sheetContentHeight=blockHeight2*torsoCount } )
+local torsoFrames =  { start=1, count=torsoCount }
 
+local legCount = 6
+local legSheet = graphics.newImageSheet( "images/leg-sheet.png", { width=blockWidth, height=blockHeight3, numFrames=legCount, sheetContentWidth=blockWidth, sheetContentHeight=blockHeight3*legCount } )
+local legFrames =  { start=1, count=legCount }
+]]--
 
 -- block groups inside scroll group
-blockGroup1 = display.newGroup()
-ribbon[1]:insert( blockGroup1 )
-blockGroup1.x = 0
+blockGroupA[1] = display.newGroup()
+ribbon[1]:insert( blockGroupA[1] )
+blockGroupA[1].x = 0
 
-blockGroup2 = display.newGroup()
-ribbon[1]:insert( blockGroup2 )
-blockGroup2.x = -blockGroupWidth
+blockGroupB[1] = display.newGroup()
+ribbon[1]:insert( blockGroupB[1] )
+blockGroupB[1].x = -blockGroupWidth
 
-local blocks1 = {}
+blockGroupA[2] = display.newGroup()
+ribbon[2]:insert( blockGroupA[2] )
+blockGroupA[2].x = 0
+
+blockGroupB[2] = display.newGroup()
+ribbon[2]:insert( blockGroupB[2] )
+blockGroupB[2].x = -blockGroupWidth
+
+blockGroupA[3] = display.newGroup()
+ribbon[3]:insert( blockGroupA[3] )
+blockGroupA[3].x = 0
+
+blockGroupB[3] = display.newGroup()
+ribbon[3]:insert( blockGroupB[3] )
+blockGroupB[3].x = -blockGroupWidth
+
+
+local headsA = {}
 for i=1, blockCount do
     -- Automatically calculate block layout within parent group based on height, width and margin values.
-    blocks1[i] = display.newSprite( headSheet, headFrames )
-    blocks1[i]:setFrame(i)
-    -- blocks1[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight )
-    blocks1[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
+    headsA[i] = display.newSprite( headSheet, headFrames )
+    -- blocks1[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight1 )
+    headsA[i]:setFrame(i)
+    headsA[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
     --blocks1[i]:setFillColor( 0, 1, 1, 0.25 )
     -- Add to group, x, y values are relative to top, left
-    blockGroup1:insert( blocks1[i] )
+    blockGroupA[1]:insert( headsA[i] )
 end
 
-local blocks2 = {}
+local headsB = {}
 for i=1, blockCount do
     -- Automatically calculate block layout within parent group based on height, width and margin values.
-    blocks2[i] = display.newSprite( headSheet, headFrames )
-    blocks2[i]:setFrame(i)
-    blocks2[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
+    headsB[i] = display.newSprite( headSheet, headFrames )
+    headsB[i]:setFrame(i)
+    headsB[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
     -- Add to group, x, y values are relative to top, left
-    blockGroup2:insert( blocks2[i] )
+    blockGroupB[1]:insert( headsB[i] )
+end
+
+
+local torsoA = {}
+for i=1, blockCount do
+    -- Automatically calculate block layout within parent group based on height, width and margin values.
+    --torsoA[i] = display.newSprite( torsoSheet, torsoFrames )
+    torsoA[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight2 )
+    --torsoA[i]:setFrame(i)
+    torsoA[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
+    torsoA[i]:setFillColor( 0, 1, 1, 0.25 )
+    -- Add to group, x, y values are relative to top, left
+    blockGroupA[2]:insert( torsoA[i] )
+end
+
+local torsoB = {}
+for i=1, blockCount do
+    -- Automatically calculate block layout within parent group based on height, width and margin values.
+    --torsoB[i] = display.newSprite( torsoSheet, torsoFrames )
+    torsoB[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight2 )
+    torsoB[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
+    -- Add to group, x, y values are relative to top, left
+    --torsoB[i]:setFrame(i)
+    torsoB[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
+    torsoB[i]:setFillColor( 1, 0, 1, 0.25 )
+    -- Add to group, x, y values are relative to top, left
+    blockGroupB[2]:insert( torsoB[i] )
+end
+
+ 
+local legsA = {}
+for i=1, blockCount do
+    -- Automatically calculate block layout within parent group based on height, width and margin values.
+    --legsA[i] = display.newSprite( legSheet, legFrames )
+    legsA[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight3 )
+    --legsA[i]:setFrame(i)
+    legsA[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
+    legsA[i]:setFillColor( 0, 1, 1, 0.25 )
+    -- Add to group, x, y values are relative to top, left
+    blockGroupA[3]:insert( legsA[i] )
+end
+
+local legsB = {}
+for i=1, blockCount do
+    -- Automatically calculate block layout within parent group based on height, width and margin values.
+    --legsB[i] = display.newSprite( legSheet, legFrames )
+    legsB[i] = display.newRect( blockWidth/2, 0, blockWidth, blockHeight3 )
+    legsB[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
+    -- Add to group, x, y values are relative to top, left
+    --legsB[i]:setFrame(i)
+    legsB[i].x = (( blockMargin + blockWidth ) * i) - blockWidth/2
+    legsB[i]:setFillColor( 1, 0, 1, 0.25 )
+    -- Add to group, x, y values are relative to top, left
+    blockGroupB[3]:insert( legsB[i] )
 end
