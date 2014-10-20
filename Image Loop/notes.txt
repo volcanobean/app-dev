@@ -1,0 +1,18 @@
+ribbon = {}
+ribbon[1]  - newGroup
+	blockGroupA[1] - newGroup
+		headsA[1] - headsA[6]
+	blockGroupB[1] - newGroup
+		headsB[1] - headsB[6]
+ribbon[1] - activeBlock
+
+
+
+
+
+
+in last spot, go to next(right) block, then shift to center
+if another swipe occurs before the shift to center, things get dumb
+
+
+if I'm already in motion - no touchee until complete!
