@@ -1,15 +1,15 @@
 -- Block and ribbon settings - adjust these settings as needed.
 
 local blockCount = 6
-local blockWidth = 512 -- replace with % instead of pixels later (responsive)
+local blockWidth = 600 -- replace with % instead of pixels later (responsive)
 local blockMargin = 15
 
-local blockHeight1 = 312
-local blockHeight2 = 540
-local blockHeight3 = 396
-local ribbonY1 = 300
-local ribbonY2 = 610
-local ribbonY3 = 775
+local blockHeight1 = 350
+local blockHeight2 = 250
+local blockHeight3 = 250
+local ribbonY1 = 350
+local ribbonY2 = 575
+local ribbonY3 = 850
 
 -- Local settings. Don't touch.
 
@@ -150,11 +150,11 @@ end
 
 -- Shift position of scond group to right or left side of main group depending on X pos
 
-local function groupSwap( ribbonNum )
-    if ( ribbon[activeRibbon].x > blockGroupCenter ) then
+local function groupSwap( target, ribbonNum )
+    if ( target.x > blockGroupCenter ) then
         -- invert blockGroup2 to the left
         blockGroupB[ribbonNum].x = -blockGroupWidth
-    elseif ( ribbon[activeRibbon].x < blockGroupCenter ) then
+    elseif ( target.x < blockGroupCenter ) then
         -- move blockGroup2 back to the right
         blockGroupB[ribbonNum].x = blockGroupWidth
     end
@@ -174,7 +174,7 @@ end
 
 -- Move ribbon to center X pos if coming from left or right
 
-local function shiftToCenter()
+local function shiftToCenter( target )
     local shiftX
     if ( blockRegion == "right" ) then
         shiftX = activeBlockSnap + blockGroupWidth
@@ -182,11 +182,11 @@ local function shiftToCenter()
         shiftX = activeBlockSnap - blockGroupWidth
     end
     -- move ribbon to relative center X pos
-    ribbon[activeRibbon].x=shiftX
+    target.x=shiftX
     -- recheck active block values
-    getActiveBlock( ribbon[activeRibbon].x, activeRibbon )
+    getActiveBlock( target.x, activeRibbon )
     -- swap groups as needed
-    groupSwap( activeRibbon )
+    groupSwap( target, activeRibbon )
     -- signal shift is complete so other movements can resume
     moveEnd()
 end
@@ -199,8 +199,6 @@ local function scrollMe( event )
     if ( event.phase == "began" ) then
         -- if not already in the middle of a previous swipe or drag/snap
         if ( moveComplete == "true" ) then
-            -- set active ribbon
-            activeRibbon = event.target.id
              -- set focus to target so corona will track finger even when it leaves the target area (as long as finger is still touching screen)
             display.getCurrentStage():setFocus( event.target )
             event.target.isFocus = true
@@ -208,26 +206,28 @@ local function scrollMe( event )
             touching = true
             touchTimer = timer.performWithDelay( 300, swipeTimer )
             -- get touch position offset to prevent awkward snapping of ribbon to user's finger
-            event.target.offset = event.x - ribbon[activeRibbon].x
-            ribbonXText.text = "X: " .. ribbon[activeRibbon].x
+            event.target.offset = event.x - event.target.x
+            ribbonXText.text = "X: " .. event.target.x
             -- get initial touch positions to measure swipe
             touchStartX = event.xStart
             touchEndX = event.x
+            -- set active ribbon
+            activeRibbon = event.target.id
         end
 
     -- ON MOVE:
     elseif ( event.target.isFocus ) then
         if ( event.phase == "moved" ) then
             -- START DRAG:
-            ribbon[activeRibbon].x = event.x - event.target.offset
+            event.target.x = event.x - event.target.offset
             -- debug
-            ribbonXText.text = "X: " .. ribbon[activeRibbon].x
+            ribbonXText.text = "X: " .. event.target.x
             -- track x and y movement, store as last positions touched
             touchEndX = event.x
             -- Swap groups as needed
-            groupSwap( activeRibbon )
+            groupSwap( event.target, activeRibbon )
             -- Check for active block
-            getActiveBlock( ribbon[activeRibbon].x, activeRibbon )
+            getActiveBlock( event.target.x, activeRibbon )
             
         -- ON RELEASE: 
         elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
@@ -249,14 +249,14 @@ local function scrollMe( event )
                             -- transition to first block in right region, then shift to center
                             blockRegion = "right"
                             activeBlockSnap = blockSnapRight[1]
-                            transition.to( ribbon[activeRibbon], { time=300, transition=easing.outSine, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
+                            transition.to( event.target, { time=300, transition=easing.outSine, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
                             -- note: shift to center will get the active block on completion
                             -- debug
                             activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                        -- else, if we're not at the end but still in the center region
                        elseif ( blockRegion == "center" ) then
                             nextBlockSnap = ribbon[activeRibbon].activeBlock + 1
-                            transition.to( ribbon[activeRibbon], { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
+                            transition.to( event.target, { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
                             -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
                             ribbon[activeRibbon].activeBlock = nextBlockSnap
                             -- debug
@@ -264,7 +264,7 @@ local function scrollMe( event )
                         -- else if we are not in the center region (because of a very fast/long swipe going into the right region before code trigger)
                         else
                             -- don't do the full swipe animation, just shift to the next block
-                            transition.to( ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
+                            transition.to( event.target, { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
                         end
 
                     -- SWIPE RIGHT:
@@ -274,13 +274,13 @@ local function scrollMe( event )
                             -- transition to last block in left region, then shift to center
                             blockRegion = "left"
                             activeBlockSnap = blockSnapLeft[blockCount]
-                            transition.to( ribbon[activeRibbon], { time=300, transition=easing.outSine, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
+                            transition.to( event.target, { time=300, transition=easing.outSine, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
                             -- debug
                             activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                          -- else, if we're not at the end but still in the center region
                        elseif ( blockRegion == "center" ) then
                             nextBlockSnap = ribbon[activeRibbon].activeBlock - 1
-                            transition.to( ribbon[activeRibbon], { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
+                            transition.to( event.target, { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
                             -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
                             ribbon[activeRibbon].activeBlock = nextBlockSnap
                             -- debug
@@ -288,7 +288,7 @@ local function scrollMe( event )
                         -- else if we are not in the center region (because of a very fast/long swipe going into the right region before code trigger)
                         else
                             -- don't do the full swipe animation, just shift to the next block
-                            transition.to( ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
+                            transition.to( event.target, { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
                         end
                     end
 
@@ -297,11 +297,11 @@ local function scrollMe( event )
                     -- if the ribbon has been dragged out of the center region into the left or the right regions
                     if( blockRegion ~= "center" ) then
                         -- shift back to center
-                        transition.to( ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
+                        transition.to( event.target, { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
                     -- else if we're still in the center
                     else
                         -- just snap to nearest block
-                        transition.to( ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=moveEnd } )
+                        transition.to( event.target, { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=moveEnd } )
                     end
                 end
                 -- clear touchCommand so it's not set incorrecty on the next button press
@@ -314,46 +314,34 @@ local function scrollMe( event )
 end
 
 -- Create guide for center of screen
+
 --display.newRect( parent, x, y, width, height )
 local centerRule = display.newRect( display.contentCenterX, 500, 10, 1000 )
 centerRule:setFillColor( 0, 1, 1, 0.25 )
 
--- Create hit areas to control ribbon scroll
-
-local hitRibbon1 = display.newRect( display.contentCenterX, 300, display.contentWidth, 215 )
-hitRibbon1:setFillColor( 0, 1, 1, 0.25 )
-hitRibbon1.id = 1
-hitRibbon1:addEventListener( "touch", scrollMe )
-
-local hitRibbon2 = display.newRect( display.contentCenterX, 545, display.contentWidth, 262 )
-hitRibbon2:setFillColor( 0, 1, 1, 0.25 )
-hitRibbon2.id = 2
-hitRibbon2:addEventListener( "touch", scrollMe )
-
-local hitRibbon3 = display.newRect( display.contentCenterX, 820, display.contentWidth, 275 )
-hitRibbon3:setFillColor( 0, 1, 1, 0.25 )
-hitRibbon3.id = 3
-hitRibbon3:addEventListener( "touch", scrollMe )
-
--- Create scrollable ribbon group (last one shows up on top, so we display legs, then body, the head)
+-- Create scrollable ribbon group (last one shows up on top)
 
 ribbon[3] = display.newGroup()
+ribbon[3]:addEventListener( "touch", scrollMe )
 ribbon[3].x = ribbonX
 ribbon[3].y = ribbonY3
 ribbon[3].id = 3
 ribbon[3].activeBlock = 1
 
 ribbon[2] = display.newGroup()
+ribbon[2]:addEventListener( "touch", scrollMe )
 ribbon[2].x = ribbonX
 ribbon[2].y = ribbonY2
 ribbon[2].id = 2
 ribbon[2].activeBlock = 1
 
 ribbon[1] = display.newGroup()
+ribbon[1]:addEventListener( "touch", scrollMe )
 ribbon[1].x = ribbonX
 ribbon[1].y = ribbonY1
 ribbon[1].id = 1
 ribbon[1].activeBlock = 1
+--ribbon[1].debug = display.newText( "R1 Active Block: " .. ribbon[1].activeBlock, 560, 50, native.systemFont, 30 )
 --sceneGroup:insert( ribbon[1] )
 --sceneGroup:insert( ribbon[1].debug )
 
@@ -363,16 +351,17 @@ local headCount = 6
 local headSheet = graphics.newImageSheet( "images/head-sheet.png", { width=blockWidth, height=blockHeight1, numFrames=headCount, sheetContentWidth=blockWidth, sheetContentHeight=blockHeight1*headCount } )
 local headFrames = { start=1, count=headCount }
 
+--[[
 local torsoCount = 6
 local torsoSheet = graphics.newImageSheet( "images/torso-sheet.png", { width=blockWidth, height=blockHeight2, numFrames=torsoCount, sheetContentWidth=blockWidth, sheetContentHeight=blockHeight2*torsoCount } )
 local torsoFrames =  { start=1, count=torsoCount }
 
 local legCount = 6
-local legSheet = graphics.newImageSheet( "images/legs-sheet.png", { width=blockWidth, height=blockHeight3, numFrames=legCount, sheetContentWidth=blockWidth, sheetContentHeight=blockHeight3*legCount } )
+local legSheet = graphics.newImageSheet( "images/leg-sheet.png", { width=blockWidth, height=blockHeight3, numFrames=legCount, sheetContentWidth=blockWidth, sheetContentHeight=blockHeight3*legCount } )
 local legFrames =  { start=1, count=legCount }
+]]--
 
 -- block groups inside scroll group
-
 blockGroupA[1] = display.newGroup()
 ribbon[1]:insert( blockGroupA[1] )
 blockGroupA[1].x = 0
@@ -411,41 +400,64 @@ end
 
 local headsB = {}
 for i=1, blockCount do
+    -- Automatically calculate block layout within parent group based on height, width and margin values.
     headsB[i] = display.newSprite( headSheet, headFrames )
     headsB[i]:setFrame(i)
     headsB[i].x = (( blockMargin + blockWidth ) * i) - blockWidth*0.5
+    -- Add to group, x, y values are relative to top, left
     blockGroupB[1]:insert( headsB[i] )
 end
 
+
 local torsoA = {}
 for i=1, blockCount do
-    torsoA[i] = display.newSprite( torsoSheet, torsoFrames )
-    torsoA[i]:setFrame(i)
+    -- Automatically calculate block layout within parent group based on height, width and margin values.
+    --torsoA[i] = display.newSprite( torsoSheet, torsoFrames )
+    torsoA[i] = display.newRect( blockWidth*0.5, 0, blockWidth, blockHeight2 )
+    --torsoA[i]:setFrame(i)
     torsoA[i].x = (( blockMargin + blockWidth ) * i) - blockWidth*0.5
+    torsoA[i]:setFillColor( 0, 1, 1, 0.25 )
+    -- Add to group, x, y values are relative to top, left
     blockGroupA[2]:insert( torsoA[i] )
 end
 
 local torsoB = {}
 for i=1, blockCount do
-    torsoB[i] = display.newSprite( torsoSheet, torsoFrames )
-    torsoB[i]:setFrame(i)
+    -- Automatically calculate block layout within parent group based on height, width and margin values.
+    --torsoB[i] = display.newSprite( torsoSheet, torsoFrames )
+    torsoB[i] = display.newRect( blockWidth*0.5, 0, blockWidth, blockHeight2 )
     torsoB[i].x = (( blockMargin + blockWidth ) * i) - blockWidth*0.5
+    -- Add to group, x, y values are relative to top, left
+    --torsoB[i]:setFrame(i)
+    torsoB[i].x = (( blockMargin + blockWidth ) * i) - blockWidth*0.5
+    torsoB[i]:setFillColor( 1, 0, 1, 0.25 )
+    -- Add to group, x, y values are relative to top, left
     blockGroupB[2]:insert( torsoB[i] )
 end
 
+ 
 local legsA = {}
 for i=1, blockCount do
     -- Automatically calculate block layout within parent group based on height, width and margin values.
-    legsA[i] = display.newSprite( legSheet, legFrames )
+    --legsA[i] = display.newSprite( legSheet, legFrames )
+    legsA[i] = display.newRect( blockWidth*0.5, 0, blockWidth, blockHeight3 )
+    --legsA[i]:setFrame(i)
     legsA[i].x = (( blockMargin + blockWidth ) * i) - blockWidth*0.5
-    legsA[i]:setFrame(i)
+    legsA[i]:setFillColor( 0, 1, 1, 0.25 )
+    -- Add to group, x, y values are relative to top, left
     blockGroupA[3]:insert( legsA[i] )
 end
 
 local legsB = {}
 for i=1, blockCount do
-    legsB[i] = display.newSprite( legSheet, legFrames )
+    -- Automatically calculate block layout within parent group based on height, width and margin values.
+    --legsB[i] = display.newSprite( legSheet, legFrames )
+    legsB[i] = display.newRect( blockWidth*0.5, 0, blockWidth, blockHeight3 )
     legsB[i].x = (( blockMargin + blockWidth ) * i) - blockWidth*0.5
-    legsB[i]:setFrame(i)
+    -- Add to group, x, y values are relative to top, left
+    --legsB[i]:setFrame(i)
+    legsB[i].x = (( blockMargin + blockWidth ) * i) - blockWidth*0.5
+    legsB[i]:setFillColor( 1, 0, 1, 0.25 )
+    -- Add to group, x, y values are relative to top, left
     blockGroupB[3]:insert( legsB[i] )
 end
