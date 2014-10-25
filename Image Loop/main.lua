@@ -17,12 +17,12 @@ local ribbon = {}
 
 local ribbonX = (display.contentWidth - blockWidth)*0.5 - blockMargin
 local ribbonStartX = ribbonX -- store starting X value for future reference
-local ribbonXText = display.newText( "X: " .. ribbonX, display.contentCenterX, 50, native.systemFont, 30 )
+--local ribbonXText = display.newText( "X: " .. ribbonX, display.contentCenterX, 50, native.systemFont, 30 )
 
 local blockRegion = "center"
 local activeRibbon = 1
 local activeBlockSnap = ribbonX
-local activeBlockText = display.newText( "ARibbon: " .. activeRibbon .. ", ABlock: 1, Region: " .. blockRegion, display.contentCenterX, 130, native.systemFont, 30 )
+local activeBlockText = display.newText( "ARibbon: " .. activeRibbon .. ", ABlock: 1, Region: " .. blockRegion, display.contentCenterX, 50, native.systemFont, 30 )
 
 -- duplicate image blocks for the purpose of x pos swapping to simulate loop
 
@@ -34,7 +34,7 @@ local blockGroupWidth = (blockWidth+blockMargin)*blockCount
 -- Get center point of block group, taking into account starting position X offset
 
 local blockGroupCenter = ribbonStartX - ( blockGroupWidth*0.5 - blockWidth*0.5 - blockMargin*0.5 )
-local blockGroupText = display.newText( "Start X: " .. ribbonStartX .. ", Width: " .. blockGroupWidth .. ", Center: " .. blockGroupCenter, display.contentCenterX, 90, native.systemFont, 30 )
+--local blockGroupText = display.newText( "Start X: " .. ribbonStartX .. ", Width: " .. blockGroupWidth .. ", Center: " .. blockGroupCenter, display.contentCenterX, 90, native.systemFont, 30 )
 
 -- Generate groups to store Block End values
 
@@ -209,7 +209,7 @@ local function scrollMe( event )
             touchTimer = timer.performWithDelay( 300, swipeTimer )
             -- get touch position offset to prevent awkward snapping of ribbon to user's finger
             event.target.offset = event.x - ribbon[activeRibbon].x
-            ribbonXText.text = "X: " .. ribbon[activeRibbon].x
+            --ribbonXText.text = "X: " .. ribbon[activeRibbon].x
             -- get initial touch positions to measure swipe
             touchStartX = event.xStart
             touchEndX = event.x
@@ -221,7 +221,7 @@ local function scrollMe( event )
             -- START DRAG:
             ribbon[activeRibbon].x = event.x - event.target.offset
             -- debug
-            ribbonXText.text = "X: " .. ribbon[activeRibbon].x
+            --ribbonXText.text = "X: " .. ribbon[activeRibbon].x
             -- track x and y movement, store as last positions touched
             touchEndX = event.x
             -- Swap groups as needed
@@ -312,6 +312,23 @@ local function scrollMe( event )
     -- for event functions, always return true to prevent touch propagation to underlying objects
     return true  
 end
+
+-- Randomize function
+
+local function randomizeBlocks()  
+    local ribbonCount = 3
+    for i=1, ribbonCount do
+        local randomNum = math.random( blockCount )
+        --print( randomNum )
+        ribbon[i].activeBlock = randomNum
+        transition.to( ribbon[i], { time=600, x=blockEnd[randomNum] + blockWidth/2 + blockMargin } )
+    end
+    --activeBlocksText.text = "Head: " .. ribbon[1].activeBlock .. ", Body: " .. ribbon[2].activeBlock .. ", Legs: " .. ribbon[3].activeBlock
+end
+
+local randomizeBtn = display.newText( "--RANDOMIZE--", display.contentCenterX, 100, native.systemFont, 30 )
+randomizeBtn:addEventListener( "tap", randomizeBlocks )
+--sceneGroup:insert( randomizeBtn )
 
 -- Create guide for center of screen
 --display.newRect( parent, x, y, width, height )
