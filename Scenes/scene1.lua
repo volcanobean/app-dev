@@ -1,13 +1,7 @@
----------------------------------------------------------------------------------
---
--- start-screen.lua
---
----------------------------------------------------------------------------------
+-- scene1.lua
 
 local composer = require( "composer" )
 local scene = composer.newScene()
-
-local _myG = composer.myGlobals
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
@@ -21,24 +15,24 @@ local _myG = composer.myGlobals
 
 -- "scene:create()"
 -- Initialize the scene here.
+-- Example: add display objects to "sceneGroup", add touch listeners, etc.
 function scene:create( event )
     local sceneGroup = self.view
 
-    -- game title
-    local titleText = display.newText( "Where's My Goblin?", display.contentCenterX, 400, native.systemFont, 60 )
-    sceneGroup:insert( titleText )
-
-    -- create start button
+    local titleText = display.newText( "Composer Time! Scene 1", display.contentCenterX, 400, native.systemFont, 40 )
+    
     local function startGame() 
-        composer.gotoScene( "gameplay", "fade", 400 )
+        composer.gotoScene( "scene2", "fade", 400 )
     end
 
-    local startBtn = display.newText( "--START--", display.contentCenterX, 700, native.systemFont, 30 )
+    local startBtn = display.newText( "SCENE 2 -->", display.contentCenterX, 700, native.systemFont, 30 )
     startBtn:addEventListener( "tap", startGame )
+
+    -- Add objects to scene group
+    sceneGroup:insert( titleText )
     sceneGroup:insert( startBtn )
-    
-    print( "Scene created: start-screen")
 end
+
 
 -- "scene:show()"
 function scene:show( event )
@@ -71,6 +65,7 @@ end
 -- "scene:destroy()"
 function scene:destroy( event )
     local sceneGroup = self.view
+
     -- Called prior to the removal of scene's view ("sceneGroup").
     -- Insert code here to clean up the scene.
     -- Example: remove display objects, save state, etc.

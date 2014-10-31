@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------
 --
--- start-screen.lua
+-- missing-poster.lua
 --
 ---------------------------------------------------------------------------------
 
@@ -25,19 +25,47 @@ function scene:create( event )
     local sceneGroup = self.view
 
     -- game title
-    local titleText = display.newText( "Where's My Goblin?", display.contentCenterX, 400, native.systemFont, 60 )
+    local titleText = display.newText( "Where's My Goblin?", display.contentCenterX, 100, native.systemFont, 40 )
     sceneGroup:insert( titleText )
 
-    -- create start button
-    local function startGame() 
-        composer.gotoScene( "gameplay", "fade", 400 )
+    -- create Next button
+    local function nextScene()
+        composer.gotoScene( "mix-n-match", "fade", 400 )
+    end
+    
+    local nextBtn = display.newText( "--next--", display.contentCenterX, 900, native.systemFont, 30 )
+    nextBtn:addEventListener( "tap", nextScene )
+    sceneGroup:insert( nextBtn )
+
+    -- Randomize function
+
+    _myG.matchBlocks = {}
+    _myG.matchBlocks[1] = 1
+    _myG.matchBlocks[2] = 1
+    _myG.matchBlocks[3] = 1
+    local matchBlocksText = display.newText( "Head: " .. _myG.matchBlocks[1] .. ", Body: " .. _myG.matchBlocks[2] .. ", Legs: " .. _myG.matchBlocks[3], 575, 1000, native.systemFont, 30 )
+    sceneGroup:insert( matchBlocksText )
+
+    local function randomizeBlocks()  
+        print ( "Function start." )
+        local ribbonCount = 3
+        for i=1, ribbonCount do
+            -- Generate a random number based on the total number of blocks
+            local randomNum = math.random( _myG.blockCount )
+            print( randomNum )
+            _myG.matchBlocks[i] = randomNum
+        end
+        matchBlocksText.text = "Head: " .. _myG.matchBlocks[1] .. ", Body: " .. _myG.matchBlocks[2] .. ", Legs: " .. _myG.matchBlocks[3]
     end
 
-    local startBtn = display.newText( "--START--", display.contentCenterX, 700, native.systemFont, 30 )
-    startBtn:addEventListener( "tap", startGame )
-    sceneGroup:insert( startBtn )
-    
-    print( "Scene created: start-screen")
+    -- Generate missing goblin
+
+    local randomizeBtn = display.newText( "--RANDOMIZE--", display.contentCenterX, 150, native.systemFont, 30 )
+    randomizeBtn:addEventListener( "tap", randomizeBlocks )
+    sceneGroup:insert( randomizeBtn )
+
+    -- Generate random goblin values on first scene load
+    randomizeBlocks()
 end
 
 -- "scene:show()"

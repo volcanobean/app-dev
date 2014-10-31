@@ -17,20 +17,21 @@ composer.myGlobals = {}
 -- Assign shorter variable name to myGlobals table to save on typing.
 local _myG = composer.myGlobals
 
--- Begin global settings
--- Block and ribbon values. Adjust as needed
+-- Begin global settings, adjust as needed
 
-_myG.blockCount = 6
-_myG.blockWidth = 512 -- replace with % instead of pixels later (responsive)
+-- Blocks
+_myG.blockCount = 5
+_myG.blockWidth = 600
+_myG.blockHeight = 250
 _myG.blockMargin = 15
 
-_myG.blockHeight1 = 312
-_myG.blockHeight2 = 540
-_myG.blockHeight3 = 396
+-- Adjust y position of ribbons
+_myG.ribbonY1 = 320
+_myG.ribbonY2 = 585
+_myG.ribbonY3 = 850
 
-_myG.ribbonY1 = 300
-_myG.ribbonY2 = 610
-_myG.ribbonY3 = 775
+-- Set whether ribbon images should repeat, ie. scroll continuiosly
+_myG.ribbonLooping = true
 
 -- Now that our variables are set, let's start the game.
 composer.gotoScene( "start-screen" )

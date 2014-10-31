@@ -30,7 +30,7 @@ function scene:create( event )
 
     -- create start button
     local function startGame() 
-        composer.gotoScene( "gameplay", "fade", 400 )
+        composer.gotoScene( "missing-poster", "fade", 400 )
     end
 
     local startBtn = display.newText( "--START--", display.contentCenterX, 700, native.systemFont, 30 )
