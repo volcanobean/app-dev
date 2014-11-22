@@ -22,15 +22,15 @@ local _myG = composer.myGlobals
 
 _myG.blockCount = 6
 _myG.blockWidth = 512 -- replace with % instead of pixels later (responsive)
-_myG.blockMargin = 15
+_myG.blockMargin = 90
 
 _myG.blockHeight1 = 312
 _myG.blockHeight2 = 540
 _myG.blockHeight3 = 396
 
-_myG.ribbonY1 = 300
-_myG.ribbonY2 = 610
-_myG.ribbonY3 = 775
+_myG.ribbonY1 = 245
+_myG.ribbonY2 = 555
+_myG.ribbonY3 = 710
 
 -- Now that our variables are set, let's start the game.
 composer.gotoScene( "start-screen" )

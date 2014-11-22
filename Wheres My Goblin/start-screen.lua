@@ -24,13 +24,18 @@ local _myG = composer.myGlobals
 function scene:create( event )
     local sceneGroup = self.view
 
+    _myG.background = display.newImage( "images/forest_bg.jpg" )
+    _myG.background.x = display.contentWidth*0.5
+    _myG.background.y = display.contentHeight*0.5
+    sceneGroup:insert( _myG.background )
+
     -- game title
     local titleText = display.newText( "Where's My Goblin?", display.contentCenterX, 400, native.systemFont, 60 )
     sceneGroup:insert( titleText )
 
     -- create start button
     local function startGame() 
-        composer.gotoScene( "gameplay", "fade", 400 )
+        composer.gotoScene( "gameplay" )
     end
 
     local startBtn = display.newText( "--START--", display.contentCenterX, 700, native.systemFont, 30 )

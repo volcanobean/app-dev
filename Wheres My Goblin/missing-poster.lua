@@ -30,7 +30,7 @@ function scene:create( event )
 
     -- create Next button
     local function nextScene()
-        composer.gotoScene( "mix-n-match", "fade", 400 )
+        composer.gotoScene( "gameplay", "fade", 400 )
     end
     
     local nextBtn = display.newText( "--next--", display.contentCenterX, 900, native.systemFont, 30 )

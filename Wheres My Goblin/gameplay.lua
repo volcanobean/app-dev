@@ -357,23 +357,30 @@ function scene:create( event )
 
     -- Create hit areas to control ribbon scroll
 
-    local hitRibbon1 = display.newRect( display.contentCenterX, 300, display.contentWidth, 215 )
+    local hitRibbon1 = display.newRect( display.contentCenterX, 260, display.contentWidth, 215 )
     hitRibbon1:setFillColor( 0, 1, 1, 0.25 )
     hitRibbon1.id = 1
     hitRibbon1:addEventListener( "touch", scrollMe )
     sceneGroup:insert( hitRibbon1 )
 
-    local hitRibbon2 = display.newRect( display.contentCenterX, 545, display.contentWidth, 262 )
+    local hitRibbon2 = display.newRect( display.contentCenterX, 500, display.contentWidth, 262 )
     hitRibbon2:setFillColor( 0, 1, 1, 0.25 )
     hitRibbon2.id = 2
     hitRibbon2:addEventListener( "touch", scrollMe )
     sceneGroup:insert( hitRibbon2 )
 
-    local hitRibbon3 = display.newRect( display.contentCenterX, 820, display.contentWidth, 275 )
+    local hitRibbon3 = display.newRect( display.contentCenterX, 770, display.contentWidth, 275 )
     hitRibbon3:setFillColor( 0, 1, 1, 0.25 )
     hitRibbon3.id = 3
     hitRibbon3:addEventListener( "touch", scrollMe )
     sceneGroup:insert( hitRibbon3 )
+
+    -- We render the background image after the hit area so it is stacked on top, hiding the hit area.
+    
+    _myG.background = display.newImage( "images/forest_bg.jpg" )
+    _myG.background.x = display.contentWidth*0.5
+    _myG.background.y = display.contentHeight*0.5
+    sceneGroup:insert( _myG.background )
 
     -- Create scrollable ribbon group (last one shows up on top, so we display legs, then body, the head)
 
@@ -490,7 +497,11 @@ function scene:create( event )
         legsB[i]:setFrame(i)
         blockGroupB[3]:insert( legsB[i] )
     end
-    
+
+    -- Load UI and goblin banner
+
+    composer.showOverlay( "ui-overlay" )
+
 --end scene:create
 end 
 
