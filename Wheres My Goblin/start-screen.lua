@@ -35,7 +35,7 @@ function scene:create( event )
 
     -- create start button
     local function startGame() 
-        composer.gotoScene( "gameplay" )
+        composer.gotoScene( "goblin-slider" )
     end
 
     local startBtn = display.newText( "--START--", display.contentCenterX, 700, native.systemFont, 30 )
