@@ -335,7 +335,8 @@ function scene:create( event )
 
     -- Randomize function
 
-    local function randomizeBlocks()  
+--[[
+    local function randomizeBlocks()
         local ribbonCount = 3
         for i=1, ribbonCount do
             local randomNum = math.random( _myG.blockCount )
@@ -349,6 +350,7 @@ function scene:create( event )
     local randomizeBtn = display.newText( "--RANDOMIZE--", display.contentCenterX, 100, native.systemFont, 30 )
     randomizeBtn:addEventListener( "tap", randomizeBlocks )
     sceneGroup:insert( randomizeBtn )
+]]--
 
     -- Create guide for center of screen
     --display.newRect( parent, x, y, width, height )
@@ -379,8 +381,8 @@ function scene:create( event )
     -- We render the background image after the hit area so it is stacked on top, hiding the hit area.
     
     _myG.background = display.newImage( "images/forest_bg.jpg" )
-    _myG.background.x = display.contentWidth*0.5
-    _myG.background.y = display.contentHeight*0.5
+    _myG.background.x = display.contentCenterX
+    _myG.background.y = display.contentCenterY
     sceneGroup:insert( _myG.background )
 
     -- Create scrollable ribbon group (last one shows up on top, so we display legs, then body, the head)
@@ -408,15 +410,15 @@ function scene:create( event )
 
     -- Image sheets for body parts
 
-    local headCount = 6
+    local headCount = _myG.blockCount
     local headSheet = graphics.newImageSheet( "images/head-sheet.png", { width=_myG.blockWidth, height=_myG.blockHeight1, numFrames=headCount, sheetContentWidth=_myG.blockWidth, sheetContentHeight=_myG.blockHeight1*headCount } )
     local headFrames = { start=1, count=headCount }
 
-    local torsoCount = 6
+    local torsoCount = _myG.blockCount
     local torsoSheet = graphics.newImageSheet( "images/torso-sheet.png", { width=_myG.blockWidth, height=_myG.blockHeight2, numFrames=torsoCount, sheetContentWidth=_myG.blockWidth, sheetContentHeight=_myG.blockHeight2*torsoCount } )
     local torsoFrames =  { start=1, count=torsoCount }
 
-    local legCount = 6
+    local legCount = _myG.blockCount
     local legSheet = graphics.newImageSheet( "images/legs-sheet.png", { width=_myG.blockWidth, height=_myG.blockHeight3, numFrames=legCount, sheetContentWidth=_myG.blockWidth, sheetContentHeight=_myG.blockHeight3*legCount } )
     local legFrames =  { start=1, count=legCount }
 

@@ -1,14 +1,16 @@
+-- Hit areas
+
+local h1 = display.newRect( 200, 100, 50, 75 )
+h1.x = 200
+h1.y = 200
+h1:setFillColor( 1, 1, 1, 0.25 )
+
+local h2 = display.newRect( 200, 100, 50, 75 )
+h2.x = 400
+h2.y = 200
+h2:setFillColor( 1, 1, 1, 0.25 )
+
 -- Drag and drop
-
-local hitArea = display.newRect( 200, 100, 50, 75 )
-hitArea.x = 200; hitArea.y = 100
-hitArea:setFillColor( 1, 1, 1, 0.25 )
-
-local item = display.newRect( 100, 100, 50, 75 )
--- store the initial coordinates for later use
-item.xOrig = 100; item.yOrig = 100
-item:setFillColor( 0, 0, 1, 1 )
---rectangle-based collision detection
 
 local function hasCollided( obj1, obj2 )
    if ( obj1 == nil ) then  --make sure the first object exists

@@ -28,26 +28,29 @@ function scene:create( event )
 
     -- Randomize function
 
-    _myG.matchBlocks = {}
-    _myG.matchBlocks[1] = 1
-    _myG.matchBlocks[2] = 1
-    _myG.matchBlocks[3] = 1
+    local matchBlocks = {}
+    matchBlocks[1] = 1
+    matchBlocks[2] = 1
+    matchBlocks[3] = 1
 
     local signState = "goblin"
-    local audioTimer
+    --local audioTimer
 
     local goblinText = display.newText( "", display.contentCenterX, 975, native.systemFont, 30 )  
     local activeRibbonsText = display.newText( "activeRibbons: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock, display.contentCenterX, 120, native.systemFont, 30 )
-    local matchBlocksText = display.newText( "Head: " .. _myG.matchBlocks[1] .. ", Body: " .. _myG.matchBlocks[2] .. ", Legs: " .. _myG.matchBlocks[3], display.contentCenterX, 30, native.systemFont, 30 )
+    local matchBlocksText = display.newText( "Head: " .. matchBlocks[1] .. ", Body: " .. matchBlocks[2] .. ", Legs: " .. matchBlocks[3], display.contentCenterX, 30, native.systemFont, 30 )
 
     -- Audio
 
     -- temp function for debuggin, sans actual audio
+    --[[
     local function stopAudio()
+        print "audio stop"
         goblinText.text = "" 
     end
 
     local function playAudio( audioVar )
+        print "audio start"
         if ( audioVar == "wheresMyGoblin" ) then
             goblinText.text = "Where's my goblin?"
         elseif ( audioVar == "myGoblin" ) then
@@ -57,18 +60,74 @@ function scene:create( event )
         end
         timer.performWithDelay( 1200, stopAudio )
     end
-  
+  ]]--
+
+    local shader = display.newRect( display.contentWidth*0.5, display.contentHeight*0.5, display.contentWidth, display.contentHeight )
+    -- can't start object with an alpha of 0 or corona will not render it
+    -- also, transition values will be relative to intial value, so we start with 1 (100%)
+    shader:setFillColor( 0, 0, 0, 1 ) 
+    -- transition to alpha 0 to hide shader on page load
+    transition.to( shader, { time=1, alpha=0 } )
+    
+    local bannerUpY = -500
+    local bannerDownY = 425
+    local matchUpY = -925
+    local matchDownY = 0
+
+    local banner = display.newImageRect( "images/banner-512w.png", 569, 1004 ) -- PoT - upscaling smaller 512w to 569w
+    banner.x = display.contentWidth*0.5
+    banner.y = bannerUpY
+
+    -- Generate Goblins parts for banner
+
+    local headMatchCount = _myG.blockCount
+    local headMatchSheet = graphics.newImageSheet( "images/head-sheet.png", { width=_myG.blockWidth, height=_myG.blockHeight1, numFrames=headMatchCount, sheetContentWidth=_myG.blockWidth, sheetContentHeight=_myG.blockHeight1*headMatchCount } )
+    local headMatchFrames = { start=1, count=_myG.blockCount }
+    local headMatch = display.newSprite( headMatchSheet, headMatchFrames )
+    headMatch.x = display.contentCenterX
+    headMatch.y = 217
+
+    local torsoMatchCount = _myG.blockCount
+    local torsoMatchSheet = graphics.newImageSheet( "images/torso-sheet.png", { width=_myG.blockWidth, height=_myG.blockHeight2, numFrames=torsoMatchCount, sheetContentWidth=_myG.blockWidth, sheetContentHeight=_myG.blockHeight2*torsoMatchCount } )
+    local torsoMatchFrames = { start=1, count=_myG.blockCount }
+    local torsoMatch = display.newSprite( torsoMatchSheet, torsoMatchFrames )
+    torsoMatch.x = display.contentCenterX
+    torsoMatch.y = 527
+
+    local legMatchCount = _myG.blockCount
+    local legMatchSheet = graphics.newImageSheet( "images/legs-sheet.png", { width=_myG.blockWidth, height=_myG.blockHeight3, numFrames=legMatchCount, sheetContentWidth=_myG.blockWidth, sheetContentHeight=_myG.blockHeight3*legMatchCount } )
+    local legMatchFrames = { start=1, count=_myG.blockCount }
+    local legMatch = display.newSprite( legMatchSheet, legMatchFrames )
+    legMatch.x = display.contentCenterX
+    legMatch.y = 682
+
+    local matchBlocksGroup = display.newGroup()
+    matchBlocksGroup:insert( legMatch )
+    matchBlocksGroup:insert( torsoMatch )
+    matchBlocksGroup:insert( headMatch )
+    matchBlocksGroup.y = matchUpY
 
     local function randomizeBlocks()  
         print ( "Function start." )
-        local ribbonCount = 3
-        for i=1, ribbonCount do
-            -- Generate a random number based on the total number of blocks
-            local randomNum = math.random( _myG.blockCount )
-            print( randomNum )
-            _myG.matchBlocks[i] = randomNum
-        end
-        matchBlocksText.text = "Head: " .. _myG.matchBlocks[1] .. ", Body: " .. _myG.matchBlocks[2] .. ", Legs: " .. _myG.matchBlocks[3]
+        -- Generate head
+        local randomNum = math.random( _myG.blockCount )
+        print( randomNum )
+        matchBlocks[1] = randomNum
+        headMatch:setFrame( randomNum )
+        
+        -- Generate torso
+        randomNum = math.random( _myG.blockCount )
+        print( randomNum )
+        matchBlocks[2] = randomNum
+        torsoMatch:setFrame( randomNum )
+
+        -- Generate legs
+        randomNum = math.random( _myG.blockCount )
+        print( randomNum )
+        matchBlocks[3] = randomNum
+        legMatch:setFrame( randomNum )
+
+        matchBlocksText.text = "Head: " .. matchBlocks[1] .. ", Body: " .. matchBlocks[2] .. ", Legs: " .. matchBlocks[3]
     end
 
     -- Generate missing goblin
@@ -100,24 +159,19 @@ function scene:create( event )
     signSprite:setFrame(1) -- 1 refers to the first frame in the sequence (6), not the frame number
     sceneGroup:insert( signSprite )
 
-    local shader = display.newRect( display.contentWidth*0.5, display.contentHeight*0.5, display.contentWidth, display.contentHeight )
-    shader:setFillColor( 0, 0, 0, 1 ) -- can't start object with an alpha of 0 or corona will not render it
-    transition.to( shader, { time=1, alpha=0 } )
-    
-    local bannerStartY = -500
-    local banner = display.newImageRect( "images/banner-512w.png", 569, 1004 ) -- PoT - upscaling smaller 512w to 569w
-    banner.x = display.contentWidth*0.5
-    banner.y = bannerStartY
-    -- local banner = display.newImage( "images/banner.png", display.contentWidth*0.5, 425 )
+
+    -- Banner animations
 
     local function bannerDown()
-        transition.to( banner, { time=500, y=425, transition=easing.outSine } )
+        transition.to( banner, { time=500, y=bannerDownY, transition=easing.outSine } )
+        transition.to( matchBlocksGroup, { time=500, y=matchDownY, transition=easing.outSine } )
         transition.to( shader, { time=300, alpha=0.5 } )
-        timer.performWithDelay( 4000, playAudio( "wheresMyGoblin" ) )
+        --timer.performWithDelay( 4000, playAudio( "wheresMyGoblin" ) )
     end
 
     local function bannerUp( event )
-        transition.to( banner, { time=500, y=bannerStartY, transition=easing.outSine } )
+        transition.to( banner, { time=500, y=bannerUpY, transition=easing.outSine } )
+        transition.to( matchBlocksGroup, { time=500, y=matchUpY, transition=easing.outSine } )
         transition.to( shader, { time=300, alpha=0 } )
         if (signState == "X") then
             signSprite:setSequence( "spinFromX" )
@@ -127,7 +181,7 @@ function scene:create( event )
         return true
     end
 
-    local posterDrop = display.newRect( 100, 925, 200, 200 )
+    local posterDrop = display.newRect( 75, 950, 150, 150 )
     posterDrop:setFillColor( 1, 1, 1, 1 )
     posterDrop:addEventListener( "tap", bannerDown )
 
@@ -137,16 +191,13 @@ function scene:create( event )
         print "Checking goblins"
         activeRibbonsText.text = "activeRibbons: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
         -- if user has a match
-        if ( _myG.matchBlocks[1] == _myG.ribbon[1].activeBlock ) and ( _myG.matchBlocks[2] == _myG.ribbon[2].activeBlock ) and  ( _myG.matchBlocks[3] == _myG.ribbon[3].activeBlock ) then
+        if ( matchBlocks[1] == _myG.ribbon[1].activeBlock ) and ( matchBlocks[2] == _myG.ribbon[2].activeBlock ) and  ( matchBlocks[3] == _myG.ribbon[3].activeBlock ) then
             signSprite:setSequence( "spinToCheck" )
         else
-            signSprite:setSequence( "spinToCheck" )
-            --[[
             signState = "X"
             signSprite:setSequence( "spinToX" )
             -- bannerDown commands but with delay. refactor?
-            timer.performWithDelay( 1000, bannerDown )
-            ]]--
+            --timer.performWithDelay( 1000, bannerDown )
         end
         signSprite:play()
         return true
