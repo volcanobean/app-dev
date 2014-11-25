@@ -1,0 +1,10 @@
+-- Define Build-time properties for your app.
+
+settings =
+{
+    orientation =
+    {
+        default = "landscapeRight",
+        supported = { "landscapeLeft", "landscapeRight" },
+    },
+}

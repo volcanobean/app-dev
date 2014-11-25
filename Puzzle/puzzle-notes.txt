@@ -1,0 +1,5 @@
+Mask Image Requirements
+
+The mask image must have width and height dimensions that are divisible by 4.
+
+The mask image must be bordered by at least 3 pixels of black space on all four sides. You may need to increase the overall size of your mask image to include this border.
