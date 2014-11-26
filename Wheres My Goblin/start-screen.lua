@@ -30,7 +30,7 @@ function scene:create( event )
     sceneGroup:insert( _myG.background )
 
     -- game title
-    local titleText = display.newText( "Where's My Goblin?", display.contentCenterX, 400, native.systemFont, 60 )
+    local titleText = display.newText( "where's my goblin?", display.contentCenterX, 400, "Mathlete-Skinny", 125 )
     sceneGroup:insert( titleText )
 
     -- create start button
@@ -38,7 +38,7 @@ function scene:create( event )
         composer.gotoScene( "goblin-slider" )
     end
 
-    local startBtn = display.newText( "--START--", display.contentCenterX, 700, native.systemFont, 30 )
+    local startBtn = display.newText( "start", display.contentCenterX, 875, "Mathlete-Skinny", 80 )
     startBtn:addEventListener( "tap", startGame )
     sceneGroup:insert( startBtn )
     

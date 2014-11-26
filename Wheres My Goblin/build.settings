@@ -1,0 +1,14 @@
+iphone =
+    {
+        plist =
+        {
+            UIAppFonts =
+            {
+                "Mathelete-Bulky.ttf",
+                "Mathelete-BulkySlant.ttf",
+                "Mathelete-Skinny.ttf",
+                "Mathelete-SkinnySlant.ttf"
+            },
+            UIApplicationExitsOnSuspend = true
+        },
+    }

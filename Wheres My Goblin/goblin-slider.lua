@@ -32,6 +32,8 @@ function scene:create( event )
     -- create ribbon table/array for storage of ribbon pieces/variables later in this file
     -- This table is in my globals so it can be accessed by other scenes
 
+    _myG.introFinished = "false"
+
     _myG.ribbon = {}
 
     local ribbonX = (display.contentWidth - _myG.blockWidth)*0.5 - _myG.blockMargin
@@ -71,8 +73,8 @@ function scene:create( event )
     local touchCommand = "drag"
     local nextBlockSnap = 0
 
-    local moveComplete = "true"
-    -- local moveText = display.newText( moveComplete, display.contentCenterX, 160, native.systemFont, 30 )
+    _myG.moveAllowed = "true"
+    -- local moveText = display.newText( _myG.moveAllowed, display.contentCenterX, 160, native.systemFont, 30 )
 
     -- Generate block end values
 
@@ -181,14 +183,14 @@ function scene:create( event )
     end
 
     local function moveStart()
-        moveComplete = "false"
-        -- moveText.text = moveComplete
+        _myG.moveAllowed = "false"
+        -- moveText.text = _myG.moveAllowed
         -- print ("before: " .. _myG.ribbon[activeRibbon].activeBlock .. ", " .. blockRegion)
     end
 
     local function moveEnd()
-        moveComplete = "true"
-        -- moveText.text = moveComplete
+        _myG.moveAllowed = "true"
+        -- moveText.text = _myG.moveAllowed
         -- print ("after:  " .. _myG.ribbon[activeRibbon].activeBlock .. ", " .. blockRegion)
     end
 
@@ -218,7 +220,7 @@ function scene:create( event )
         -- ON PRESS:
         if ( event.phase == "began" ) then
             -- if not already in the middle of a previous swipe or drag/snap
-            if ( moveComplete == "true" ) then
+            if ( _myG.moveAllowed == "true" ) then
                 -- set active ribbon
                 activeRibbon = event.target.id
                  -- set focus to target so corona will track finger even when it leaves the target area (as long as finger is still touching screen)
@@ -258,7 +260,7 @@ function scene:create( event )
                 touching = false
 
                 -- if not in the middle of a previous swipe/drag
-                if ( moveComplete == "true" ) then
+                if ( _myG.moveAllowed == "true" ) then
                     -- if a swip command has been triggered
                     if ( touchCommand == "swipe" ) then
 
@@ -332,25 +334,6 @@ function scene:create( event )
         -- for event functions, always return true to prevent touch propagation to underlying objects
         return true  
     end
-
-    -- Randomize function
-
---[[
-    local function randomizeBlocks()
-        local ribbonCount = 3
-        for i=1, ribbonCount do
-            local randomNum = math.random( _myG.blockCount )
-            --print( randomNum )
-            _myG.ribbon[i].activeBlock = randomNum
-            transition.to( _myG.ribbon[i], { time=600, x=blockEnd[randomNum] + _myG.blockWidth/2 + _myG.blockMargin } )
-        end
-        --activeBlocksText.text = "Head: " .. _myG.ribbon[1].activeBlock .. ", Body: " .. _myG.ribbon[2].activeBlock .. ", Legs: " .. _myG.ribbon[3].activeBlock
-    end
-
-    local randomizeBtn = display.newText( "--RANDOMIZE--", display.contentCenterX, 100, native.systemFont, 30 )
-    randomizeBtn:addEventListener( "tap", randomizeBlocks )
-    sceneGroup:insert( randomizeBtn )
-]]--
 
     -- Create guide for center of screen
     --display.newRect( parent, x, y, width, height )
@@ -501,6 +484,8 @@ function scene:create( event )
         blockGroupB[3]:insert( legsB[i] )
     end
 
+    -- Load Golbin banner and UI 
+
     composer.showOverlay( "ui-overlay" )
 
 --end scene:create
@@ -514,8 +499,13 @@ function scene:show( event )
         -- Called when the scene is still off screen (but is about to come on screen).
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
-        -- Insert code here to make the scene come alive.
-        -- Example: start timers, begin animation, play audio, etc.
+
+        -- Hide the goblin slider on initial game load.
+
+        _myG.ribbon[1].isVisible = false
+        _myG.ribbon[2].isVisible = false
+        _myG.ribbon[3].isVisible = false
+
     end
 end
 

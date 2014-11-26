@@ -80,26 +80,28 @@ function scene:create( event )
 
     -- Generate Goblins parts for banner
 
+    local mScale = 0.83
+
     local headMatchCount = _myG.blockCount
-    local headMatchSheet = graphics.newImageSheet( "images/head-sheet.png", { width=_myG.blockWidth, height=_myG.blockHeight1, numFrames=headMatchCount, sheetContentWidth=_myG.blockWidth, sheetContentHeight=_myG.blockHeight1*headMatchCount } )
+    local headMatchSheet = graphics.newImageSheet( "images/head-sheet.png", { width=_myG.blockWidth*mScale, height=_myG.blockHeight1*mScale, numFrames=headMatchCount, sheetContentWidth=_myG.blockWidth*mScale, sheetContentHeight=_myG.blockHeight1*headMatchCount*mScale } )
     local headMatchFrames = { start=1, count=_myG.blockCount }
     local headMatch = display.newSprite( headMatchSheet, headMatchFrames )
     headMatch.x = display.contentCenterX
-    headMatch.y = 217
+    headMatch.y = 380*mScale
 
     local torsoMatchCount = _myG.blockCount
-    local torsoMatchSheet = graphics.newImageSheet( "images/torso-sheet.png", { width=_myG.blockWidth, height=_myG.blockHeight2, numFrames=torsoMatchCount, sheetContentWidth=_myG.blockWidth, sheetContentHeight=_myG.blockHeight2*torsoMatchCount } )
+    local torsoMatchSheet = graphics.newImageSheet( "images/torso-sheet.png", { width=_myG.blockWidth*mScale, height=_myG.blockHeight2*mScale, numFrames=torsoMatchCount, sheetContentWidth=_myG.blockWidth*mScale, sheetContentHeight=_myG.blockHeight2*torsoMatchCount*mScale } )
     local torsoMatchFrames = { start=1, count=_myG.blockCount }
     local torsoMatch = display.newSprite( torsoMatchSheet, torsoMatchFrames )
     torsoMatch.x = display.contentCenterX
-    torsoMatch.y = 527
+    torsoMatch.y = 690*mScale
 
     local legMatchCount = _myG.blockCount
-    local legMatchSheet = graphics.newImageSheet( "images/legs-sheet.png", { width=_myG.blockWidth, height=_myG.blockHeight3, numFrames=legMatchCount, sheetContentWidth=_myG.blockWidth, sheetContentHeight=_myG.blockHeight3*legMatchCount } )
+    local legMatchSheet = graphics.newImageSheet( "images/legs-sheet.png", { width=_myG.blockWidth*mScale, height=_myG.blockHeight3*mScale, numFrames=legMatchCount, sheetContentWidth=_myG.blockWidth*mScale, sheetContentHeight=_myG.blockHeight3*legMatchCount*mScale } )
     local legMatchFrames = { start=1, count=_myG.blockCount }
     local legMatch = display.newSprite( legMatchSheet, legMatchFrames )
     legMatch.x = display.contentCenterX
-    legMatch.y = 682
+    legMatch.y = 845*mScale
 
     local matchBlocksGroup = display.newGroup()
     matchBlocksGroup:insert( legMatch )
@@ -159,10 +161,18 @@ function scene:create( event )
     signSprite:setFrame(1) -- 1 refers to the first frame in the sequence (6), not the frame number
     sceneGroup:insert( signSprite )
 
+    -- Show goblins after first load
+
+    local function showGoblinSlider()
+        _myG.ribbon[1].isVisible = true
+        _myG.ribbon[2].isVisible = true
+        _myG.ribbon[3].isVisible = true
+    end
 
     -- Banner animations
 
     local function bannerDown()
+        _myG.moveAllowed = "false"
         transition.to( banner, { time=500, y=bannerDownY, transition=easing.outSine } )
         transition.to( matchBlocksGroup, { time=500, y=matchDownY, transition=easing.outSine } )
         transition.to( shader, { time=300, alpha=0.5 } )
@@ -170,6 +180,7 @@ function scene:create( event )
     end
 
     local function bannerUp( event )
+        _myG.moveAllowed = "true"
         transition.to( banner, { time=500, y=bannerUpY, transition=easing.outSine } )
         transition.to( matchBlocksGroup, { time=500, y=matchUpY, transition=easing.outSine } )
         transition.to( shader, { time=300, alpha=0 } )
@@ -178,6 +189,7 @@ function scene:create( event )
             signSprite:play()
             signState = "goblin"
         end
+        showGoblinSlider()
         return true
     end
 
@@ -188,6 +200,7 @@ function scene:create( event )
     shader:addEventListener( "tap", bannerUp )
 
     local function compareGoblins( event )
+        --_myG.moveAllowed = "false"
         print "Checking goblins"
         activeRibbonsText.text = "activeRibbons: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
         -- if user has a match
@@ -205,6 +218,10 @@ function scene:create( event )
 
     signSprite:addEventListener( "tap", compareGoblins )
 
+    -- Show goblin to be match on first load.
+
+    bannerDown()
+
 --end scene:create
 end 
 
@@ -216,8 +233,8 @@ function scene:show( event )
         -- Called when the scene is still off screen (but is about to come on screen).
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
-        -- Insert code here to make the scene come alive.
-        -- Example: start timers, begin animation, play audio, etc.
+
+        --TO DO. Why can't I call functions here?
     end
 end
 
