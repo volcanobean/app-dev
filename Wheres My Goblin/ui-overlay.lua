@@ -33,12 +33,17 @@ function scene:create( event )
     matchBlocks[2] = 1
     matchBlocks[3] = 1
 
+    local introComplete
+    local bannerTimer
+
     --local debug
 
     local goblinText = display.newText( "", display.contentCenterX, 975, native.systemFont, 30 )  
-    local activeRibbonsText = display.newText( "activeRibbons: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock, display.contentCenterX, 120, native.systemFont, 30 )
-    local matchBlocksText = display.newText( "Head: " .. matchBlocks[1] .. ", Body: " .. matchBlocks[2] .. ", Legs: " .. matchBlocks[3], display.contentCenterX, 30, native.systemFont, 30 )
+    local activeText = display.newText( "UI Active: " .. _myG.uiActive, display.contentCenterX, 920, native.systemFont, 30 ) 
 
+    local matchBlocksText = display.newText( "Match these: " .. matchBlocks[1] .. ", " .. matchBlocks[2] .. ", " .. matchBlocks[3], display.contentCenterX, 950, native.systemFont, 30 )
+    local activeRibbonsText = display.newText( "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock, display.contentCenterX, 980, native.systemFont, 30 )
+ 
     -- Audio
 
     -- temp function for debuggin, sans actual audio
@@ -113,12 +118,15 @@ function scene:create( event )
     -- animate banner
 
     local function uiActiveCheck()
-        if introComplete == "true" then
+        --[[if introComplete == "true" then
             _myG.uiActive = "true"
         else
             -- cue up next part of intro
             --timer.performWithDelay( 600, sliderIntro )
-        end
+        end]]--
+        _myG.uiActive = "true"
+        activeText.text = "UI Active: " .. _myG.uiActive
+        print ("uiActiveCheck uiActive: " .. _myG.uiActive )
     end
 
     local function bannerPlayDown()
@@ -155,13 +163,14 @@ function scene:create( event )
         matchBlocks[3] = randomNum
         legMatch:setFrame( randomNum )
 
-        matchBlocksText.text = "Head: " .. matchBlocks[1] .. ", Body: " .. matchBlocks[2] .. ", Legs: " .. matchBlocks[3]
+        matchBlocksText.text = "Match these: " .. matchBlocks[1] .. ", " .. matchBlocks[2] .. ", " .. matchBlocks[3]
     end
 
+--[[
     local randomizeBtn = display.newText( "--RANDOMIZE--", display.contentCenterX, 75, native.systemFont, 30 )
     randomizeBtn:addEventListener( "tap", randomizeBlocks )
     sceneGroup:insert( randomizeBtn )
-
+]]--
     -- Generate random goblin values on first scene load
 
     randomizeBlocks()
@@ -239,12 +248,13 @@ function scene:create( event )
         handlePlay( "up" )
         gearPlay( "backward" )
         bannerPlayUp()
+        print ("raiseBanner uiActive: " .. _myG.uiActive )
     end
 
-    local bannerTimer
-
     local function lowerBanner( event )
-        uiActive = "false"
+        _myG.uiActive = "false"
+        print ("lowerBanner uiActive: " .. _myG.uiActive )
+        activeText.text = "UI Active: " .. _myG.uiActive
         handlePlay( "down" )
         gearPlay( "forward" )
         timer.performWithDelay( 600, bannerPlayDown )
@@ -256,6 +266,7 @@ function scene:create( event )
     local function raiseBannerNow( event )
         timer.cancel( bannerStayTimer )
         raiseBanner()
+        print ("raiseBannerNow uiActive: " .. _myG.uiActive )
         return true
     end
 
@@ -268,7 +279,8 @@ function scene:create( event )
     -- on first scene load, play banner animation
 
     timer.performWithDelay( 400, lowerBanner )
-    --showGoblinSlider()
+    introComplete = "true"
+    showGoblinSlider()
 
 
 --end scene:create

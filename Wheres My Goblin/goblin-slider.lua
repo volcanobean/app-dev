@@ -71,6 +71,8 @@ function scene:create( event )
     local touchCommand = "drag"
     local nextBlockSnap = 0
 
+    local moveAllowed = "true"
+
     -- on first load, UI is not active until after intro animations complete
 
     _myG.uiActive = "false"
@@ -106,9 +108,11 @@ function scene:create( event )
         -- It is a swipe if the user moves their finger left or right and then releases before the countdown ends.
         if ( touchEndX ~= touchStartX ) and ( touching == false ) then
            touchCommand = "swipe"
+           print( "swipe" )
         -- It is a drag if the user moves their finger left or right and does not release before the timer ends.
         else
-           touchCommand = "drag" 
+           touchCommand = "drag"
+           print( "drag" )
         end
     end
 
@@ -181,21 +185,24 @@ function scene:create( event )
         end
     end
 
+    -- Functions for use in only allowing movement after a previous movement is complete
+
     local function moveStart()
-        _myG.uiActive = "false"
-        -- moveText.text = _myG.uiActive
+        moveAllowed = "false"
+        -- moveText.text = moveAllowed
         -- print ("before: " .. _myG.ribbon[activeRibbon].activeBlock .. ", " .. blockRegion)
     end
 
     local function moveEnd()
-        _myG.uiActive = "true"
-        -- moveText.text = __myG.uiActive
+        moveAllowed = "true"
+        -- moveText.text = moveAllowed
         -- print ("after:  " .. _myG.ribbon[activeRibbon].activeBlock .. ", " .. blockRegion)
     end
 
     -- Move ribbon to center X pos if coming from left or right
 
     local function shiftToCenter()
+        print ("shift to center")
         local shiftX
         if ( blockRegion == "right" ) then
             shiftX = activeBlockSnap + blockGroupWidth
@@ -219,12 +226,16 @@ function scene:create( event )
         -- ON PRESS:
         if ( event.phase == "began" ) then
             -- if not already in the middle of a previous swipe or drag/snap
-            if ( _myG.uiActive == "true" ) then
+            if ( _myG.uiActive == "true" ) and ( moveAllowed == "true" ) then
                 -- set active ribbon
                 activeRibbon = event.target.id
-                 -- set focus to target so corona will track finger even when it leaves the target area (as long as finger is still touching screen)
+                -- debug
+                activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: 1, Region: " .. blockRegion
+
+                -- set focus to target so corona will track finger even when it leaves the target area (as long as finger is still touching screen)
                 display.getCurrentStage():setFocus( event.target )
                 event.target.isFocus = true
+                
                 -- touch has started. start timer
                 touching = true
                 touchTimer = timer.performWithDelay( 300, swipeTimer )
@@ -234,6 +245,9 @@ function scene:create( event )
                 -- get initial touch positions to measure swipe
                 touchStartX = event.xStart
                 touchEndX = event.x
+
+                -- Check for active block, this is to make sure a new tap doesn't use the old active block information
+                getActiveBlock( _myG.ribbon[activeRibbon].x, activeRibbon )
             end
 
         -- ON MOVE:
@@ -247,7 +261,7 @@ function scene:create( event )
                 touchEndX = event.x
                 -- Swap groups as needed
                 groupSwap( activeRibbon )
-                -- Check for active block
+                 -- Check for active block
                 getActiveBlock( _myG.ribbon[activeRibbon].x, activeRibbon )
                 
             -- ON RELEASE: 
@@ -259,12 +273,12 @@ function scene:create( event )
                 touching = false
 
                 -- if not in the middle of a previous swipe/drag
-                if ( _myG.uiActive == "true" ) then
+                if ( _myG.uiActive == "true" )  and ( moveAllowed == "true" ) then
                     -- if a swip command has been triggered
                     if ( touchCommand == "swipe" ) then
 
                         -- SWIPE LEFT:
-                        if ( touchEndX < touchStartX) then
+                        if ( touchEndX < touchStartX ) then
                             -- if at end of center block region
                             if ( _myG.ribbon[activeRibbon].activeBlock == _myG.blockCount ) then
                                 -- transition to first block in right region, then shift to center
@@ -322,6 +336,7 @@ function scene:create( event )
                         -- else if we're still in the center
                         else
                             -- just snap to nearest block
+                            print ("abs: " .. activeBlockSnap)
                             transition.to( _myG.ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=moveEnd } )
                         end
                     end
@@ -362,10 +377,12 @@ function scene:create( event )
 
     -- We render the background image after the hit area so it is stacked on top, hiding the hit area.
     
+    --[[
     _myG.background = display.newImage( "images/forest_bg.jpg" )
     _myG.background.x = display.contentCenterX
     _myG.background.y = display.contentCenterY
     sceneGroup:insert( _myG.background )
+    ]]--
 
     -- Create scrollable ribbon group (last one shows up on top, so we display legs, then body, the head)
 

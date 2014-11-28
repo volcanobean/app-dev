@@ -37,6 +37,8 @@ composer.gotoScene( "start-screen" )
 
 
 -- Code to have Corona display the font names found
+
+--[[
 --
 local fonts = native.getFontNames()
 
@@ -64,3 +66,5 @@ for i, fontname in ipairs(fonts) do
     end
 end
 ---------------------------------------------------------
+
+]]--
