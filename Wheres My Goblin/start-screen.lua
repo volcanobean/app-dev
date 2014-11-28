@@ -24,6 +24,18 @@ local _myG = composer.myGlobals
 function scene:create( event )
     local sceneGroup = self.view
 
+    -- create start function
+    local function startGame( event ) 
+        composer.gotoScene( "goblin-slider" )
+        return true
+    end
+
+    -- load 'secret button' first to hide it behind background image
+    local startHitArea =  display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight )
+    startHitArea:setFillColor( 0, 1, 1, 0.25 )
+    startHitArea:addEventListener( "tap", startGame )
+    sceneGroup:insert( startHitArea )
+
     _myG.background = display.newImage( "images/forest_bg.jpg" )
     _myG.background.x = display.contentWidth*0.5
     _myG.background.y = display.contentHeight*0.5
@@ -33,13 +45,8 @@ function scene:create( event )
     local titleText = display.newText( "where's my goblin?", display.contentCenterX, 400, "Mathlete-Skinny", 125 )
     sceneGroup:insert( titleText )
 
-    -- create start button
-    local function startGame() 
-        composer.gotoScene( "goblin-slider" )
-    end
-
     local startBtn = display.newText( "start", display.contentCenterX, 875, "Mathlete-Skinny", 80 )
-    startBtn:addEventListener( "tap", startGame )
+    -- startBtn:addEventListener( "tap", startGame )
     sceneGroup:insert( startBtn )
     
     print( "Scene created: start-screen")

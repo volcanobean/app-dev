@@ -32,8 +32,6 @@ function scene:create( event )
     -- create ribbon table/array for storage of ribbon pieces/variables later in this file
     -- This table is in my globals so it can be accessed by other scenes
 
-    _myG.introFinished = "false"
-
     _myG.ribbon = {}
 
     local ribbonX = (display.contentWidth - _myG.blockWidth)*0.5 - _myG.blockMargin
@@ -73,8 +71,9 @@ function scene:create( event )
     local touchCommand = "drag"
     local nextBlockSnap = 0
 
-    _myG.moveAllowed = "true"
-    -- local moveText = display.newText( _myG.moveAllowed, display.contentCenterX, 160, native.systemFont, 30 )
+    -- on first load, UI is not active until after intro animations complete
+
+    _myG.uiActive = "false"
 
     -- Generate block end values
 
@@ -183,14 +182,14 @@ function scene:create( event )
     end
 
     local function moveStart()
-        _myG.moveAllowed = "false"
-        -- moveText.text = _myG.moveAllowed
+        _myG.uiActive = "false"
+        -- moveText.text = _myG.uiActive
         -- print ("before: " .. _myG.ribbon[activeRibbon].activeBlock .. ", " .. blockRegion)
     end
 
     local function moveEnd()
-        _myG.moveAllowed = "true"
-        -- moveText.text = _myG.moveAllowed
+        _myG.uiActive = "true"
+        -- moveText.text = __myG.uiActive
         -- print ("after:  " .. _myG.ribbon[activeRibbon].activeBlock .. ", " .. blockRegion)
     end
 
@@ -220,7 +219,7 @@ function scene:create( event )
         -- ON PRESS:
         if ( event.phase == "began" ) then
             -- if not already in the middle of a previous swipe or drag/snap
-            if ( _myG.moveAllowed == "true" ) then
+            if ( _myG.uiActive == "true" ) then
                 -- set active ribbon
                 activeRibbon = event.target.id
                  -- set focus to target so corona will track finger even when it leaves the target area (as long as finger is still touching screen)
@@ -260,7 +259,7 @@ function scene:create( event )
                 touching = false
 
                 -- if not in the middle of a previous swipe/drag
-                if ( _myG.moveAllowed == "true" ) then
+                if ( _myG.uiActive == "true" ) then
                     -- if a swip command has been triggered
                     if ( touchCommand == "swipe" ) then
 
@@ -484,6 +483,12 @@ function scene:create( event )
         blockGroupB[3]:insert( legsB[i] )
     end
 
+    -- Hide the goblin slider on initial game load.
+    
+    _myG.ribbon[1].isVisible = false
+    _myG.ribbon[2].isVisible = false
+    _myG.ribbon[3].isVisible = false
+    
     -- Load Golbin banner and UI 
 
     composer.showOverlay( "ui-overlay" )
@@ -500,11 +505,7 @@ function scene:show( event )
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
 
-        -- Hide the goblin slider on initial game load.
-
-        _myG.ribbon[1].isVisible = false
-        _myG.ribbon[2].isVisible = false
-        _myG.ribbon[3].isVisible = false
+        
 
     end
 end

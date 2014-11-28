@@ -26,15 +26,14 @@ local _myG = composer.myGlobals
 function scene:create( event )
     local sceneGroup = self.view
 
-    -- Randomize function
+    -- Create table to hold data for goblin match
 
     local matchBlocks = {}
     matchBlocks[1] = 1
     matchBlocks[2] = 1
     matchBlocks[3] = 1
 
-    local signState = "goblin"
-    --local audioTimer
+    --local debug
 
     local goblinText = display.newText( "", display.contentCenterX, 975, native.systemFont, 30 )  
     local activeRibbonsText = display.newText( "activeRibbons: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock, display.contentCenterX, 120, native.systemFont, 30 )
@@ -60,7 +59,9 @@ function scene:create( event )
         end
         timer.performWithDelay( 1200, stopAudio )
     end
-  ]]--
+    ]]--
+
+    -- Banner sprites
 
     local shader = display.newRect( display.contentWidth*0.5, display.contentHeight*0.5, display.contentWidth, display.contentHeight )
     -- can't start object with an alpha of 0 or corona will not render it
@@ -74,13 +75,13 @@ function scene:create( event )
     local matchUpY = -925
     local matchDownY = 0
 
-    local banner = display.newImageRect( "images/banner-512w.png", 569, 1004 ) -- PoT - upscaling smaller 512w to 569w
+    local banner = display.newImageRect( "images/banner-512w.png", 569, 1004 ) -- PoT - upscaling smaller 512w image to 569w
     banner.x = display.contentWidth*0.5
     banner.y = bannerUpY
 
-    -- Generate Goblins parts for banner
+    -- Add goblin match pieces to banner
 
-    local mScale = 0.83
+    local mScale = 0.83 -- single variable to scale all goblin banner parts larger or smaller
 
     local headMatchCount = _myG.blockCount
     local headMatchSheet = graphics.newImageSheet( "images/head-sheet.png", { width=_myG.blockWidth*mScale, height=_myG.blockHeight1*mScale, numFrames=headMatchCount, sheetContentWidth=_myG.blockWidth*mScale, sheetContentHeight=_myG.blockHeight1*headMatchCount*mScale } )
@@ -109,6 +110,31 @@ function scene:create( event )
     matchBlocksGroup:insert( headMatch )
     matchBlocksGroup.y = matchUpY
 
+    -- animate banner
+
+    local function uiActiveCheck()
+        if introComplete == "true" then
+            _myG.uiActive = "true"
+        else
+            -- cue up next part of intro
+            --timer.performWithDelay( 600, sliderIntro )
+        end
+    end
+
+    local function bannerPlayDown()
+        transition.to( banner, { time=500, y=bannerDownY, transition=easing.outSine } )
+        transition.to( matchBlocksGroup, { time=500, y=matchDownY, transition=easing.outSine } )
+        transition.to( shader, { time=300, alpha=0.5 } )
+    end
+
+    local function bannerPlayUp()
+        transition.to( banner, { time=500, y=bannerUpY, transition=easing.outSine, onComplete=uiActiveCheck } )
+        transition.to( matchBlocksGroup, { time=500, y=matchUpY, transition=easing.outSine } )
+        transition.to( shader, { time=300, alpha=0 } )
+    end
+
+    -- Randomize functions
+
     local function randomizeBlocks()  
         print ( "Function start." )
         -- Generate head
@@ -132,36 +158,74 @@ function scene:create( event )
         matchBlocksText.text = "Head: " .. matchBlocks[1] .. ", Body: " .. matchBlocks[2] .. ", Legs: " .. matchBlocks[3]
     end
 
-    -- Generate missing goblin
-
     local randomizeBtn = display.newText( "--RANDOMIZE--", display.contentCenterX, 75, native.systemFont, 30 )
     randomizeBtn:addEventListener( "tap", randomizeBlocks )
     sceneGroup:insert( randomizeBtn )
+
     -- Generate random goblin values on first scene load
+
     randomizeBlocks()
 
-    -- Load UI and goblin banner
+    -- gear sprite
 
-    -- Sprite data
+    local gearSequence =
+    {
+        { name="forward", frames={ 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 3, 4, 4, 1 }, time=600, loopCount=1 },
+        { name="backward", frames={ 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 3, 2, 2, 1 }, time=600, loopCount=1 }
+    }
 
-    local sequenceData =
+    local gearSheetInfo = require("gear-sheet")
+    local gearSheet = graphics.newImageSheet( "images/gear-sheet.png", gearSheetInfo:getSheet() )
+    
+    local gearHandle = display.newImage( gearSheet, 5 )
+    gearHandle.x = 70
+    gearHandle.y = 933
+    gearHandle.anchorY = 1
+    sceneGroup:insert( gearHandle )
+
+    local function handlePlay( seqVar )
+        if seqVar == "down" then
+            transition.to( gearHandle, { time=400, rotation=90, transition=easing.outSine } )
+        elseif seqVar == "up" then
+            transition.to( gearHandle, { time=400, rotation=0, transition=easing.outSine } )
+        end
+    end
+
+    local gearSprite = display.newSprite( gearSheet, gearSequence )
+    gearSprite.x = 85
+    gearSprite.y = 940
+    gearSprite:setFrame(1) -- 1 refers to the first frame in the sequence (6), not the frame number
+    sceneGroup:insert( gearSprite )
+
+    local function gearPlay( seqVar )
+        gearSprite:setSequence( seqVar )
+        gearSprite:play()
+    end
+
+    -- sign sprite
+
+    local signSequence =
     {
         { name="spinToCheck", frames={ 6, 7, 8, 11, 9, 10, 6, 7, 8, 11, 4, 5, 1, 2, 2, 1 }, time=500, loopCount=1 },
         { name="spinToX", frames={ 6, 7, 8, 11, 9, 10, 6, 7, 8, 11, 15, 16, 12, 13, 13, 12 }, time=500, loopCount=1 },
         { name="spinFromCheck", frames={ 1, 2, 3, 11, 4, 5, 1, 2, 3, 11, 9, 10, 6, 7, 7, 6 }, time=500, loopCount=1 },
         { name="spinFromX", frames={ 12, 13, 14, 11, 15, 16, 12, 13, 14, 11, 9, 10, 6, 7, 7, 6 }, time=500, loopCount=1 }
-    
     }
 
-    local sheetInfo = require("sign-sheet")
-    local myImageSheet = graphics.newImageSheet( "images/sign-sheet.png", sheetInfo:getSheet() )
-    local signSprite = display.newSprite( myImageSheet, sequenceData )
+    local signSheetInfo = require("sign-sheet")
+    local signSheet = graphics.newImageSheet( "images/sign-sheet.png", signSheetInfo:getSheet() )
+    local signSprite = display.newSprite( signSheet, signSequence )
     signSprite.x = 654
     signSprite.y = 931
-    signSprite:setFrame(1) -- 1 refers to the first frame in the sequence (6), not the frame number
+    signSprite:setFrame(1) -- 1 refers to the first frame in the sequence, not the frame number
     sceneGroup:insert( signSprite )
 
-    -- Show goblins after first load
+    local function signPlay( seqVar )
+        signSprite:setSequence( seqVar )
+        signSprite:play()
+    end
+
+    -- make slider visible, for use after intro compeletes
 
     local function showGoblinSlider()
         _myG.ribbon[1].isVisible = true
@@ -169,58 +233,43 @@ function scene:create( event )
         _myG.ribbon[3].isVisible = true
     end
 
-    -- Banner animations
+    -- animation functions
 
-    local function bannerDown()
-        _myG.moveAllowed = "false"
-        transition.to( banner, { time=500, y=bannerDownY, transition=easing.outSine } )
-        transition.to( matchBlocksGroup, { time=500, y=matchDownY, transition=easing.outSine } )
-        transition.to( shader, { time=300, alpha=0.5 } )
-        --timer.performWithDelay( 4000, playAudio( "wheresMyGoblin" ) )
+    local function raiseBanner()
+        handlePlay( "up" )
+        gearPlay( "backward" )
+        bannerPlayUp()
     end
 
-    local function bannerUp( event )
-        _myG.moveAllowed = "true"
-        transition.to( banner, { time=500, y=bannerUpY, transition=easing.outSine } )
-        transition.to( matchBlocksGroup, { time=500, y=matchUpY, transition=easing.outSine } )
-        transition.to( shader, { time=300, alpha=0 } )
-        if (signState == "X") then
-            signSprite:setSequence( "spinFromX" )
-            signSprite:play()
-            signState = "goblin"
-        end
-        showGoblinSlider()
+    local bannerTimer
+
+    local function lowerBanner( event )
+        uiActive = "false"
+        handlePlay( "down" )
+        gearPlay( "forward" )
+        timer.performWithDelay( 600, bannerPlayDown )
+        --playAudio( "wheresMyGoblin" )
+        bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
         return true
     end
 
-    local posterDrop = display.newRect( 75, 950, 150, 150 )
-    posterDrop:setFillColor( 1, 1, 1, 1 )
-    posterDrop:addEventListener( "tap", bannerDown )
-
-    shader:addEventListener( "tap", bannerUp )
-
-    local function compareGoblins( event )
-        --_myG.moveAllowed = "false"
-        print "Checking goblins"
-        activeRibbonsText.text = "activeRibbons: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
-        -- if user has a match
-        if ( matchBlocks[1] == _myG.ribbon[1].activeBlock ) and ( matchBlocks[2] == _myG.ribbon[2].activeBlock ) and  ( matchBlocks[3] == _myG.ribbon[3].activeBlock ) then
-            signSprite:setSequence( "spinToCheck" )
-        else
-            signState = "X"
-            signSprite:setSequence( "spinToX" )
-            -- bannerDown commands but with delay. refactor?
-            --timer.performWithDelay( 1000, bannerDown )
-        end
-        signSprite:play()
+    local function raiseBannerNow( event )
+        timer.cancel( bannerStayTimer )
+        raiseBanner()
         return true
     end
 
-    signSprite:addEventListener( "tap", compareGoblins )
+    -- event listeners
 
-    -- Show goblin to be match on first load.
+    gearSprite:addEventListener( "tap", lowerBanner )
+    gearHandle:addEventListener( "tap", lowerBanner )
+    shader:addEventListener( "tap", raiseBannerNow )
 
-    bannerDown()
+    -- on first scene load, play banner animation
+
+    timer.performWithDelay( 400, lowerBanner )
+    --showGoblinSlider()
+
 
 --end scene:create
 end 
@@ -233,8 +282,6 @@ function scene:show( event )
         -- Called when the scene is still off screen (but is about to come on screen).
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
-
-        --TO DO. Why can't I call functions here?
     end
 end
 

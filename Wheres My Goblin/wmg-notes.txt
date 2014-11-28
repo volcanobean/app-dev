@@ -75,6 +75,86 @@ ribbon2a, ribbon2b
 ribbon3a, ribbon3b
 
 
+--------------------------------
+
+-- BANNER INTRO 
+
+-- functions, vars
+
+uiActive = "true"
+	goblin-slider active
+	sign active
+	gear active
+
+uiActive = "false"
+	goblin-slider inactive
+	sign inactive
+	gear inactive
+
+local function raiseBanner()
+	handleUp
+	gearBackward
+	bannerUp
+	if introFinished = "true" then
+		-- on later, non-intro usage, re-activate UI
+		uiActive = "true"
+	else
+		-- cue up next part of intro
+		timer.performWithDelay( 600, sliderIntro )
+	end
+end
+
+local function lowerBanner()
+	uiActive = "false"
+	handleDown
+	gearFoward
+	bannerDown
+	play audio wheresMyGoblin
+	bannerTimer = timer.performWithDelay( 4000, raiseBanner )
+end
+
+local function raiseBannerNow()
+	timer.cancel( bannerTimer )
+	raiseBanner()
+end
+
+-- START intro animation
+
+introFinished = "false" --> !! Replace introFinished with uiActive?
+goblin-slider invisible (from end of previous scene)
+
+lowerBanner() -- lower banner, raise banner and cue sliderIntro
+
+sliderIntro()
+	goblin-slider visible
+	goblin pieces scroll across/slide in
+	sign spins up
+	introFinished = "true"
+	uiActive = "true"
+
+-- END INTRO
+-- START GAMEPLAY
+
+on gear click
+	lowerBanner()
+
+on sign click
+	uiActive = "false"
+
+	if matchBlocks = activeBlocks
+		sign spinToCheck
+		play audio thatsMyGoblin
+		play Win animation
+	elseif matchBlocks ~= activeBlocks
+		sign spinToX
+		play audio notMyGoblin
+		--> !! Do not lower banner
+		pause
+		spin back to goblin
+		uiActive = "true"
+		
+-- END GAMEPLAY
+
 
 
 
