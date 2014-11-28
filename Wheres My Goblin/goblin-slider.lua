@@ -41,8 +41,8 @@ function scene:create( event )
     local blockRegion = "center"
     local activeRibbon = 1
     local activeBlockSnap = ribbonX
-    local activeBlockText = display.newText( "ARibbon: " .. activeRibbon .. ", ABlock: 1, Region: " .. blockRegion, display.contentCenterX, 50, native.systemFont, 30 )
-    sceneGroup:insert( activeBlockText )
+    -- local activeBlockText = display.newText( "ARibbon: " .. activeRibbon .. ", ABlock: 1, Region: " .. blockRegion, display.contentCenterX, 50, native.systemFont, 30 )
+    -- sceneGroup:insert( activeBlockText )
 
     -- duplicate image blocks for the purpose of x pos swapping to simulate loop
 
@@ -134,7 +134,7 @@ function scene:create( event )
             end
             blockRegion = "right"
             -- debug
-            activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
         
         -- if we're to the left of the main blocks (positive x pos)
         elseif( currentX > (ribbonStartX + _myG.blockWidth*0.5)) then
@@ -151,7 +151,7 @@ function scene:create( event )
             end
             blockRegion = "left"
             -- debug
-            activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
 
         -- if x pos is in the main block area
         else
@@ -168,7 +168,7 @@ function scene:create( event )
             end
             blockRegion = "center"
             -- debug
-            activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
         end
         --print ( blockRegion )
     end
@@ -230,7 +230,7 @@ function scene:create( event )
                 -- set active ribbon
                 activeRibbon = event.target.id
                 -- debug
-                activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: 1, Region: " .. blockRegion
+                -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: 1, Region: " .. blockRegion
 
                 -- set focus to target so corona will track finger even when it leaves the target area (as long as finger is still touching screen)
                 display.getCurrentStage():setFocus( event.target )
@@ -287,7 +287,7 @@ function scene:create( event )
                                 transition.to( _myG.ribbon[activeRibbon], { time=300, transition=easing.outSine, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
                                 -- note: shift to center will get the active block on completion
                                 -- debug
-                                activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+                                -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                            -- else, if we're not at the end but still in the center region
                            elseif ( blockRegion == "center" ) then
                                 nextBlockSnap = _myG.ribbon[activeRibbon].activeBlock + 1
@@ -295,7 +295,7 @@ function scene:create( event )
                                 -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
                                 _myG.ribbon[activeRibbon].activeBlock = nextBlockSnap
                                 -- debug
-                                activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+                                -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                             -- else if we are not in the center region (because of a very fast/long swipe going into the right region before code trigger)
                             else
                                 -- don't do the full swipe animation, just shift to the next block
@@ -311,7 +311,7 @@ function scene:create( event )
                                 activeBlockSnap = blockSnapLeft[_myG.blockCount]
                                 transition.to( _myG.ribbon[activeRibbon], { time=300, transition=easing.outSine, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
                                 -- debug
-                                activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+                                -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                              -- else, if we're not at the end but still in the center region
                            elseif ( blockRegion == "center" ) then
                                 nextBlockSnap = _myG.ribbon[activeRibbon].activeBlock - 1
@@ -319,7 +319,7 @@ function scene:create( event )
                                 -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
                                 _myG.ribbon[activeRibbon].activeBlock = nextBlockSnap
                                 -- debug
-                                activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+                                -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                             -- else if we are not in the center region (because of a very fast/long swipe going into the right region before code trigger)
                             else
                                 -- don't do the full swipe animation, just shift to the next block
@@ -377,12 +377,10 @@ function scene:create( event )
 
     -- We render the background image after the hit area so it is stacked on top, hiding the hit area.
     
-    --[[
     _myG.background = display.newImage( "images/forest_bg.jpg" )
     _myG.background.x = display.contentCenterX
     _myG.background.y = display.contentCenterY
     sceneGroup:insert( _myG.background )
-    ]]--
 
     -- Create scrollable ribbon group (last one shows up on top, so we display legs, then body, the head)
 
