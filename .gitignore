@@ -1,2 +1,4 @@
-# Ignore any images folder and its contents
+# Ignore any images or audio folder and their contents
+*/audio/*
+*/fonts/*
 */images/*

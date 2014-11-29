@@ -60,12 +60,16 @@ function scene:create( event )
 
     -- temp function for debuggin, sans actual audio
 
+    local mySound = media.newEventSound( "audio/wmg-mason-01.wav" )
+
     local function stopAudio()
-        goblinText.text = "" 
+        goblinText.text = ""
     end
 
     local function audioWheresMyGoblin()
         goblinText.text = "Where's my goblin?" 
+        -- Play sound
+        media.playEventSound( mySound )
         timer.performWithDelay( 2000, stopAudio )
     end
 
@@ -303,11 +307,11 @@ function scene:create( event )
             uiActiveFalse()
             print "Checking goblins"
             activeRibbonsText.text = "activeRibbons: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
-            -- if user has a match
+            -- if user successfully has a match
             if ( matchBlocks[1] == _myG.ribbon[1].activeBlock ) and ( matchBlocks[2] == _myG.ribbon[2].activeBlock ) and  ( matchBlocks[3] == _myG.ribbon[3].activeBlock ) then
                 signSpinToCheck()
                 timer.performWithDelay( 700, audioThatsMyGoblin )
-                -- replace with victory animation
+                -- replace below with victory animation
                 timer.performWithDelay( 3000, signSpinFromCheck )
                 timer.performWithDelay( 3500, uiActiveTrue )
             else
@@ -329,6 +333,7 @@ function scene:create( event )
 
     -- on first scene load, play banner animation
 
+    -- edit below to incorporate introComplete variable
     uiActiveTrue()
     timer.performWithDelay( 400, lowerBanner )
     introComplete = "true"
