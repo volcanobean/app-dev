@@ -349,6 +349,29 @@ function scene:create( event )
         return true  
     end
 
+    -- Randomize function
+
+    _myG.scopeTest = function()
+        print ("I see it")
+    end
+
+    function _myG.randomizeBlocks()  
+        local ribbonCount = 3
+        for i=1, 3 do
+            local randomNum = math.random( _myG.blockCount )
+            --print( randomNum )
+            _myG.ribbon[i].activeBlock = randomNum
+            --_myG.ribbon[i].debug.text = "R" .. i .. " Active Block: " .. _myG.ribbon[i].activeBlock
+            transition.to( _myG.ribbon[i], { time=800, x=blockEnd[randomNum] + _myG.blockWidth/2 + _myG.blockMargin } )
+        end
+    end
+
+    --[[
+    local randomBtn = display.newText( "--RANDOMIZE--", display.contentCenterX, 100, native.systemFont, 30 )
+    randomBtn:addEventListener( "tap", _myG.randomizeBlocks )
+    sceneGroup:insert( randomBtn )
+    ]]--
+
     -- Create guide for center of screen
     --display.newRect( parent, x, y, width, height )
     local centerRule = display.newRect( display.contentCenterX, 500, 10, 1000 )
