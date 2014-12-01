@@ -13,12 +13,6 @@ local _myG = composer.myGlobals
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
 -- -----------------------------------------------------------------------------------------------------------------
 
--- local forward references should go here
-
-
--- -------------------------------------------------------------------------------
-
-
 -- "scene:create()"
 -- Initialize the scene here.
 
@@ -33,8 +27,9 @@ function scene:create( event )
     matchBlocks[2] = 1
     matchBlocks[3] = 1
 
-    local introComplete = "false"
+    _myG.introComplete = "false"
     local bannerTimer
+    local signState = "goblin"
 
     --local debug
 
@@ -42,7 +37,7 @@ function scene:create( event )
     local activeText = display.newText( "UI Active: " .. _myG.uiActive, display.contentCenterX, 950, native.systemFont, 30 ) 
 
     local matchBlocksText = display.newText( "Match these: " .. matchBlocks[1] .. ", " .. matchBlocks[2] .. ", " .. matchBlocks[3], display.contentCenterX, 20, native.systemFont, 30 )
-    local activeRibbonsText = display.newText( "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock, display.contentCenterX, 60, native.systemFont, 30 )
+    _myG.activeRibbonsText = display.newText( "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock, display.contentCenterX, 60, native.systemFont, 30 )
 
     -- UI on/off functions
 
@@ -75,11 +70,13 @@ function scene:create( event )
 
     local function audioThatsMyGoblin()
         goblinText.text = "That's my goblin!" 
+        media.playEventSound( mySound )
         timer.performWithDelay( 2000, stopAudio )
     end
 
     local function audioNotMyGoblin()
         goblinText.text = "That's not my goblin." 
+        media.playEventSound( mySound )
         timer.performWithDelay( 2000, stopAudio )
     end
 
@@ -91,6 +88,7 @@ function scene:create( event )
     shader:setFillColor( 0, 0, 0, 1 ) 
     -- transition to alpha 0 to hide shader on page load
     transition.to( shader, { time=1, alpha=0 } )
+    sceneGroup:insert( shader )
     
     local bannerUpY = -500
     local bannerDownY = 425
@@ -100,6 +98,7 @@ function scene:create( event )
     local banner = display.newImageRect( "images/banner-512w.png", 569, 1004 ) -- PoT - upscaling smaller 512w image to 569w
     banner.x = display.contentWidth*0.5
     banner.y = bannerUpY
+    sceneGroup:insert( banner )
 
     -- Add goblin match pieces to banner
 
@@ -134,16 +133,6 @@ function scene:create( event )
 
     -- animate banner
 
-    local function uiActiveCheck()
-        --[[if introComplete == "true" then
-            _myG.uiActive = "true"
-        else
-            -- cue up next part of intro
-            --timer.performWithDelay( 600, sliderIntro )
-        end]]--
-        uiActiveTrue()
-    end
-
     local function bannerPlayDown()
         transition.to( banner, { time=500, y=bannerDownY, transition=easing.outSine } )
         transition.to( matchBlocksGroup, { time=500, y=matchDownY, transition=easing.outSine } )
@@ -153,7 +142,7 @@ function scene:create( event )
     local function bannerPlayUp()
         transition.to( banner, { time=500, y=bannerUpY, transition=easing.outSine } )
         transition.to( matchBlocksGroup, { time=500, y=matchUpY, transition=easing.outSine } )
-        transition.to( shader, { time=300, alpha=0, onComplete=uiActiveCheck } )
+        transition.to( shader, { time=300, alpha=0 } )
     end
 
     -- Randomize functions
@@ -204,7 +193,7 @@ function scene:create( event )
 
     local function handlePlay( seqVar )
         if seqVar == "down" then
-            transition.to( gearHandle, { time=400, rotation=90, transition=easing.outSine } )
+            transition.to( gearHandle, { time=400, rotation=100, transition=easing.outSine } )
         elseif seqVar == "up" then
             transition.to( gearHandle, { time=400, rotation=0, transition=easing.outSine } )
         end
@@ -225,6 +214,7 @@ function scene:create( event )
 
     local signSequence =
     {
+        { name="spin", frames={ 6, 7, 8, 11, 9, 10, 6, 7, 8, 11, 9, 10, 6, 7, 7, 6 }, time=500, loopCount=1 },
         { name="spinToCheck", frames={ 6, 7, 8, 11, 9, 10, 6, 7, 8, 11, 4, 5, 1, 2, 2, 1 }, time=500, loopCount=1 },
         { name="spinToX", frames={ 6, 7, 8, 11, 9, 10, 6, 7, 8, 11, 15, 16, 12, 13, 13, 12 }, time=500, loopCount=1 },
         { name="spinFromCheck", frames={ 1, 2, 3, 11, 4, 5, 1, 2, 3, 11, 9, 10, 6, 7, 7, 6 }, time=500, loopCount=1 },
@@ -238,6 +228,11 @@ function scene:create( event )
     signSprite.y = 931
     signSprite:setFrame(1) -- 1 refers to the first frame in the sequence, not the frame number
     sceneGroup:insert( signSprite )
+
+    local function signSpin()
+        signSprite:setSequence( "spin" )
+        signSprite:play()
+    end
 
     local function signSpinToCheck()
         signSprite:setSequence( "spinToCheck" )
@@ -259,14 +254,24 @@ function scene:create( event )
         signSprite:play()
     end
 
-    -- make slider visible, for use after intro compeletes
+    -- Sign animation and match checking
 
-    local function showGoblinSlider()
-        _myG.ribbon[1].isVisible = true
-        _myG.ribbon[2].isVisible = true
-        _myG.ribbon[3].isVisible = true
-        _myG.randomizeBlocks()
-        introComplete = "true"
+    local function compareGoblins()
+        print "Checking goblins"
+        _myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
+        -- if user successfully has a match
+        if matchBlocks[1] == _myG.ribbon[1].activeBlock and matchBlocks[2] == _myG.ribbon[2].activeBlock and matchBlocks[3] == _myG.ribbon[3].activeBlock then
+            signSpinToCheck()
+            signState = "check"
+            timer.performWithDelay( 700, audioThatsMyGoblin )
+            -- replace below with victory animation
+            timer.performWithDelay( 3000, signSpinFromCheck )
+            timer.performWithDelay( 3500, uiActiveTrue )
+        else
+            signSpinToX()
+            signState = "x"
+            timer.performWithDelay( 700, audioNotMyGoblin )
+        end
     end
 
     -- animation functions
@@ -275,20 +280,28 @@ function scene:create( event )
         handlePlay( "up" )
         gearPlay( "backward" )
         bannerPlayUp()
-        print ("raiseBanner uiActive: " .. _myG.uiActive )
-        if ( introComplete == "false") then
-            timer.performWithDelay( 600, showGoblinSlider )
+        print( "raiseBanner uiActive: " .. _myG.uiActive )
+        if ( _myG.introComplete == "false" ) then
+            _myG.loadSlider()
+        elseif ( signState == "x" ) then
+            signSpinFromX()
+            timer.performWithDelay( 500, uiActiveTrue )
         end
     end
 
-    local function lowerBanner( event )
-        if _myG.uiActive == "true" then
+    local function turnCrank( event )
+        if ( _myG.uiActive == "true" ) then
             uiActiveFalse()
             handlePlay( "down" )
             gearPlay( "forward" )
-            timer.performWithDelay( 600, bannerPlayDown )
-            timer.performWithDelay( 1400, audioWheresMyGoblin ) 
-            bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
+            if ( _myG.introComplete == "false" ) then
+                timer.performWithDelay( 600, bannerPlayDown )
+                timer.performWithDelay( 1400, audioWheresMyGoblin )
+            else
+                timer.performWithDelay( 600, compareGoblins )
+                timer.performWithDelay( 2000, bannerPlayDown )
+            end
+            bannerStayTimer = timer.performWithDelay( 6000, raiseBanner )
         end
         return true
     end
@@ -296,51 +309,28 @@ function scene:create( event )
     local function raiseBannerNow( event )
         timer.cancel( bannerStayTimer )
         raiseBanner()
-        print ("raiseBannerNow uiActive: " .. _myG.uiActive )
+        print( "raiseBannerNow uiActive: " .. _myG.uiActive )
         return true
     end
 
-    -- Sign animation and match checking
-
-    local function compareGoblins( event )
-        if( _myG.uiActive == "true" ) then
-            uiActiveFalse()
-            print "Checking goblins"
-            activeRibbonsText.text = "activeRibbons: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
-            -- if user successfully has a match
-            if ( matchBlocks[1] == _myG.ribbon[1].activeBlock ) and ( matchBlocks[2] == _myG.ribbon[2].activeBlock ) and  ( matchBlocks[3] == _myG.ribbon[3].activeBlock ) then
-                signSpinToCheck()
-                timer.performWithDelay( 700, audioThatsMyGoblin )
-                -- replace below with victory animation
-                timer.performWithDelay( 3000, signSpinFromCheck )
-                timer.performWithDelay( 3500, uiActiveTrue )
-            else
-                signSpinToX()
-                timer.performWithDelay( 700, audioNotMyGoblin )
-                timer.performWithDelay( 3000, signSpinFromX )
-                timer.performWithDelay( 3500, uiActiveTrue )
-            end
-        end
-        return true
+    function _myG.startGamePlay()
+        _myG.introComplete = "true"
+        _myG.uiActive = "true"
+        _myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
     end
 
     -- event listeners
 
-    gearSprite:addEventListener( "tap", lowerBanner )
-    gearHandle:addEventListener( "tap", lowerBanner )
+    gearSprite:addEventListener( "tap", turnCrank )
+    gearHandle:addEventListener( "tap", turnCrank )
     shader:addEventListener( "tap", raiseBannerNow )
-    signSprite:addEventListener( "tap", compareGoblins )
 
-    -- on first scene load, play banner animation
-    -- temporarily true to allow first animation
 
-    uiActiveTrue() 
+    -- INTRO ANIMATION:
 
-    -- Generate random goblin values on first scene load
-
+    uiActiveTrue() -- temporarily true to allow first animation
     randomizeMatch()
-
-    timer.performWithDelay( 400, lowerBanner )
+    timer.performWithDelay( 600, turnCrank )
 
 --end scene:create
 end 

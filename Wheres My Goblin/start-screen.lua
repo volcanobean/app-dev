@@ -13,12 +13,6 @@ local _myG = composer.myGlobals
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
 -- -----------------------------------------------------------------------------------------------------------------
 
--- local forward references should go here
-
-
--- -------------------------------------------------------------------------------
-
-
 -- "scene:create()"
 -- Initialize the scene here.
 function scene:create( event )
@@ -42,8 +36,12 @@ function scene:create( event )
     sceneGroup:insert( _myG.background )
 
     -- game title
-    local titleText = display.newText( "where's my goblin?", display.contentCenterX, 400, "Mathlete-Skinny", 125 )
-    sceneGroup:insert( titleText )
+    local titleText1 = display.newText( "where's", display.contentCenterX, 400, "Mathlete-Skinny", 125 )
+    local titleText2 = display.newText( "my", display.contentCenterX, 525, "Mathlete-Skinny", 125 )
+    local titleText3 = display.newText( "goblin?", display.contentCenterX, 650, "Mathlete-Skinny", 125 )
+    sceneGroup:insert( titleText1 )
+    sceneGroup:insert( titleText2 )
+    sceneGroup:insert( titleText3 )
 
     local startBtn = display.newText( "start", display.contentCenterX, 875, "Mathlete-Skinny", 80 )
     -- startBtn:addEventListener( "tap", startGame )

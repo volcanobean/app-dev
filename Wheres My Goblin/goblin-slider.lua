@@ -13,12 +13,6 @@ local _myG = composer.myGlobals
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
 -- -----------------------------------------------------------------------------------------------------------------
 
--- local forward references should go here
-
-
--- -------------------------------------------------------------------------------
-
-
 -- "scene:create()"
 -- Initialize the scene here.
 
@@ -349,29 +343,6 @@ function scene:create( event )
         return true  
     end
 
-    -- Randomize function
-
-    _myG.scopeTest = function()
-        print ("I see it")
-    end
-
-    function _myG.randomizeBlocks()  
-        local ribbonCount = 3
-        for i=1, 3 do
-            local randomNum = math.random( _myG.blockCount )
-            --print( randomNum )
-            _myG.ribbon[i].activeBlock = randomNum
-            --_myG.ribbon[i].debug.text = "R" .. i .. " Active Block: " .. _myG.ribbon[i].activeBlock
-            transition.to( _myG.ribbon[i], { time=800, x=blockEnd[randomNum] + _myG.blockWidth/2 + _myG.blockMargin } )
-        end
-    end
-
-    --[[
-    local randomBtn = display.newText( "--RANDOMIZE--", display.contentCenterX, 100, native.systemFont, 30 )
-    randomBtn:addEventListener( "tap", _myG.randomizeBlocks )
-    sceneGroup:insert( randomBtn )
-    ]]--
-
     -- Create guide for center of screen
     --display.newRect( parent, x, y, width, height )
     local centerRule = display.newRect( display.contentCenterX, 500, 10, 1000 )
@@ -521,15 +492,55 @@ function scene:create( event )
         blockGroupB[3]:insert( legsB[i] )
     end
 
+    -- slider setup for first load
+
+    function _myG.loadSlider()
+        -- get random values for start position
+        local random1 = math.random( 1, _myG.blockCount-2 )
+        local random2 = math.random( 1, _myG.blockCount-1 )
+        local random3 = math.random( 2, _myG.blockCount )
+        -- get offset values
+        local end1 = random1+1
+        local end2 = random1+2
+        local end3 = random2+1
+        local end4 = random3-1
+        if( end2 > _myG.blockCount ) then
+            end2 = _myG.blockCount
+        end
+        if( end3 > _myG.blockCount ) then
+            end3 = _myG.blockCount
+        end
+        print( random1,random2,random3 )
+        print( end2,end3,end4 )
+        -- set inital positions
+        transition.to( _myG.ribbon[1], { time=0, x=blockEnd[random1] + _myG.blockWidth/2 + _myG.blockMargin } )
+        transition.to( _myG.ribbon[2], { time=0, x=blockEnd[random2] + _myG.blockWidth/2 + _myG.blockMargin } )
+        transition.to( _myG.ribbon[3], { time=0, x=blockEnd[random3] + _myG.blockWidth/2 + _myG.blockMargin } )
+        --fade in
+        transition.to( _myG.ribbon[1], { time=600, alpha=1 } )
+        transition.to( _myG.ribbon[2], { time=600, alpha=1 } )
+        transition.to( _myG.ribbon[3], { time=600, alpha=1 } )
+        -- begin animation
+        transition.to( _myG.ribbon[1], { delay=700, time=275, x=blockEnd[end1] + _myG.blockWidth/2 + _myG.blockMargin } )
+        transition.to( _myG.ribbon[1], { delay=1400, time=275, x=blockEnd[end2] + _myG.blockWidth/2 + _myG.blockMargin } )
+        transition.to( _myG.ribbon[2], { delay=2100, time=275, x=blockEnd[end3] + _myG.blockWidth/2 + _myG.blockMargin } )
+        transition.to( _myG.ribbon[3], { delay=2800, time=275, x=blockEnd[end4] + _myG.blockWidth/2 + _myG.blockMargin } )
+        -- set ative block values based on post-animation start position
+        _myG.ribbon[1].activeBlock = end2
+        _myG.ribbon[2].activeBlock = end3
+        _myG.ribbon[3].activeBlock = end4
+        timer.performWithDelay( 3100, _myG.startGamePlay )
+    end
+
+    -- Load Goblin banner and UI 
+
+    composer.showOverlay( "ui-overlay", { effect="fade" }  )
+
     -- Hide the goblin slider on initial game load.
     
-    _myG.ribbon[1].isVisible = false
-    _myG.ribbon[2].isVisible = false
-    _myG.ribbon[3].isVisible = false
-    
-    -- Load Golbin banner and UI 
-
-    composer.showOverlay( "ui-overlay" )
+    _myG.ribbon[1].alpha=0
+    _myG.ribbon[2].alpha=0
+    _myG.ribbon[3].alpha=0
 
 --end scene:create
 end 
