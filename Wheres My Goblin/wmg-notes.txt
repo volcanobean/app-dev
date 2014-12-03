@@ -156,5 +156,12 @@ on sign click
 -- END GAMEPLAY
 
 
+pull crank
+signSpin
+goblin check
+lower banner
+raise banner
+sign spin
+crank reverse
 
 
