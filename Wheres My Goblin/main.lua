@@ -44,7 +44,7 @@ composer.gotoScene( "start-screen" )
 
 -- Code to have Corona display the font names found
 
---[[
+
 --
 local fonts = native.getFontNames()
 
@@ -57,7 +57,7 @@ end
 
 print( "\rFont count = " .. count )
 
-local name = "athlete"     -- part of the Font name we are looking for
+local name = "agic"     -- part of the Font name we are looking for
 
 name = string.lower( name )
 
@@ -72,5 +72,5 @@ for i, fontname in ipairs(fonts) do
     end
 end
 ---------------------------------------------------------
-]]--
+
 

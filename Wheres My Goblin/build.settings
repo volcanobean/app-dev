@@ -11,10 +11,10 @@ settings =
         {
             UIAppFonts =
             {
-                "Mathelete-Bulky.ttf",
-                "Mathelete-BulkySlant.ttf",
-                "Mathelete-Skinny.ttf",
-                "Mathelete-SkinnySlant.ttf"
+                "fonts/Mathlete-Bulky.ttf",
+                "fonts/Mathlete-BulkySlant.ttf",
+                "fonts/Mathlete-Skinny.ttf",
+                "fonts/Mathlete-SkinnySlant.ttf"
             },
             UIApplicationExitsOnSuspend = false
         },

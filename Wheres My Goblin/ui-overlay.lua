@@ -360,7 +360,7 @@ function scene:create( event )
             else
                 timer.performWithDelay( 600, compareGoblins )
             end
-            bannerStayTimer = timer.performWithDelay( 6000, raiseBanner )
+            bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
         end
         return true
     end

@@ -77,7 +77,7 @@ function scene:create( event )
     sceneGroup:insert( titleText2 )
     sceneGroup:insert( titleText3 )
 
-    local startBtn = display.newText( "start", display.contentCenterX, 875, "Mathlete-Skinny", 80 )
+    local startBtn = display.newText( "start", display.contentCenterX, 875, "Mathlete-SkinnySlant", 80 )
     -- startBtn:addEventListener( "tap", startGame )
     sceneGroup:insert( startBtn )
     
