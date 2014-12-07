@@ -1,4 +1,11 @@
-iphone =
+settings =
+{
+    orientation =
+    {
+        default = "portrait",
+        supported = { "portrait", "portraitUpsideDown" }
+    },
+    iphone =
     {
         plist =
         {
@@ -9,6 +16,15 @@ iphone =
                 "Mathelete-Skinny.ttf",
                 "Mathelete-SkinnySlant.ttf"
             },
-            UIApplicationExitsOnSuspend = true
+            UIApplicationExitsOnSuspend = false
         },
-    }
+    },
+    --[[
+    plugins =
+    {
+        ["plugin.google.play.services"] =
+        {
+            publisherId = "com.coronalabs"
+        },
+    }, ]]--
+}

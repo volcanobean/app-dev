@@ -371,7 +371,7 @@ function scene:create( event )
 
     -- We render the background image after the hit area so it is stacked on top, hiding the hit area.
     
-    _myG.background = display.newImage( "images/forest_bg.jpg" )
+    _myG.background = display.newImageRect( "images/forest-bg.jpg", 768, 1366 )
     _myG.background.x = display.contentCenterX
     _myG.background.y = display.contentCenterY
     sceneGroup:insert( _myG.background )
@@ -402,7 +402,8 @@ function scene:create( event )
     -- Image sheets for body parts
 
     local headCount = _myG.blockCount
-    local headSheet = graphics.newImageSheet( "images/head-sheet.png", { width=_myG.blockWidth, height=_myG.blockHeight1, numFrames=headCount, sheetContentWidth=_myG.blockWidth, sheetContentHeight=_myG.blockHeight1*headCount } )
+    local headSheetInfo = require("heads-sheet")
+    local headSheet = graphics.newImageSheet( "images/heads-sheet.png", headSheetInfo:getSheet() )
     local headFrames = { start=1, count=headCount }
 
     local torsoCount = _myG.blockCount
@@ -532,16 +533,6 @@ function scene:create( event )
         timer.performWithDelay( 3100, _myG.startGamePlay )
     end
 
-    -- Load Goblin banner and UI 
-
-    composer.showOverlay( "ui-overlay", { effect="fade" }  )
-
-    -- Hide the goblin slider on initial game load.
-    
-    _myG.ribbon[1].alpha=0
-    _myG.ribbon[2].alpha=0
-    _myG.ribbon[3].alpha=0
-
 --end scene:create
 end 
 
@@ -551,10 +542,17 @@ function scene:show( event )
 
     if ( event.phase == "will" ) then
         -- Called when the scene is still off screen (but is about to come on screen).
-    elseif ( event.phase == "did" ) then
-        -- Called when the scene is now on screen.
 
-        
+        -- Hide the goblin slider on initial game load.
+        _myG.ribbon[1].alpha=0
+        _myG.ribbon[2].alpha=0
+        _myG.ribbon[3].alpha=0
+
+    elseif ( event.phase == "did" ) then
+        -- Called when the scene is now on screen
+
+        -- Load Goblin banner and UI 
+        composer.showOverlay( "ui-overlay", { effect="fade" }  )
 
     end
 end

@@ -13,6 +13,15 @@ local _myG = composer.myGlobals
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
 -- -----------------------------------------------------------------------------------------------------------------
 
+-- local forward references should go here
+-- any reference created in scene:create will not be available in scene:hide, show, etc
+-- unless it is first defined as a forward reference here
+
+local bannerStayTimer
+local crankTimer
+
+-- -------------------------------------------------------------------------------
+
 -- "scene:create()"
 -- Initialize the scene here.
 
@@ -28,7 +37,7 @@ function scene:create( event )
     matchBlocks[3] = 1
 
     _myG.introComplete = "false"
-    local bannerTimer
+    local bannerState = "up"
     local signState = "goblin"
 
     --local debug
@@ -38,6 +47,16 @@ function scene:create( event )
 
     local matchBlocksText = display.newText( "Match these: " .. matchBlocks[1] .. ", " .. matchBlocks[2] .. ", " .. matchBlocks[3], display.contentCenterX, 20, native.systemFont, 30 )
     _myG.activeRibbonsText = display.newText( "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock, display.contentCenterX, 60, native.systemFont, 30 )
+
+    sceneGroup:insert( goblinText )
+    sceneGroup:insert( activeText )
+    sceneGroup:insert( matchBlocksText )
+    sceneGroup:insert( _myG.activeRibbonsText )
+
+    goblinText.isVisible = false
+    activeText.isVisible = false
+    matchBlocksText.isVisible = false
+    _myG.activeRibbonsText.isVisible = false
 
     -- UI on/off functions
 
@@ -55,7 +74,7 @@ function scene:create( event )
 
     -- temp function for debuggin, sans actual audio
 
-    local mySound = media.newEventSound( "audio/wmg-mason-01.wav" )
+    local mySound = audio.loadSound( "audio/wmg-mason-01.wav" )
 
     local function stopAudio()
         goblinText.text = ""
@@ -64,25 +83,25 @@ function scene:create( event )
     local function audioWheresMyGoblin()
         goblinText.text = "Where's my goblin?" 
         -- Play sound
-        media.playEventSound( mySound )
+        audio.play( mySound )
         timer.performWithDelay( 2000, stopAudio )
     end
 
     local function audioThatsMyGoblin()
         goblinText.text = "That's my goblin!" 
-        media.playEventSound( mySound )
+        --audio.play( mySound )
         timer.performWithDelay( 2000, stopAudio )
     end
 
     local function audioNotMyGoblin()
         goblinText.text = "That's not my goblin." 
-        media.playEventSound( mySound )
+        --audio.play( mySound )
         timer.performWithDelay( 2000, stopAudio )
     end
 
     -- Banner sprites
 
-    local shader = display.newRect( display.contentWidth*0.5, display.contentHeight*0.5, display.contentWidth, display.contentHeight )
+    local shader = display.newRect( display.contentWidth*0.5, display.contentHeight*0.5, display.contentWidth+10, display.contentHeight+10 )
     -- can't start object with an alpha of 0 or corona will not render it
     -- also, transition values will be relative to intial value, so we start with 1 (100%)
     shader:setFillColor( 0, 0, 0, 1 ) 
@@ -95,7 +114,7 @@ function scene:create( event )
     local matchUpY = -925
     local matchDownY = 0
 
-    local banner = display.newImageRect( "images/banner-512w.png", 569, 1004 ) -- PoT - upscaling smaller 512w image to 569w
+    local banner = display.newImageRect( "images/banner.png", 569, 1004 ) -- PoT - upscaling smaller 512w image to 569w
     banner.x = display.contentWidth*0.5
     banner.y = bannerUpY
     sceneGroup:insert( banner )
@@ -105,9 +124,12 @@ function scene:create( event )
     local mScale = 0.83 -- single variable to scale all goblin banner parts larger or smaller
 
     local headMatchCount = _myG.blockCount
-    local headMatchSheet = graphics.newImageSheet( "images/head-sheet.png", { width=_myG.blockWidth*mScale, height=_myG.blockHeight1*mScale, numFrames=headMatchCount, sheetContentWidth=_myG.blockWidth*mScale, sheetContentHeight=_myG.blockHeight1*headMatchCount*mScale } )
+    -- instead of loading the original heads-sheet.lua file, load a duplicate with scaled values
+    local headMatchSheetInfo = require("match-heads-sheet") 
+    local headMatchSheet = graphics.newImageSheet( "images/heads-sheet.png", headMatchSheetInfo:getSheet() )
     local headMatchFrames = { start=1, count=_myG.blockCount }
     local headMatch = display.newSprite( headMatchSheet, headMatchFrames )
+    --headMatch = display.newImageRect( headMatchSheet, 1, _myG.blockWidth*mScale, _myG.blockHeight2*mScale )
     headMatch.x = display.contentCenterX
     headMatch.y = 380*mScale
 
@@ -130,16 +152,21 @@ function scene:create( event )
     matchBlocksGroup:insert( torsoMatch )
     matchBlocksGroup:insert( headMatch )
     matchBlocksGroup.y = matchUpY
+    sceneGroup:insert( matchBlocksGroup )
 
     -- animate banner
 
     local function bannerPlayDown()
+        bannerState = "down"
+        print( bannerState ) 
         transition.to( banner, { time=500, y=bannerDownY, transition=easing.outSine } )
         transition.to( matchBlocksGroup, { time=500, y=matchDownY, transition=easing.outSine } )
         transition.to( shader, { time=300, alpha=0.5 } )
     end
 
     local function bannerPlayUp()
+        bannerState = "up"
+        print( bannerState ) 
         transition.to( banner, { time=500, y=bannerUpY, transition=easing.outSine } )
         transition.to( matchBlocksGroup, { time=500, y=matchUpY, transition=easing.outSine } )
         transition.to( shader, { time=300, alpha=0 } )
@@ -170,9 +197,16 @@ function scene:create( event )
         matchBlocksText.text = "Match these: " .. matchBlocks[1] .. ", " .. matchBlocks[2] .. ", " .. matchBlocks[3]
     end
 
-    local randomizeBtn = display.newText( "--RANDOMIZE--", display.contentCenterX, 100, native.systemFont, 30 )
-    randomizeBtn:addEventListener( "tap", randomizeMatch )
-    sceneGroup:insert( randomizeBtn )
+    -- back to home
+
+    local function returnHome( event )
+        composer.gotoScene( "start-screen" )
+        return true
+    end
+
+    local homeButton = display.newText( "<- HOME", 100, 50, native.systemFont, 30 )
+    homeButton:addEventListener( "tap", returnHome )
+    sceneGroup:insert( homeButton )
 
     -- gear sprite
 
@@ -205,8 +239,13 @@ function scene:create( event )
     gearSprite:setFrame(1) -- 1 refers to the first frame in the sequence (6), not the frame number
     sceneGroup:insert( gearSprite )
 
-    local function gearPlay( seqVar )
-        gearSprite:setSequence( seqVar )
+    local function gearForward()
+        gearSprite:setSequence( "forward" )
+        gearSprite:play()
+    end
+
+    local function gearBackward()
+        gearSprite:setSequence( "backward" )
         gearSprite:play()
     end
 
@@ -254,22 +293,30 @@ function scene:create( event )
         signSprite:play()
     end
 
+    -- vicotry animation
+
+    local function playVictoryScene()
+        print ( "Victory!" )
+    end
+
     -- Sign animation and match checking
 
     local function compareGoblins()
-        print "Checking goblins"
-        _myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
+        print "compareGoblins"
+        --_myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
         -- if user successfully has a match
         if matchBlocks[1] == _myG.ribbon[1].activeBlock and matchBlocks[2] == _myG.ribbon[2].activeBlock and matchBlocks[3] == _myG.ribbon[3].activeBlock then
             signSpinToCheck()
             signState = "check"
             timer.performWithDelay( 700, audioThatsMyGoblin )
             -- replace below with victory animation
-            timer.performWithDelay( 3000, signSpinFromCheck )
-            timer.performWithDelay( 3500, uiActiveTrue )
+            --timer.performWithDelay( 3000, signSpinFromCheck )
+            --timer.performWithDelay( 3500, uiActiveTrue )
+            playVictoryScene()
         else
             signSpinToX()
             signState = "x"
+            bannerPlayDown()
             timer.performWithDelay( 700, audioNotMyGoblin )
         end
     end
@@ -277,8 +324,9 @@ function scene:create( event )
     -- animation functions
 
     local function raiseBanner()
+        print ( "raiseBanner" )
         handlePlay( "up" )
-        gearPlay( "backward" )
+        gearBackward()
         bannerPlayUp()
         print( "raiseBanner uiActive: " .. _myG.uiActive )
         if ( _myG.introComplete == "false" ) then
@@ -289,27 +337,31 @@ function scene:create( event )
         end
     end
 
+    local function raiseBannerNow( event )
+        print( "raiseBannerNow" )
+        timer.cancel( bannerStayTimer )
+        raiseBanner()
+        print( "raiseBannerNow uiActive: " .. _myG.uiActive )
+        return true
+    end
+
     local function turnCrank( event )
+        print ( "turnCrank" )
+        if ( bannerState == "down" ) then
+            raiseBannerNow()
+        end
         if ( _myG.uiActive == "true" ) then
             uiActiveFalse()
             handlePlay( "down" )
-            gearPlay( "forward" )
+            gearForward()
             if ( _myG.introComplete == "false" ) then
                 timer.performWithDelay( 600, bannerPlayDown )
                 timer.performWithDelay( 1400, audioWheresMyGoblin )
             else
                 timer.performWithDelay( 600, compareGoblins )
-                timer.performWithDelay( 2000, bannerPlayDown )
             end
             bannerStayTimer = timer.performWithDelay( 6000, raiseBanner )
         end
-        return true
-    end
-
-    local function raiseBannerNow( event )
-        timer.cancel( bannerStayTimer )
-        raiseBanner()
-        print( "raiseBannerNow uiActive: " .. _myG.uiActive )
         return true
     end
 
@@ -330,7 +382,7 @@ function scene:create( event )
 
     uiActiveTrue() -- temporarily true to allow first animation
     randomizeMatch()
-    timer.performWithDelay( 600, turnCrank )
+    crankTimer = timer.performWithDelay( 600, turnCrank )
 
 --end scene:create
 end 
@@ -355,6 +407,10 @@ function scene:hide( event )
         -- Called when the scene is on screen (but is about to go off screen).
         -- Insert code here to "pause" the scene.
         -- Example: stop timers, stop animation, stop audio, etc.
+
+        timer.cancel( bannerStayTimer )
+        timer.cancel( crankTimer )
+
     elseif ( event.phase == "did" ) then
         -- Called immediately after scene goes off screen.
     end

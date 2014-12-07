@@ -9,6 +9,8 @@ local scene = composer.newScene()
 
 local _myG = composer.myGlobals
 
+-- local ads = require( "ads" )
+
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
 -- -----------------------------------------------------------------------------------------------------------------
@@ -18,27 +20,59 @@ local _myG = composer.myGlobals
 function scene:create( event )
     local sceneGroup = self.view
 
+    -- Ad code
+
+    --[[
+
+    local bannerAppID = "ca-app-pub-7094148843149156/1832646501"  -- admob, iOS banner
+
+    local adProvider = "admob"
+
+    local function adListener( event )
+        -- The 'event' table includes:
+        -- event.name: string value of "adsRequest"
+        -- event.response: message from the ad provider about the status of this request
+        -- event.phase: string value of "loaded", "shown", or "refresh"
+        -- event.type: string value of "banner" or "interstitial"
+        -- event.isError: boolean true or false
+
+        local msg = event.response
+        -- Quick debug message regarding the response from the library
+        print( "Message from the ads library: ", msg )
+
+        if ( event.isError ) then
+            print( "Error, no ad received", msg )
+        else
+            print( "Ah ha! Got one!" )
+        end
+    end
+
+    ads.init( adProvider, appID, adListener )
+    ]]--
+
     -- create start function
+
     local function startGame( event ) 
         composer.gotoScene( "goblin-slider" )
         return true
     end
 
     -- load 'secret button' first to hide it behind background image
+
     local startHitArea =  display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight )
     startHitArea:setFillColor( 0, 1, 1, 0.25 )
     startHitArea:addEventListener( "tap", startGame )
     sceneGroup:insert( startHitArea )
 
-    _myG.background = display.newImage( "images/forest_bg.jpg" )
+    _myG.background = display.newImageRect( "images/forest-bg.jpg", 768, 1366 )
     _myG.background.x = display.contentWidth*0.5
     _myG.background.y = display.contentHeight*0.5
     sceneGroup:insert( _myG.background )
 
     -- game title
-    local titleText1 = display.newText( "where's", display.contentCenterX, 400, "Mathlete-Skinny", 125 )
-    local titleText2 = display.newText( "my", display.contentCenterX, 525, "Mathlete-Skinny", 125 )
-    local titleText3 = display.newText( "goblin?", display.contentCenterX, 650, "Mathlete-Skinny", 125 )
+    local titleText1 = display.newText( "where's", display.contentCenterX, 300, "Mathlete-Skinny", 125 )
+    local titleText2 = display.newText( "my", display.contentCenterX, 410, "Mathlete-Skinny", 125 )
+    local titleText3 = display.newText( "goblin?", display.contentCenterX, 510, "Mathlete-Skinny", 125 )
     sceneGroup:insert( titleText1 )
     sceneGroup:insert( titleText2 )
     sceneGroup:insert( titleText3 )
@@ -47,7 +81,7 @@ function scene:create( event )
     -- startBtn:addEventListener( "tap", startGame )
     sceneGroup:insert( startBtn )
     
-    print( "Scene created: start-screen")
+    -- ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
 end
 
 -- "scene:show()"

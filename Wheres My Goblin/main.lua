@@ -36,6 +36,12 @@ _myG.ribbonY3 = 710
 composer.gotoScene( "start-screen" )
 
 
+-- Scale factor
+-- This value specifies the scale threshold above which Corona will use images in that suffix set.
+-- The following code can help you determine the proper values:
+
+-- print( "Scale factor: " .. display.pixelWidth / display.actualContentWidth )
+
 -- Code to have Corona display the font names found
 
 --[[
@@ -66,5 +72,5 @@ for i, fontname in ipairs(fonts) do
     end
 end
 ---------------------------------------------------------
-
 ]]--
+
