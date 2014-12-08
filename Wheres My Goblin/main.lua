@@ -21,7 +21,7 @@ local _myG = composer.myGlobals
 -- Block and ribbon values. Adjust as needed
 
 _myG.blockCount = 10
-_myG.blockWidth = 512 -- replace with % instead of pixels later (responsive)
+_myG.blockWidth = 512 -- replace with % instead of pixels later ("adaptive")
 _myG.blockMargin = 90
 
 _myG.blockHeight1 = 312

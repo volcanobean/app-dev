@@ -1,76 +1,35 @@
---
--- Abstract: Where's My Goblin?
---
--- Version: 1.0
---
--- Copyright (C) 2014 Volcano Bean, LLC. All Rights Reserved.
-------------------------------------------------------------
+-- adaptive stage
 
 -- hide device status bar
 display.setStatusBar( display.HiddenStatusBar )
 
--- load composer, go to first scene
-local composer = require( "composer" )
+local myStage = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight )
+myStage:setFillColor( 1, 1, 1, 0.25 )
 
--- Create a table for my global variables, which will be shared between scenes/lua files.
-composer.myGlobals = {}
--- Assign shorter variable name to myGlobals table to save on typing.
-local _myG = composer.myGlobals
+-- bg image width is based on screen width, bg image height is based on a proportional percentage of that same screen width
+local bgTest = display.newImageRect( "images/forest-bg.jpg", display.contentWidth, display.contentWidth*1.77865)
+bgTest.x = display.contentCenterX
+bgTest.y = display.contentCenterY
 
--- Begin global settings
--- Block and ribbon values. Adjust as needed
+--local myPxRect = display.newRect( display.contentCenterX, display.contentCenterY, 300, 100 )
 
-_myG.blockCount = 6
-_myG.blockWidth = 512 -- replace with % instead of pixels later (responsive)
-_myG.blockMargin = 90
+--local myAdpRect = display.newRect( display.contentCenterX, display.contentCenterY+150, display.contentWidth*0.8, 100 )
 
-_myG.blockHeight1 = 312
-_myG.blockHeight2 = 540
-_myG.blockHeight3 = 396
+-- debug
+local stageHW = display.newText( display.contentWidth .. ' x ' .. display.contentHeight, display.contentCenterX, 50, native.systemFont, 30 )
 
-_myG.ribbonY1 = 245
-_myG.ribbonY2 = 555
-_myG.ribbonY3 = 710
+local bottomHugger = display.newGroup()
+bottomHugger.x = display.contentCenterX
+bottomHugger.y = display.contentHeight - 30
 
--- Now that our variables are set, let's start the game.
-composer.gotoScene( "start-screen" )
+local topH = display.newRect( bottomHugger, 0, 0, display.contentWidth, 20 )
+topH:setFillColor( 0, 1, 1, 1 )
 
-
--- Scale factor
--- This value specifies the scale threshold above which Corona will use images in that suffix set.
--- The following code can help you determine the proper values:
-
--- print( "Scale factor: " .. display.pixelWidth / display.actualContentWidth )
-
--- Code to have Corona display the font names found
+local bottomH = display.newRect( bottomHugger, 0, 20, display.contentWidth, 20 )
+bottomH:setFillColor( 1, 0, 1, 1 )
 
 
---
-local fonts = native.getFontNames()
 
-count = 0
+--768 x 1366
 
--- Count the number of total fonts
-for i,fontname in ipairs(fonts) do
-    count = count+1
-end
-
-print( "\rFont count = " .. count )
-
-local name = "agic"     -- part of the Font name we are looking for
-
-name = string.lower( name )
-
--- Display each font in the terminal console
-for i, fontname in ipairs(fonts) do
-    j, k = string.find( string.lower( fontname ), name )
-
-    if( j ~= nil ) then
-
-        print( "fontname = " .. tostring( fontname ) )
-
-    end
-end
----------------------------------------------------------
-
-
+--1.77865
