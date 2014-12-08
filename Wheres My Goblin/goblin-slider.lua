@@ -401,10 +401,15 @@ function scene:create( event )
 
     -- Image sheets for body parts
 
-    local headCount = _myG.blockCount
-    local headSheetInfo = require("heads-sheet")
-    local headSheet = graphics.newImageSheet( "images/heads-sheet.png", headSheetInfo:getSheet() )
+    local headCount = 9
+    local headSheetInfo = require("heads-sheet-1")
+    local headSheet = graphics.newImageSheet( "images/heads-1.png", headSheetInfo:getSheet() )
     local headFrames = { start=1, count=headCount }
+
+    local head2Count = 1
+    local head2SheetInfo = require("heads-sheet-2")
+    local head2Sheet = graphics.newImageSheet( "images/heads-2.png", head2SheetInfo:getSheet() )
+    local head2Frames = { start=1, count=head2Count }
 
     local torsoCount = _myG.blockCount
     local torsoSheet = graphics.newImageSheet( "images/torso-sheet.png", { width=_myG.blockWidth, height=_myG.blockHeight2, numFrames=torsoCount, sheetContentWidth=_myG.blockWidth, sheetContentHeight=_myG.blockHeight2*torsoCount } )
@@ -444,8 +449,17 @@ function scene:create( event )
     local headsA = {}
     for i=1, _myG.blockCount do
         -- Automatically calculate block layout within parent group based on height, width and margin values.
-        headsA[i] = display.newSprite( headSheet, headFrames )
-        headsA[i]:setFrame(i)
+        if ( i <= headCount ) then
+            -- on hd devices the head assets are too large for a single sprite sheet
+            -- so we use the first head sprite sheet
+            headsA[i] = display.newSprite( headSheet, headFrames )
+            headsA[i]:setFrame(i)
+        else
+            -- then use the second head sprite sheet tp pick up where we legt off
+            headsA[i] = display.newSprite( head2Sheet, head2Frames )
+            -- we use i minus headCount because, even though this is sprite 10 in our array, it is frame 1 in our second sprite sheet
+            headsA[i]:setFrame(i-headCount)
+        end
         headsA[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth*0.5 
         -- Note on *0.5 vs /2 to get half of _myG.blockWidth: in corona multiplication is faster than division
         -- Add to group, x, y values are relative to top, left
@@ -454,8 +468,15 @@ function scene:create( event )
 
     local headsB = {}
     for i=1, _myG.blockCount do
-        headsB[i] = display.newSprite( headSheet, headFrames )
-        headsB[i]:setFrame(i)
+        if ( i <= headCount ) then
+            -- use the first head sprite sheet
+            headsB[i] = display.newSprite( headSheet, headFrames )
+            headsB[i]:setFrame(i)
+        else
+            -- use the second head sprite sheet
+            headsB[i] = display.newSprite( head2Sheet, head2Frames )
+            headsB[i]:setFrame(i-headCount)
+        end
         headsB[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth*0.5
         blockGroupB[1]:insert( headsB[i] )
     end
