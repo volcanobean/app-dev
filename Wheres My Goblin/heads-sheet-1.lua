@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:fe5869029a1df66934dea85bcbdc8380:a9fde908063a73312783a5e60fc414c0:13305c6706f5985c6ad08badc402b12e$
+-- $TexturePacker:SmartUpdate:e15b0696c9a1e28b768a24a6fdb60eb9:b107b169826e74d7c186ed926211de31:df20e5a99330c3aec1aa6a51b5b12b0e$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -16,85 +16,109 @@ SheetInfo.sheet =
     
         {
             -- head-cheshire
-            x=306,
-            y=755,
+            x=643,
+            y=274,
             width=313,
-            height=264,
+            height=265,
 
             sourceX = 109,
-            sourceY = 36,
+            sourceY = 35,
             sourceWidth = 512,
             sourceHeight = 313
         },
         {
             -- head-gentleman
-            x=2,
-            y=479,
-            width=302,
-            height=312,
+            x=273,
+            y=731,
+            width=305,
+            height=281,
 
-            sourceX = 117,
-            sourceY = 0,
+            sourceX = 116,
+            sourceY = 32,
             sourceWidth = 512,
             sourceHeight = 313
         },
         {
             -- head-goggles
             x=2,
-            y=2,
-            width=394,
+            y=215,
+            width=396,
             height=201,
 
-            sourceX = 66,
+            sourceX = 65,
             sourceY = 93,
             sourceWidth = 512,
             sourceHeight = 313
         },
         {
             -- head-grump
-            x=2,
-            y=205,
+            x=580,
+            y=694,
             width=313,
-            height=272,
+            height=273,
 
             sourceX = 100,
-            sourceY = 24,
+            sourceY = 23,
             sourceWidth = 512,
             sourceHeight = 313
         },
         {
-            -- head-helmet
-            x=725,
-            y=2,
-            width=274,
-            height=258,
+            -- head-hood
+            x=2,
+            y=731,
+            width=269,
+            height=284,
 
-            sourceX = 126,
-            sourceY = 37,
+            sourceX = 135,
+            sourceY = 29,
             sourceWidth = 512,
             sourceHeight = 313
         },
         {
             -- head-skicap
-            x=398,
-            y=2,
-            width=325,
-            height=310,
+            x=2,
+            y=418,
+            width=326,
+            height=311,
 
             sourceX = 85,
-            sourceY = 2,
+            sourceY = 1,
             sourceWidth = 512,
             sourceHeight = 313
         },
         {
             -- head-tongue
-            x=306,
-            y=479,
-            width=310,
+            x=330,
+            y=418,
+            width=311,
             height=274,
 
-            sourceX = 128,
+            sourceX = 127,
             sourceY = 33,
+            sourceWidth = 512,
+            sourceHeight = 313
+        },
+        {
+            -- head-zzz1
+            x=453,
+            y=2,
+            width=405,
+            height=270,
+
+            sourceX = 70,
+            sourceY = 37,
+            sourceWidth = 512,
+            sourceHeight = 313
+        },
+        {
+            -- head-zzz2
+            x=2,
+            y=2,
+            width=449,
+            height=211,
+
+            sourceX = 40,
+            sourceY = 72,
             sourceWidth = 512,
             sourceHeight = 313
         },
@@ -111,9 +135,11 @@ SheetInfo.frameIndex =
     ["head-gentleman"] = 2,
     ["head-goggles"] = 3,
     ["head-grump"] = 4,
-    ["head-helmet"] = 5,
+    ["head-hood"] = 5,
     ["head-skicap"] = 6,
     ["head-tongue"] = 7,
+    ["head-zzz1"] = 8,
+    ["head-zzz2"] = 9,
 }
 
 function SheetInfo:getSheet()

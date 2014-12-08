@@ -126,7 +126,7 @@ function scene:create( event )
     local headMatchCount = _myG.blockCount
     -- instead of loading the original heads-sheet.lua file, load a duplicate with scaled values
     local headMatchSheetInfo = require("match-heads-sheet") 
-    local headMatchSheet = graphics.newImageSheet( "images/heads-sheet.png", headMatchSheetInfo:getSheet() )
+    local headMatchSheet = graphics.newImageSheet( "images/heads-1.png", headMatchSheetInfo:getSheet() )
     local headMatchFrames = { start=1, count=_myG.blockCount }
     local headMatch = display.newSprite( headMatchSheet, headMatchFrames )
     --headMatch = display.newImageRect( headMatchSheet, 1, _myG.blockWidth*mScale, _myG.blockHeight2*mScale )

@@ -1,4 +1,4 @@
-# Ignore any images or audio folder and their contents
+# Ignore any non-code asset folders and their contents
 */audio/*
 */fonts/*
 */images/*
