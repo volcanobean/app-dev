@@ -9,10 +9,6 @@ local scene = composer.newScene()
 
 local _myG = composer.myGlobals
 
-local cW = display.contentWidth
-local cH = display.contentHeight
-local mW = 0.0013020833*cW
-
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
 -- -----------------------------------------------------------------------------------------------------------------
@@ -105,7 +101,7 @@ function scene:create( event )
 
     -- Banner sprites
 
-    local shader = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth+10, display.contentHeight+10 )
+    local shader = display.newRect( display.contentWidth*0.5, display.contentHeight*0.5, display.contentWidth+10, display.contentHeight+10 )
     -- can't start object with an alpha of 0 or corona will not render it
     -- also, transition values will be relative to intial value, so we start with 1 (100%)
     shader:setFillColor( 0, 0, 0, 1 ) 
@@ -118,8 +114,8 @@ function scene:create( event )
     local matchUpY = -925
     local matchDownY = 0
 
-    local banner = display.newImageRect( "images/banner.png", 569*mW, 1004*mW)
-    banner.x = display.contentCenterX
+    local banner = display.newImageRect( "images/banner.png", 569, 1004 ) -- PoT - upscaling smaller 512w image to 569w
+    banner.x = display.contentWidth*0.5
     banner.y = bannerUpY
     sceneGroup:insert( banner )
 
@@ -216,16 +212,16 @@ function scene:create( event )
 
     local gearSequence =
     {
-        { name="forward", frames={ 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 3, 4, 4, 1 }, time=700, loopCount=1 },
-        { name="backward", frames={ 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 3, 2, 2, 1 }, time=700, loopCount=1 }
+        { name="forward", frames={ 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 3, 4, 4, 1 }, time=600, loopCount=1 },
+        { name="backward", frames={ 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 3, 2, 2, 1 }, time=600, loopCount=1 }
     }
 
     local gearSheetInfo = require("gear-sheet")
     local gearSheet = graphics.newImageSheet( "images/gear-sheet.png", gearSheetInfo:getSheet() )
     
     local gearHandle = display.newImage( gearSheet, 5 )
-    gearHandle.x = 70*mW
-    gearHandle.y = display.contentHeight-(91*mW)
+    gearHandle.x = 70
+    gearHandle.y = 933
     gearHandle.anchorY = 1
     sceneGroup:insert( gearHandle )
 
@@ -238,10 +234,8 @@ function scene:create( event )
     end
 
     local gearSprite = display.newSprite( gearSheet, gearSequence )
-    gearSprite.anchorX = 0
-    gearSprite.anchorY = 1
-    gearSprite.x = 0
-    gearSprite.y = cH
+    gearSprite.x = 85
+    gearSprite.y = 940
     gearSprite:setFrame(1) -- 1 refers to the first frame in the sequence (6), not the frame number
     sceneGroup:insert( gearSprite )
 
@@ -269,10 +263,9 @@ function scene:create( event )
     local signSheetInfo = require("sign-sheet")
     local signSheet = graphics.newImageSheet( "images/sign-sheet.png", signSheetInfo:getSheet() )
     local signSprite = display.newSprite( signSheet, signSequence )
-    signSprite.anchorY = 1
-    signSprite.x = 654*mW
-    signSprite.y = cH 
-    signSprite:setFrame(1) -- 1 refers to the first frame in the sequence (6), not the frame number
+    signSprite.x = 654
+    signSprite.y = 931
+    signSprite:setFrame(1) -- 1 refers to the first frame in the sequence, not the frame number
     sceneGroup:insert( signSprite )
 
     local function signSpin()
@@ -365,7 +358,7 @@ function scene:create( event )
                 timer.performWithDelay( 600, bannerPlayDown )
                 timer.performWithDelay( 1400, audioWheresMyGoblin )
             else
-                timer.performWithDelay( 300, compareGoblins )
+                timer.performWithDelay( 600, compareGoblins )
             end
             bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
         end

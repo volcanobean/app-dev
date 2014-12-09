@@ -1,14 +1,72 @@
+--
+-- For more information on build.settings see the Corona SDK Build Guide at:
+-- http://docs.coronalabs.com/guide/distribution/buildSettings/index.html
+--
+
 settings =
 {
+    
     orientation =
     {
+        -- Supported values for orientation:
+        -- portrait, portraitUpsideDown, landscapeLeft, landscapeRight
+
         default = "portrait",
         supported = { "portrait", "portraitUpsideDown" }
     },
+    
+    excludeFiles =
+    {
+        -- Include only the necessary icon files on each platform
+        iphone = { "Icon-*dpi.png", },
+        android = { "Icon.png", "Icon-Small-*.png", "Icon*@2x.png", },
+    },
+
+    plugins =
+    {
+        --[[
+        ["plugin.google.play.services"] =
+        {
+            publisherId = "com.coronalabs"
+        },
+        ]]--
+    }, 
+
+    --
+    -- iOS Section
+    --
     iphone =
     {
         plist =
         {
+            UIStatusBarHidden = false,
+            UIPrerenderedIcon = true, -- set to false for "shine" overlay
+            --UIApplicationExitsOnSuspend = true, -- uncomment to quit app on suspend
+
+            CFBundleIconFiles =
+            {
+                "Icon.png",
+                "Icon@2x.png",
+                "Icon-60.png",
+                "Icon-60@2x.png",
+                "Icon-60@3x.png",
+                "Icon-72.png",
+                "Icon-72@2x.png",
+                "Icon-76.png",
+                "Icon-76@2x.png",
+                "Icon-Small.png",
+                "Icon-Small@2x.png",
+                "Icon-Small@3x.png",
+                "Icon-Small-40.png",
+                "Icon-Small-40@2x.png",
+                "Icon-Small-50.png",
+                "Icon-Small-50@2x.png",
+            },
+
+            --launch image files table
+            UILaunchImages = {
+            },
+
             UIAppFonts =
             {
                 "fonts/Mathlete-Bulky.ttf",
@@ -16,15 +74,24 @@ settings =
                 "fonts/Mathlete-Skinny.ttf",
                 "fonts/Mathlete-SkinnySlant.ttf"
             },
-            UIApplicationExitsOnSuspend = false
+        }
+    },
+    
+    --
+    -- Android Section
+    --
+    android =
+    {
+        -- Version Code must be set to a higher value when submitting an updated app to market.
+        -- 10 = 1.0, 11 = 1.1, 12 = 1.2, etc
+        versionCode = "10",
+        
+        -- Raise the max heap size on a device from 32 MB to 256 MB to allow Corona app to load 2048×2048 images.
+        largeHeap = true,
+
+        usesPermissions =
+        {
+            "android.permission.INTERNET",
         },
     },
-    --[[
-    plugins =
-    {
-        ["plugin.google.play.services"] =
-        {
-            publisherId = "com.coronalabs"
-        },
-    }, ]]--
 }

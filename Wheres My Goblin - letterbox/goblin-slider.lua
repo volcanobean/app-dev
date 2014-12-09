@@ -9,10 +9,6 @@ local scene = composer.newScene()
 
 local _myG = composer.myGlobals
 
-local cW = display.contentWidth
-local cH = display.contentHeight
-local mW = 0.0013020833*cW
-
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
 -- -----------------------------------------------------------------------------------------------------------------
@@ -20,8 +16,12 @@ local mW = 0.0013020833*cW
 -- "scene:create()"
 -- Initialize the scene here.
 
+-- "scene:create()"
 function scene:create( event )
     local sceneGroup = self.view
+
+    -- My global variables (_myG.) - The following variables are all assigned in the main.lua file for this project:
+    -- blockCount, blockWidth, blockMargin, blockHeight1, blockHeight2, blockHeight3, ribbonY1, ribbonY2, ribbonY3
 
     -- create ribbon table/array for storage of ribbon pieces/variables later in this file
     -- This table is in my globals so it can be accessed by other scenes
@@ -371,16 +371,10 @@ function scene:create( event )
 
     -- We render the background image after the hit area so it is stacked on top, hiding the hit area.
     
-    _myG.background = display.newImageRect( "images/forest-bg.jpg", display.contentWidth, 1366*mW)
+    _myG.background = display.newImageRect( "images/forest-bg.jpg", 768, 1366 )
     _myG.background.x = display.contentCenterX
     _myG.background.y = display.contentCenterY
     sceneGroup:insert( _myG.background )
-
-    local uiShader = display.newImageRect( "images/ui-shader.png", display.contentWidth, 403*mW )
-    uiShader.anchorY = 1
-    uiShader.x = display.contentCenterX
-    uiShader.y = cH
-    sceneGroup:insert( uiShader )
 
     -- Create scrollable ribbon group (last one shows up on top, so we display legs, then body, the head)
 

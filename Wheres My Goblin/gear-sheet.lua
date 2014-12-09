@@ -1,12 +1,15 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:4ec8876f330d6ea7a8486705573ff660:5dca45b8ca3dc94bbc7ac137c1aa0926:c82b0a3d3bdba5ab3e6e218c8a63fac8$
+-- $TexturePacker:SmartUpdate:21e6326ec72a1c9a1ecb4d3058b90abe:423e561160d85d7a20d0f65633d0550c:7e74f066b082c8b087d0148203bd67f2$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
 -- local sprite = display.newSprite( myImageSheet , {frames={sheetInfo:getFrameIndex("sprite")}} )
 --
+
+local cW = display.contentWidth
+local mW = 0.0013020833*cW
 
 local SheetInfo = {}
 
@@ -16,48 +19,64 @@ SheetInfo.sheet =
     
         {
             -- gear-1
-            x=2,
-            y=225,
-            width=171,
-            height=170,
+            x=40*mW,
+            y=2*mW,
+            width=222*mW,
+            height=225*mW,
 
+            sourceX = 0,
+            sourceY = 0,
+            sourceWidth = 222*mW,
+            sourceHeight = 225*mW
         },
         {
             -- gear-2
-            x=32,
-            y=2,
-            width=171,
-            height=170,
+            x=264*mW,
+            y=2*mW,
+            width=222*mW,
+            height=225*mW,
 
+            sourceX = 0,
+            sourceY = 0,
+            sourceWidth = 222*mW,
+            sourceHeight = 225*mW
         },
         {
             -- gear-3
-            x=205,
-            y=2,
-            width=171,
-            height=170,
+            x=40*mW,
+            y=229*mW,
+            width=222*mW,
+            height=225*mW,
 
+            sourceX = 0,
+            sourceY = 0,
+            sourceWidth = 222*mW,
+            sourceHeight = 225*mW
         },
         {
             -- gear-4
-            x=175,
-            y=174,
-            width=171,
-            height=170,
+            x=264*mW,
+            y=229*mW,
+            width=222*mW,
+            height=225*mW,
 
+            sourceX = 0,
+            sourceY = 0,
+            sourceWidth = 222*mW,
+            sourceHeight = 225*mW
         },
         {
             -- gear-handle
-            x=2,
-            y=2,
-            width=28,
-            height=221,
+            x=2*mW,
+            y=2*mW,
+            width=36*mW,
+            height=287*mW
 
         },
     },
     
-    sheetContentWidth = 512,
-    sheetContentHeight = 512
+    sheetContentWidth = 512*mW,
+    sheetContentHeight = 512*mW
 }
 
 SheetInfo.frameIndex =

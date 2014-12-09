@@ -9,10 +9,6 @@ local scene = composer.newScene()
 
 local _myG = composer.myGlobals
 
-local cW = display.contentWidth
-local cH = display.contentHeight
-local mW = 0.0013020833*cW
-
 -- local ads = require( "ads" )
 
 -- -----------------------------------------------------------------------------------------------------------------
@@ -68,20 +64,20 @@ function scene:create( event )
     startHitArea:addEventListener( "tap", startGame )
     sceneGroup:insert( startHitArea )
 
-    _myG.background = display.newImageRect( "images/forest-bg.jpg", display.contentWidth, 1366*mW)
-    _myG.background.x = display.contentCenterX
-    _myG.background.y = display.contentCenterY
+    _myG.background = display.newImageRect( "images/forest-bg.jpg", 768, 1366 )
+    _myG.background.x = display.contentWidth*0.5
+    _myG.background.y = display.contentHeight*0.5
     sceneGroup:insert( _myG.background )
 
     -- game title
-    local titleText1 = display.newText( "where's", display.contentCenterX, cW*0.39, "Mathlete-Skinny", cW*0.163 ) --300,125
-    local titleText2 = display.newText( "my", display.contentCenterX, cW*0.533, "Mathlete-Skinny", cW*0.163 ) --410,125
-    local titleText3 = display.newText( "goblin?", display.contentCenterX, 510, "Mathlete-Skinny", cW*0.163) --510,163
+    local titleText1 = display.newText( "where's", display.contentCenterX, 300, "Mathlete-Skinny", 125 )
+    local titleText2 = display.newText( "my", display.contentCenterX, 410, "Mathlete-Skinny", 125 )
+    local titleText3 = display.newText( "goblin?", display.contentCenterX, 510, "Mathlete-Skinny", 125 )
     sceneGroup:insert( titleText1 )
     sceneGroup:insert( titleText2 )
     sceneGroup:insert( titleText3 )
 
-    local startBtn = display.newText( "start", display.contentCenterX, 875, "Mathlete-SkinnySlant", cW*0.104 ) --80
+    local startBtn = display.newText( "start", display.contentCenterX, 875, "Mathlete-SkinnySlant", 80 )
     -- startBtn:addEventListener( "tap", startGame )
     sceneGroup:insert( startBtn )
     
