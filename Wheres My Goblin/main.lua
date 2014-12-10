@@ -3,13 +3,15 @@
 --
 -- Version: 1.0
 --
--- Copyright (C) 2014 Volcano Bean, LLC. All Rights Reserved.
+-- Copyright (C) 2014-2015 Volcano Bean, LLC. All Rights Reserved.
 ------------------------------------------------------------
 
 -- hide device status bar
+
 display.setStatusBar( display.HiddenStatusBar )
 
 -- load composer, go to first scene
+
 local composer = require( "composer" )
 
 -- Create a table for my global variables, which will be shared between scenes/lua files.
@@ -39,9 +41,9 @@ _myG.blockHeight1 = 312*mW
 _myG.blockHeight2 = 540*mW
 _myG.blockHeight3 = 396*mW
 
-_myG.ribbonY1 = 245*mW
-_myG.ribbonY2 = 555*mW
-_myG.ribbonY3 = 710*mW
+_myG.ribbonY1 = display.contentCenterY-(287*mW) --225
+_myG.ribbonY2 = display.contentCenterY+(23*mW) --535
+_myG.ribbonY3 = display.contentCenterY+(178*mW) --690
 
 -- Now that our variables are set, let's start the game.
 

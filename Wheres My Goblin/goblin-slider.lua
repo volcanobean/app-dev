@@ -102,11 +102,11 @@ function scene:create( event )
         -- It is a swipe if the user moves their finger left or right and then releases before the countdown ends.
         if ( touchEndX ~= touchStartX ) and ( touching == false ) then
            touchCommand = "swipe"
-           print( "swipe" )
+           --print( "swipe" )
         -- It is a drag if the user moves their finger left or right and does not release before the timer ends.
         else
            touchCommand = "drag"
-           print( "drag" )
+           --print( "drag" )
         end
     end
 
@@ -196,7 +196,7 @@ function scene:create( event )
     -- Move ribbon to center X pos if coming from left or right
 
     local function shiftToCenter()
-        print ("shift to center")
+        --print ("shift to center")
         local shiftX
         if ( blockRegion == "right" ) then
             shiftX = activeBlockSnap + blockGroupWidth
@@ -330,7 +330,7 @@ function scene:create( event )
                         -- else if we're still in the center
                         else
                             -- just snap to nearest block
-                            print ("abs: " .. activeBlockSnap)
+                            --print ("abs: " .. activeBlockSnap)
                             transition.to( _myG.ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=moveEnd } )
                         end
                     end
@@ -344,26 +344,25 @@ function scene:create( event )
     end
 
     -- Create guide for center of screen
-    --display.newRect( parent, x, y, width, height )
     local centerRule = display.newRect( display.contentCenterX, 500, 10, 1000 )
     centerRule:setFillColor( 0, 1, 1, 0.25 )
     sceneGroup:insert( centerRule )
 
     -- Create hit areas to control ribbon scroll
 
-    local hitRibbon1 = display.newRect( display.contentCenterX, 260, display.contentWidth, 215 )
+    local hitRibbon1 = display.newRect( display.contentCenterX, display.contentCenterY-(272*mW), display.contentWidth, 215*mW ) --260,215
     hitRibbon1:setFillColor( 0, 1, 1, 0.25 )
     hitRibbon1.id = 1
     hitRibbon1:addEventListener( "touch", scrollMe )
     sceneGroup:insert( hitRibbon1 )
 
-    local hitRibbon2 = display.newRect( display.contentCenterX, 500, display.contentWidth, 262 )
+    local hitRibbon2 = display.newRect( display.contentCenterX, display.contentCenterY-(32*mW), display.contentWidth, 262*mW ) --500,262
     hitRibbon2:setFillColor( 0, 1, 1, 0.25 )
     hitRibbon2.id = 2
     hitRibbon2:addEventListener( "touch", scrollMe )
     sceneGroup:insert( hitRibbon2 )
 
-    local hitRibbon3 = display.newRect( display.contentCenterX, 770, display.contentWidth, 275 )
+    local hitRibbon3 = display.newRect( display.contentCenterX, display.contentCenterY+(238*mW), display.contentWidth, 275*mW ) --770,275
     hitRibbon3:setFillColor( 0, 1, 1, 0.25 )
     hitRibbon3.id = 3
     hitRibbon3:addEventListener( "touch", scrollMe )
@@ -375,6 +374,8 @@ function scene:create( event )
     _myG.background.x = display.contentCenterX
     _myG.background.y = display.contentCenterY
     sceneGroup:insert( _myG.background )
+
+    --_myG.background.isVisible = false
 
     local uiShader = display.newImageRect( "images/ui-shader.png", display.contentWidth, 403*mW )
     uiShader.anchorY = 1
@@ -417,13 +418,25 @@ function scene:create( event )
     local head2Sheet = graphics.newImageSheet( "images/heads-2.png", head2SheetInfo:getSheet() )
     local head2Frames = { start=1, count=head2Count }
 
-    local torsoCount = _myG.blockCount
-    local torsoSheet = graphics.newImageSheet( "images/torso-sheet.png", { width=_myG.blockWidth, height=_myG.blockHeight2, numFrames=torsoCount, sheetContentWidth=_myG.blockWidth, sheetContentHeight=_myG.blockHeight2*torsoCount } )
+    local torsoCount = 5
+    local torsoSheetInfo = require("torso-sheet-1")
+    local torsoSheet = graphics.newImageSheet( "images/torso-1.png", torsoSheetInfo:getSheet() )
     local torsoFrames =  { start=1, count=torsoCount }
 
-    local legCount = _myG.blockCount
-    local legSheet = graphics.newImageSheet( "images/legs-sheet.png", { width=_myG.blockWidth, height=_myG.blockHeight3, numFrames=legCount, sheetContentWidth=_myG.blockWidth, sheetContentHeight=_myG.blockHeight3*legCount } )
+    local torso2Count = 5
+    local torso2SheetInfo = require("torso-sheet-2")
+    local torso2Sheet = graphics.newImageSheet( "images/torso-2.png", torso2SheetInfo:getSheet() )
+    local torso2Frames =  { start=1, count=torso2Count }
+
+    local legCount = 6
+    local legSheetInfo = require("legs-sheet-1")
+    local legSheet = graphics.newImageSheet( "images/legs-1.png", legSheetInfo:getSheet() )
     local legFrames =  { start=1, count=legCount }
+
+    local leg2Count = 4
+    local leg2SheetInfo = require("legs-sheet-2")
+    local leg2Sheet = graphics.newImageSheet( "images/legs-2.png", leg2SheetInfo:getSheet() )
+    local leg2Frames =  { start=1, count=leg2Count }
 
     -- block groups inside scroll group
 
@@ -461,7 +474,7 @@ function scene:create( event )
             headsA[i] = display.newSprite( headSheet, headFrames )
             headsA[i]:setFrame(i)
         else
-            -- then use the second head sprite sheet tp pick up where we legt off
+            -- then use the second head sprite sheet tp pick up where we left off
             headsA[i] = display.newSprite( head2Sheet, head2Frames )
             -- we use i minus headCount because, even though this is sprite 10 in our array, it is frame 1 in our second sprite sheet
             headsA[i]:setFrame(i-headCount)
@@ -489,34 +502,53 @@ function scene:create( event )
 
     local torsoA = {}
     for i=1, _myG.blockCount do
-        torsoA[i] = display.newSprite( torsoSheet, torsoFrames )
-        torsoA[i]:setFrame(i)
+        if ( i <= torsoCount ) then
+            torsoA[i] = display.newSprite( torsoSheet, torsoFrames )
+            torsoA[i]:setFrame(i)
+        else
+            torsoA[i] = display.newSprite( torso2Sheet, torso2Frames )
+            torsoA[i]:setFrame(i-torsoCount)
+        end
         torsoA[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth*0.5
         blockGroupA[2]:insert( torsoA[i] )
     end
 
     local torsoB = {}
     for i=1, _myG.blockCount do
-        torsoB[i] = display.newSprite( torsoSheet, torsoFrames )
-        torsoB[i]:setFrame(i)
+        if ( i <= torsoCount ) then
+            torsoB[i] = display.newSprite( torsoSheet, torsoFrames )
+            torsoB[i]:setFrame(i)
+        else
+            torsoB[i] = display.newSprite( torso2Sheet, torso2Frames )
+            torsoB[i]:setFrame(i-torsoCount)
+        end
         torsoB[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth*0.5
         blockGroupB[2]:insert( torsoB[i] )
     end
 
     local legsA = {}
     for i=1, _myG.blockCount do
-        -- Automatically calculate block layout within parent group based on height, width and margin values.
-        legsA[i] = display.newSprite( legSheet, legFrames )
+        if ( i <= legCount ) then
+            legsA[i] = display.newSprite( legSheet, legFrames )
+            legsA[i]:setFrame(i)
+        else
+            legsA[i] = display.newSprite( leg2Sheet, leg2Frames )
+            legsA[i]:setFrame(i-legCount)
+        end
         legsA[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth*0.5
-        legsA[i]:setFrame(i)
         blockGroupA[3]:insert( legsA[i] )
     end
 
     local legsB = {}
     for i=1, _myG.blockCount do
-        legsB[i] = display.newSprite( legSheet, legFrames )
+        if ( i <= legCount ) then
+            legsB[i] = display.newSprite( legSheet, legFrames )
+            legsB[i]:setFrame(i)
+        else
+            legsB[i] = display.newSprite( leg2Sheet, leg2Frames )
+            legsB[i]:setFrame(i-legCount)
+        end
         legsB[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth*0.5
-        legsB[i]:setFrame(i)
         blockGroupB[3]:insert( legsB[i] )
     end
 
@@ -566,10 +598,8 @@ end
 -- "scene:show()"
 function scene:show( event )
     local sceneGroup = self.view
-
     if ( event.phase == "will" ) then
         -- Called when the scene is still off screen (but is about to come on screen).
-
         -- Hide the goblin slider on initial game load.
         _myG.ribbon[1].alpha=0
         _myG.ribbon[2].alpha=0
@@ -577,18 +607,14 @@ function scene:show( event )
 
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen
-
         -- Load Goblin banner and UI 
         composer.showOverlay( "ui-overlay", { effect="fade" }  )
-
     end
 end
-
 
 -- "scene:hide()"
 function scene:hide( event )
     local sceneGroup = self.view
-
     if ( event.phase == "will" ) then
         -- Called when the scene is on screen (but is about to go off screen).
         -- Insert code here to "pause" the scene.
@@ -597,7 +623,6 @@ function scene:hide( event )
         -- Called immediately after scene goes off screen.
     end
 end
-
 
 -- "scene:destroy()"
 function scene:destroy( event )

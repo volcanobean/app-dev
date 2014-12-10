@@ -74,14 +74,14 @@ function scene:create( event )
     sceneGroup:insert( _myG.background )
 
     -- game title
-    local titleText1 = display.newText( "where's", display.contentCenterX, cW*0.39, "Mathlete-Skinny", cW*0.163 ) --300,125
-    local titleText2 = display.newText( "my", display.contentCenterX, cW*0.533, "Mathlete-Skinny", cW*0.163 ) --410,125
-    local titleText3 = display.newText( "goblin?", display.contentCenterX, 510, "Mathlete-Skinny", cW*0.163) --510,163
+    local titleText1 = display.newText( "where's", display.contentCenterX, display.contentCenterY-(322*mW), "Mathlete-Skinny", 125*mW ) --300,125
+    local titleText2 = display.newText( "my", display.contentCenterX, display.contentCenterY-(212*mW), "Mathlete-Skinny", 125*mW ) --410,125
+    local titleText3 = display.newText( "goblin?", display.contentCenterX, display.contentCenterY-(112*mW), "Mathlete-Skinny", 125*mW) --510,125
     sceneGroup:insert( titleText1 )
     sceneGroup:insert( titleText2 )
     sceneGroup:insert( titleText3 )
 
-    local startBtn = display.newText( "start", display.contentCenterX, 875, "Mathlete-SkinnySlant", cW*0.104 ) --80
+    local startBtn = display.newText( "start", display.contentCenterX, display.contentCenterY+(363*mW), "Mathlete-SkinnySlant", 80*mW ) --875,80
     -- startBtn:addEventListener( "tap", startGame )
     sceneGroup:insert( startBtn )
     
