@@ -4,6 +4,7 @@
 --
 ---------------------------------------------------------------------------------
 
+print ("start of start-screen")
 local composer = require( "composer" )
 local scene = composer.newScene()
 
@@ -58,6 +59,7 @@ function scene:create( event )
 
     local function startGame( event ) 
         composer.gotoScene( "goblin-slider" )
+        --_myG.background.isVisible = false
         return true
     end
 
@@ -98,6 +100,12 @@ function scene:show( event )
         -- Called when the scene is now on screen.
         -- Insert code here to make the scene come alive.
         -- Example: start timers, begin animation, play audio, etc.
+
+        -- pre-load next scene
+
+        print ( "loading goblin-slider" )
+        composer.loadScene( "goblin-slider" )
+
     end
 end
 

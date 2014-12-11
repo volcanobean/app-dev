@@ -11,7 +11,11 @@ local _myG = composer.myGlobals
 
 local cW = display.contentWidth
 local cH = display.contentHeight
+local cX = display.contentCenterX
+local cY = display.contentCenterY
 local mW = 0.0013020833*cW
+local screenRatio = cW/cH
+print ("screenRatio " .. screenRatio)
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
@@ -113,18 +117,32 @@ function scene:create( event )
     transition.to( shader, { time=1, alpha=0 } )
     sceneGroup:insert( shader )
     
-    local bannerUpY = display.contentCenterY
-    local bannerDownY = display.contentCenterY
+    local bannerUpY
+    local bannerDownY
 
-    local banner = display.newImageRect( "images/banner.png", 569*mW, 1004*mW)
+    local banner = display.newImageRect( "images/banner.png", 569*mW, 1050*mW) --scale up from 512
+    
+    if( screenRatio >= 0.7 ) then 
+        banner.anchorY = 1
+        -- if our device has iPad-eque proportions
+        bannerUpY = 0
+        bannerDownY = cH*0.92 --440
+    else
+        banner.anchorY = 0
+        -- if we're on a taller thinner device
+        bannerUpY = -1050*mW
+        bannerDownY = 0
+    end
+
     banner.x = display.contentCenterX
-    banner.y = 0
+    banner.y = bannerUpY
+    sceneGroup:insert( banner )
 
     -- Add goblin match pieces to banner
 
     local mScale = 0.83 -- single variable to scale all goblin banner parts larger or smaller
 
-    local headMatchCount = _myG.blockCount
+    local headMatchCount = 5
     -- instead of loading the original heads-sheet.lua file, load a duplicate with scaled values
     local headMatchSheetInfo = require("heads-sheet-1") 
     local headMatchSheet = graphics.newImageSheet( "images/heads-1.png", headMatchSheetInfo:getSheet() )
@@ -134,43 +152,41 @@ function scene:create( event )
     headMatch.x = display.contentCenterX
     headMatch.y = 0 --380
 
-    local torsoMatchCount = _myG.blockCount
+    local torsoMatchCount = 5
     local torsoMatchSheet = graphics.newImageSheet( "images/torso-sheet.png", { width=_myG.blockWidth*mScale, height=_myG.blockHeight2*mScale, numFrames=torsoMatchCount, sheetContentWidth=_myG.blockWidth*mScale, sheetContentHeight=_myG.blockHeight2*torsoMatchCount*mScale } )
     local torsoMatchFrames = { start=1, count=_myG.blockCount }
     local torsoMatch = display.newSprite( torsoMatchSheet, torsoMatchFrames )
     torsoMatch.x = display.contentCenterX
-    torsoMatch.y = 310 --690
+    torsoMatch.y = 0 --690
 
-    local legMatchCount = _myG.blockCount
+    local legMatchCount = 5
     local legMatchSheet = graphics.newImageSheet( "images/legs-sheet.png", { width=_myG.blockWidth*mScale, height=_myG.blockHeight3*mScale, numFrames=legMatchCount, sheetContentWidth=_myG.blockWidth*mScale, sheetContentHeight=_myG.blockHeight3*legMatchCount*mScale } )
     local legMatchFrames = { start=1, count=_myG.blockCount }
     local legMatch = display.newSprite( legMatchSheet, legMatchFrames )
     legMatch.x = display.contentCenterX
-    legMatch.y = 515 --845
+    legMatch.y = 0 --845
 
-    local bannerGroup = display.newGroup()
-    bannerGroup:insert( banner )
-    bannerGroup:insert( legMatch )
-    bannerGroup:insert( torsoMatch )
-    bannerGroup:insert( headMatch )
-    bannerGroup.anchorY = 1
-    bannerGroup.y = display.contentCenterY
-    bannerGroup:scale( 0.5, 0.5 )
-    sceneGroup:insert( bannerGroup )
+    local matchGroup = display.newGroup()
+    matchGroup:insert( legMatch )
+    matchGroup:insert( torsoMatch )
+    matchGroup:insert( headMatch )
+    matchGroup.y = 0
+    matchGroup:scale( mScale, mScale )
+    sceneGroup:insert( matchGroup )
 
     -- animate banner
 
     local function bannerPlayDown()
         bannerState = "down"
         print( bannerState ) 
-        transition.to( bannerGroup, { time=500, y=bannerDownY, transition=easing.outSine } )
+        transition.to( banner, { time=500, y=bannerDownY, transition=easing.outSine } )
         transition.to( shader, { time=300, alpha=0.5 } )
     end
 
     local function bannerPlayUp()
         bannerState = "up"
         print( bannerState ) 
-        transition.to( bannerGroup, { time=500, y=bannerUpY, transition=easing.outSine } )
+        transition.to( banner, { time=500, y=bannerUpY, transition=easing.outSine } )
         transition.to( shader, { time=300, alpha=0 } )
     end
 

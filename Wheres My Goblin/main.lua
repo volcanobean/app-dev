@@ -26,25 +26,10 @@ local _myG = composer.myGlobals
 -- all scale/size values will be a percentage of the contentWidth, so a 512w rectangle on a 768w display (512/768) would be: cW*0.667
 -- mW is multiplierWidth for converting existing values easier ( 768 divided by 100 to get a percentage for multiplying instead of dividing)
 
-local cW = display.contentWidth
-local cH = display.contentHeight
-local mW = 0.0013020833*cW
-
--- Begin global settings
--- Block and ribbon values. Adjust as needed
-
-_myG.blockCount = 10
-_myG.blockWidth = 512*mW
-_myG.blockMargin = 90*mW
-
-_myG.blockHeight1 = 312*mW
-_myG.blockHeight2 = 540*mW
-_myG.blockHeight3 = 396*mW
-
-_myG.ribbonY1 = display.contentCenterY-(287*mW) --225
-_myG.ribbonY2 = display.contentCenterY+(23*mW) --535
-_myG.ribbonY3 = display.contentCenterY+(178*mW) --690
 
 -- Now that our variables are set, let's start the game.
+
+print("-----")
+print ("end of main")
 
 composer.gotoScene( "start-screen" )
