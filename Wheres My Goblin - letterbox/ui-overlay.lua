@@ -9,14 +9,6 @@ local scene = composer.newScene()
 
 local _myG = composer.myGlobals
 
-local cW = display.contentWidth
-local cH = display.contentHeight
-local cX = display.contentCenterX
-local cY = display.contentCenterY
-local mW = 0.0013020833*cW
-local screenRatio = cW/cH
-print ("screenRatio " .. screenRatio)
-
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
 -- -----------------------------------------------------------------------------------------------------------------
@@ -109,158 +101,100 @@ function scene:create( event )
 
     -- Banner sprites
 
-    local shader = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth+10, display.contentHeight+10 )
+    local shader = display.newRect( display.contentWidth*0.5, display.contentHeight*0.5, display.contentWidth+10, display.contentHeight+10 )
     -- can't start object with an alpha of 0 or corona will not render it
     -- also, transition values will be relative to intial value, so we start with 1 (100%)
     shader:setFillColor( 0, 0, 0, 1 ) 
     -- transition to alpha 0 to hide shader on page load
     transition.to( shader, { time=1, alpha=0 } )
     sceneGroup:insert( shader )
+    
+    local bannerUpY = -500
+    local bannerDownY = 425
+    local matchUpY = -925
+    local matchDownY = 0
 
-    local banner = display.newImageRect( "images/banner.png", 569*mW, 1050*mW) --scale up from 512
+    local banner = display.newImageRect( "images/banner.png", 569, 1004 ) -- PoT - upscaling smaller 512w image to 569w
+    banner.x = display.contentWidth*0.5
+    banner.y = bannerUpY
+    sceneGroup:insert( banner )
 
     -- Add goblin match pieces to banner
 
-    local headMatch
-    local headMatchSheetInfo
-    local headMatchSheet
-    local headMatchFrames
+    local mScale = 0.83 -- single variable to scale all goblin banner parts larger or smaller
 
-    local torsoMatch
-    local torsoMatchSheetInfo
-    local torsoMatchSheet
-    local torsoMatchFrames
+    local headMatchCount = _myG.blockCount
+    -- instead of loading the original heads-sheet.lua file, load a duplicate with scaled values
+    local headMatchSheetInfo = require("match-heads-sheet") 
+    local headMatchSheet = graphics.newImageSheet( "images/heads-1.png", headMatchSheetInfo:getSheet() )
+    local headMatchFrames = { start=1, count=_myG.blockCount }
+    local headMatch = display.newSprite( headMatchSheet, headMatchFrames )
+    --headMatch = display.newImageRect( headMatchSheet, 1, _myG.blockWidth*mScale, _myG.blockHeight2*mScale )
+    headMatch.x = display.contentCenterX
+    headMatch.y = 380*mScale
 
-    local legMatch
-    local legMatchSheetInfo
-    local legMatchSheet
-    local legMatchFrames
+    local torsoMatchCount = _myG.blockCount
+    local torsoMatchSheet = graphics.newImageSheet( "images/torso-sheet.png", { width=_myG.blockWidth*mScale, height=_myG.blockHeight2*mScale, numFrames=torsoMatchCount, sheetContentWidth=_myG.blockWidth*mScale, sheetContentHeight=_myG.blockHeight2*torsoMatchCount*mScale } )
+    local torsoMatchFrames = { start=1, count=_myG.blockCount }
+    local torsoMatch = display.newSprite( torsoMatchSheet, torsoMatchFrames )
+    torsoMatch.x = display.contentCenterX
+    torsoMatch.y = 690*mScale
 
-    local function getMatchParts()
-        -- Generate head
-        local matchNumber = math.random( _myG.blockCount )
-        matchBlocks[1] = matchNumber
-        if ( matchNumber <= 9 ) then
-            -- if random number is within range of first sheet...
-            headMatchSheetInfo = require("heads-sheet-1")
-            headMatchSheet = graphics.newImageSheet( "images/heads-1.png", headMatchSheetInfo:getSheet() )
-            headMatchFrames = { start=1, count=9 }
-            headMatch = display.newSprite( headMatchSheet, headMatchFrames )
-            headMatch:setFrame( matchNumber )
-        else
-            -- else use the second sheet tp pick up where we left off
-            headMatchSheetInfo = require("heads-sheet-2")
-            headMatchSheet = graphics.newImageSheet( "images/heads-2.png", headMatchSheetInfo:getSheet() )
-            headMatchFrames = { start=1, count=1 }
-            headMatch = display.newSprite( headMatchSheet, headMatchFrames )
-            headMatch:setFrame( matchNumber-9 )
-        end
+    local legMatchCount = _myG.blockCount
+    local legMatchSheet = graphics.newImageSheet( "images/legs-sheet.png", { width=_myG.blockWidth*mScale, height=_myG.blockHeight3*mScale, numFrames=legMatchCount, sheetContentWidth=_myG.blockWidth*mScale, sheetContentHeight=_myG.blockHeight3*legMatchCount*mScale } )
+    local legMatchFrames = { start=1, count=_myG.blockCount }
+    local legMatch = display.newSprite( legMatchSheet, legMatchFrames )
+    legMatch.x = display.contentCenterX
+    legMatch.y = 845*mScale
 
-        -- Generate torso
-        matchNumber = math.random( _myG.blockCount )
-        matchBlocks[2] = matchNumber
-        if ( matchNumber <= 5 ) then
-            -- if random number is within range of first sheet...
-            torsoMatchSheetInfo = require("torso-sheet-1")
-            torsoMatchSheet = graphics.newImageSheet( "images/torso-1.png", torsoMatchSheetInfo:getSheet() )
-            torsoMatchFrames = { start=1, count=5 }
-            torsoMatch = display.newSprite( torsoMatchSheet, torsoMatchFrames )
-            torsoMatch:setFrame( matchNumber )
-        else
-            -- else use the second sheet tp pick up where we left off
-            torsoMatchSheetInfo = require("torso-sheet-2")
-            torsoMatchSheet = graphics.newImageSheet( "images/torso-2.png", torsoMatchSheetInfo:getSheet() )
-            torsoMatchFrames = { start=1, count=5 }
-            torsoMatch = display.newSprite( torsoMatchSheet, torsoMatchFrames )
-            torsoMatch:setFrame( matchNumber-5 )
-        end
-
-        -- Generate legs
-        matchNumber = math.random( _myG.blockCount )
-        matchBlocks[3] = matchNumber
-        if ( matchNumber <= 6 ) then
-            -- if random number is within range of first sheet...
-            legMatchSheetInfo = require("legs-sheet-1")
-            legMatchSheet = graphics.newImageSheet( "images/legs-1.png", legMatchSheetInfo:getSheet() )
-            legMatchFrames = { start=1, count=6 }
-            legMatch = display.newSprite( legMatchSheet, legMatchFrames )
-            legMatch:setFrame( matchNumber )
-        else
-            -- else use the second sheet tp pick up where we left off
-            legMatchSheetInfo = require("legs-sheet-2")
-            legMatchSheet = graphics.newImageSheet( "images/legs-2.png", legMatchSheetInfo:getSheet() )
-            legMatchFrames = { start=1, count=4 }
-            legMatch = display.newSprite( legMatchSheet, legMatchFrames )
-            legMatch:setFrame( matchNumber-6 )
-        end
-    end
-
-    -- generate intial values
-
-    getMatchParts()
-
-    -- assign Y values now that objects have been created
-
-    headMatch.y = 385*mW
-    torsoMatch.y = 695*mW
-    legMatch.y = 850*mW
-
-    local mScale = 0.83 
-
-    local matchGroup = display.newGroup()
-    matchGroup:insert( legMatch )
-    matchGroup:insert( torsoMatch )
-    matchGroup:insert( headMatch )
-    matchGroup:scale( mScale, mScale )
-
-    local bannerUpY
-    local bannerDownY
-
-    local bannerGroup = display.newGroup()
-    bannerGroup:insert( banner )
-    bannerGroup:insert( matchGroup )
-    sceneGroup:insert( bannerGroup )
-
-    if( screenRatio >= 0.7 ) then
-        -- if our device has iPad-eque proportions
-        bannerGroup.anchorY = 1
-        banner.anchorY = 1
-        matchGroup.y = -940*mW
-        bannerUpY = 0 --0
-        bannerDownY = cH*0.91 --440
-    elseif( screenRatio > 0.6 ) and ( screenRatio < 0.7 ) then
-        -- if we're on shorter mobile devices
-        bannerGroup.anchorY = 1
-        banner.anchorY = 1
-        matchGroup.y = -940*mW
-        bannerUpY = 0 --0
-        bannerDownY = cH*0.82 --440
-     else
-        -- if we're on a taller thinner device
-        bannerGroup.anchorY = 0
-        banner.anchorY = 0
-        matchGroup.y = 120*mW
-        bannerUpY = -1050*mW
-        bannerDownY = 0
-    end
-
-    bannerGroup.y = bannerUpY
-    bannerGroup.x = display.contentCenterX
+    local matchBlocksGroup = display.newGroup()
+    matchBlocksGroup:insert( legMatch )
+    matchBlocksGroup:insert( torsoMatch )
+    matchBlocksGroup:insert( headMatch )
+    matchBlocksGroup.y = matchUpY
+    sceneGroup:insert( matchBlocksGroup )
 
     -- animate banner
 
     local function bannerPlayDown()
         bannerState = "down"
         print( bannerState ) 
-        transition.to( bannerGroup, { time=500, y=bannerDownY, transition=easing.outSine } )
+        transition.to( banner, { time=500, y=bannerDownY, transition=easing.outSine } )
+        transition.to( matchBlocksGroup, { time=500, y=matchDownY, transition=easing.outSine } )
         transition.to( shader, { time=300, alpha=0.5 } )
     end
 
     local function bannerPlayUp()
         bannerState = "up"
         print( bannerState ) 
-        transition.to( bannerGroup, { time=500, y=bannerUpY, transition=easing.outSine } )
+        transition.to( banner, { time=500, y=bannerUpY, transition=easing.outSine } )
+        transition.to( matchBlocksGroup, { time=500, y=matchUpY, transition=easing.outSine } )
         transition.to( shader, { time=300, alpha=0 } )
+    end
+
+    -- Randomize functions
+
+    local function randomizeMatch()  
+        print ( "Function start." )
+        -- Generate head
+        local randomNum = math.random( _myG.blockCount )
+        print( randomNum )
+        matchBlocks[1] = randomNum
+        headMatch:setFrame( randomNum )
+        
+        -- Generate torso
+        randomNum = math.random( _myG.blockCount )
+        print( randomNum )
+        matchBlocks[2] = randomNum
+        torsoMatch:setFrame( randomNum )
+
+        -- Generate legs
+        randomNum = math.random( _myG.blockCount )
+        print( randomNum )
+        matchBlocks[3] = randomNum
+        legMatch:setFrame( randomNum )
+
+        matchBlocksText.text = "Match these: " .. matchBlocks[1] .. ", " .. matchBlocks[2] .. ", " .. matchBlocks[3]
     end
 
     -- back to home
@@ -278,16 +212,16 @@ function scene:create( event )
 
     local gearSequence =
     {
-        { name="forward", frames={ 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 3, 4, 4, 1 }, time=700, loopCount=1 },
-        { name="backward", frames={ 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 3, 2, 2, 1 }, time=700, loopCount=1 }
+        { name="forward", frames={ 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 3, 4, 4, 1 }, time=600, loopCount=1 },
+        { name="backward", frames={ 1, 4, 3, 2, 1, 4, 3, 2, 1, 4, 3, 3, 2, 2, 1 }, time=600, loopCount=1 }
     }
 
     local gearSheetInfo = require("gear-sheet")
     local gearSheet = graphics.newImageSheet( "images/gear-sheet.png", gearSheetInfo:getSheet() )
     
     local gearHandle = display.newImage( gearSheet, 5 )
-    gearHandle.x = 70*mW
-    gearHandle.y = display.contentHeight-(91*mW)
+    gearHandle.x = 70
+    gearHandle.y = 933
     gearHandle.anchorY = 1
     sceneGroup:insert( gearHandle )
 
@@ -300,10 +234,8 @@ function scene:create( event )
     end
 
     local gearSprite = display.newSprite( gearSheet, gearSequence )
-    gearSprite.anchorX = 0
-    gearSprite.anchorY = 1
-    gearSprite.x = 0
-    gearSprite.y = cH
+    gearSprite.x = 85
+    gearSprite.y = 940
     gearSprite:setFrame(1) -- 1 refers to the first frame in the sequence (6), not the frame number
     sceneGroup:insert( gearSprite )
 
@@ -331,10 +263,9 @@ function scene:create( event )
     local signSheetInfo = require("sign-sheet")
     local signSheet = graphics.newImageSheet( "images/sign-sheet.png", signSheetInfo:getSheet() )
     local signSprite = display.newSprite( signSheet, signSequence )
-    signSprite.anchorY = 1
-    signSprite.x = 654*mW
-    signSprite.y = cH 
-    signSprite:setFrame(1) -- 1 refers to the first frame in the sequence (6), not the frame number
+    signSprite.x = 654
+    signSprite.y = 931
+    signSprite:setFrame(1) -- 1 refers to the first frame in the sequence, not the frame number
     sceneGroup:insert( signSprite )
 
     local function signSpin()
@@ -427,7 +358,7 @@ function scene:create( event )
                 timer.performWithDelay( 600, bannerPlayDown )
                 timer.performWithDelay( 1400, audioWheresMyGoblin )
             else
-                timer.performWithDelay( 300, compareGoblins )
+                timer.performWithDelay( 600, compareGoblins )
             end
             bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
         end
@@ -450,6 +381,7 @@ function scene:create( event )
     -- INTRO ANIMATION:
 
     uiActiveTrue() -- temporarily true to allow first animation
+    randomizeMatch()
     crankTimer = timer.performWithDelay( 600, turnCrank )
 
 --end scene:create

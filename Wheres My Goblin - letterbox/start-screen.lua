@@ -4,15 +4,10 @@
 --
 ---------------------------------------------------------------------------------
 
-print ("start of start-screen")
 local composer = require( "composer" )
 local scene = composer.newScene()
 
 local _myG = composer.myGlobals
-
-local cW = display.contentWidth
-local cH = display.contentHeight
-local mW = 0.0013020833*cW
 
 -- local ads = require( "ads" )
 
@@ -59,7 +54,6 @@ function scene:create( event )
 
     local function startGame( event ) 
         composer.gotoScene( "goblin-slider" )
-        --_myG.background.isVisible = false
         return true
     end
 
@@ -70,20 +64,20 @@ function scene:create( event )
     startHitArea:addEventListener( "tap", startGame )
     sceneGroup:insert( startHitArea )
 
-    _myG.background = display.newImageRect( "images/forest-bg.jpg", display.contentWidth, 1366*mW)
-    _myG.background.x = display.contentCenterX
-    _myG.background.y = display.contentCenterY
+    _myG.background = display.newImageRect( "images/forest-bg.jpg", 768, 1366 )
+    _myG.background.x = display.contentWidth*0.5
+    _myG.background.y = display.contentHeight*0.5
     sceneGroup:insert( _myG.background )
 
     -- game title
-    local titleText1 = display.newText( "where's", display.contentCenterX, display.contentCenterY-(322*mW), "Mathlete-Skinny", 125*mW ) --300,125
-    local titleText2 = display.newText( "my", display.contentCenterX, display.contentCenterY-(212*mW), "Mathlete-Skinny", 125*mW ) --410,125
-    local titleText3 = display.newText( "goblin?", display.contentCenterX, display.contentCenterY-(112*mW), "Mathlete-Skinny", 125*mW) --510,125
+    local titleText1 = display.newText( "where's", display.contentCenterX, 300, "Mathlete-Skinny", 125 )
+    local titleText2 = display.newText( "my", display.contentCenterX, 410, "Mathlete-Skinny", 125 )
+    local titleText3 = display.newText( "goblin?", display.contentCenterX, 510, "Mathlete-Skinny", 125 )
     sceneGroup:insert( titleText1 )
     sceneGroup:insert( titleText2 )
     sceneGroup:insert( titleText3 )
 
-    local startBtn = display.newText( "start", display.contentCenterX, display.contentCenterY+(363*mW), "Mathlete-SkinnySlant", 80*mW ) --875,80
+    local startBtn = display.newText( "start", display.contentCenterX, 875, "Mathlete-SkinnySlant", 80 )
     -- startBtn:addEventListener( "tap", startGame )
     sceneGroup:insert( startBtn )
     
@@ -100,12 +94,6 @@ function scene:show( event )
         -- Called when the scene is now on screen.
         -- Insert code here to make the scene come alive.
         -- Example: start timers, begin animation, play audio, etc.
-
-        -- pre-load next scene
-
-        print ( "loading goblin-slider" )
-        composer.loadScene( "goblin-slider" )
-
     end
 end
 

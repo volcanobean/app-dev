@@ -20,13 +20,18 @@ local stageHW = display.newText( display.contentWidth .. ' x ' .. display.conten
 
 local bottomHugger = display.newGroup()
 bottomHugger.x = display.contentCenterX
+--bottomHugger.y = display.contentHeight - 30
+bottomHugger.anchorY = 0
 bottomHugger.y = display.contentHeight - 30
 
-local topH = display.newRect( bottomHugger, 0, 0, display.contentWidth, 20 )
+
+local topH = display.newRect( display.contentCenterX, 0, display.contentWidth, 20 )
 topH:setFillColor( 0, 1, 1, 1 )
 
-local bottomH = display.newRect( bottomHugger, 0, 20, display.contentWidth, 20 )
+local bottomH = display.newRect( display.contentCenterX, 0, display.contentWidth, 40 )
 bottomH:setFillColor( 1, 0, 1, 1 )
+bottomH.anchorY = 1
+bottomH.y = display.contentHeight
 
 
 

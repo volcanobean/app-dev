@@ -1,0 +1,30 @@
+settings =
+{
+    orientation =
+    {
+        default = "portrait",
+        supported = { "portrait", "portraitUpsideDown" }
+    },
+    iphone =
+    {
+        plist =
+        {
+            UIAppFonts =
+            {
+                "fonts/Mathlete-Bulky.ttf",
+                "fonts/Mathlete-BulkySlant.ttf",
+                "fonts/Mathlete-Skinny.ttf",
+                "fonts/Mathlete-SkinnySlant.ttf"
+            },
+            UIApplicationExitsOnSuspend = false
+        },
+    },
+    --[[
+    plugins =
+    {
+        ["plugin.google.play.services"] =
+        {
+            publisherId = "com.coronalabs"
+        },
+    }, ]]--
+}
