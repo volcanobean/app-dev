@@ -24,8 +24,21 @@ function scene:create( event )
 
     -- main character
 
-    local fairy = display.newImage( "images/fairy.png" )
-    fairy.x = display.contentWidth *0.90
+    local background = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight )
+    background:setFillColor(0,0,0,1)
+    sceneGroup:insert( background )
+
+    local fairySpriteOptions =
+    {
+        width = 115,
+        height = 158,
+        numFrames = 2
+    }
+    local fairySheet = graphics.newImageSheet( "images/spritesheet-fairy-A.png", fairySpriteOptions )
+    local fairyFrames = { start=1, count=2 }
+
+    local fairy = display.newSprite( fairySheet, fairyFrames )
+    fairy.x = display.contentWidth *0.10
     fairy.y = display.contentHeight *0.90
     physics.addBody( fairy, "dynamic" )
     sceneGroup:insert( fairy )
@@ -37,12 +50,19 @@ function scene:create( event )
     --Moving fairy--
 
     local function touchScreen( event )
-        if event.phase == "began"  then
         transition.to( fairy, { time=1000, x=event.x, y=event.y })
+        print("----")
+        print ("Fairy:",fairy.x)
+        print ("Event:",event.x)
+        if (fairy.x > event.x) then
+            fairy:setFrame (2) 
+        elseif (fairy.x <= event.x) then
+            fairy:setFrame (1)
         end
+        return true
     end
 
-    Runtime:addEventListener( "touch", touchScreen )
+    background:addEventListener( "tap", touchScreen )
 
     -- Define creation of Glow
 
@@ -61,8 +81,15 @@ function scene:create( event )
 
     --Fairy catching the Glow
 
+    local mySound3 = audio.loadSound( "audio/magic-chime-02.mp3" )
+
+    local function sparkle()
+        audio.play( mySound3 )
+    end
+
     local function onCollision( event )
         event.target:removeSelf()
+        sparkle()
     end 
 
     --Runtime:addEventListener( "collision", onCollision )
@@ -84,7 +111,8 @@ function scene:create( event )
         return true
     end
 
-    local replayButton = display.newText( "Replay", 75, 35, native.systemFont, 30 )
+    local replayButton = 
+    display.newRect(75, 35, 100, 50)
     sceneGroup:insert( replayButton )
     replayButton:addEventListener( "tap", replay )
 
@@ -101,7 +129,7 @@ function scene:show( event )
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
         -- Insert code here to make the scene come alive.
-        -- Example: start timers, begin animation, play audio, etc.
+        -- Example: start timers, begin animation, play audio, etc.        
     end
 end
 

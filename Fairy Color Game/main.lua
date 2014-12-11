@@ -10,4 +10,4 @@ display.setStatusBar( display.HiddenStatusBar )
 local composer = require( "composer" )
 
 print( "main loaded" ) 
-composer.gotoScene( "gameplay" )
+composer.gotoScene( "start-screen" )
