@@ -14,8 +14,6 @@ local cW = display.contentWidth
 local cH = display.contentHeight
 local mW = 0.0013020833*cW
 
--- local ads = require( "ads" )
-
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
 -- -----------------------------------------------------------------------------------------------------------------
@@ -27,10 +25,8 @@ function scene:create( event )
 
     -- Ad code
 
-    --[[
-
+    local ads = require( "ads" )
     local bannerAppID = "ca-app-pub-7094148843149156/1832646501"  -- admob, iOS banner
-
     local adProvider = "admob"
 
     local function adListener( event )
@@ -52,8 +48,8 @@ function scene:create( event )
         end
     end
 
-    ads.init( adProvider, appID, adListener )
-    ]]--
+    ads.init( adProvider, bannerAppID, adListener )
+    ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
 
     -- create start function
 
@@ -83,11 +79,9 @@ function scene:create( event )
     sceneGroup:insert( titleText2 )
     sceneGroup:insert( titleText3 )
 
-    local startBtn = display.newText( "start", display.contentCenterX, display.contentCenterY+(363*mW), "Mathlete-SkinnySlant", 80*mW ) --875,80
+    local startBtn = display.newText( "start", display.contentCenterX, display.contentCenterY+(200*mW), "Mathlete-SkinnySlant", 80*mW ) --875,80
     -- startBtn:addEventListener( "tap", startGame )
     sceneGroup:insert( startBtn )
-    
-    -- ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
 end
 
 -- "scene:show()"

@@ -6,6 +6,7 @@
 settings =
 {
     
+
     orientation =
     {
         -- Supported values for orientation:
@@ -24,12 +25,10 @@ settings =
 
     plugins =
     {
-        --[[
         ["plugin.google.play.services"] =
         {
             publisherId = "com.coronalabs"
         },
-        ]]--
     }, 
 
     --

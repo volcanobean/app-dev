@@ -6,6 +6,7 @@
 
 local composer = require( "composer" )
 local scene = composer.newScene()
+local _myG = composer.myGlobals
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
@@ -23,6 +24,9 @@ function scene:create( event )
     physics.setGravity(0,0)
 
     -- main character
+    --local player = "p1"
+    print ("game p: " .. _myG.player)
+
 
     local background = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight )
     background:setFillColor(0,0,0,1)
@@ -31,17 +35,24 @@ function scene:create( event )
     local fairySpriteOptions =
     {
         width = 115,
-        height = 158,
-        numFrames = 2
+        height = 159,
+        numFrames = 4
     }
-    local fairySheet = graphics.newImageSheet( "images/spritesheet-fairy-A.png", fairySpriteOptions )
-    local fairyFrames = { start=1, count=2 }
+    local fairySheet = graphics.newImageSheet( "images/Spritesheet-Fairy-AB.png", fairySpriteOptions )
+    local fairyFrames = { start=1, count=4 }
+
 
     local fairy = display.newSprite( fairySheet, fairyFrames )
     fairy.x = display.contentWidth *0.10
     fairy.y = display.contentHeight *0.90
     physics.addBody( fairy, "dynamic" )
     sceneGroup:insert( fairy )
+
+    if _myG.player == "p1" then 
+        fairy:setFrame(1)  
+    elseif _myG.player == "p2" then
+        fairy:setFrame (3)
+    end  
 
     -- Color glowballs to collect
 
@@ -54,15 +65,23 @@ function scene:create( event )
         print("----")
         print ("Fairy:",fairy.x)
         print ("Event:",event.x)
-        if (fairy.x > event.x) then
-            fairy:setFrame (2) 
-        elseif (fairy.x <= event.x) then
-            fairy:setFrame (1)
-        end
+        if _myG.player == "p1" then
+            if (fairy.x > event.x) then
+                fairy:setFrame (2) 
+            elseif (fairy.x <= event.x) then
+                fairy:setFrame (1)
+            end
+        elseif _myG.player == "p2" then 
+            if (fairy.x > event.x) then
+                fairy:setFrame (4) 
+            elseif (fairy.x <= event.x) then
+                fairy:setFrame (3)
+            end
+        end 
         return true
     end
 
-    background:addEventListener( "tap", touchScreen )
+   background:addEventListener( "tap", touchScreen )
 
     -- Define creation of Glow
 
