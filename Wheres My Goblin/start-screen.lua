@@ -14,19 +14,11 @@ local cW = display.contentWidth
 local cH = display.contentHeight
 local mW = 0.0013020833*cW
 
--- -----------------------------------------------------------------------------------------------------------------
--- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
--- -----------------------------------------------------------------------------------------------------------------
+ -- Ad code
 
--- "scene:create()"
--- Initialize the scene here.
-function scene:create( event )
-    local sceneGroup = self.view
-
-    -- Ad code
-
-    local ads = require( "ads" )
+local ads = require( "ads" )
     local bannerAppID = "ca-app-pub-7094148843149156/1832646501"  -- admob, iOS banner
+    local interstitialAppID = "ca-app-pub-7094148843149156/3309379704" -- admob, iOS interstitial
     local adProvider = "admob"
 
     local function adListener( event )
@@ -49,7 +41,16 @@ function scene:create( event )
     end
 
     ads.init( adProvider, bannerAppID, adListener )
-    ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
+    --ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
+
+-- -----------------------------------------------------------------------------------------------------------------
+-- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
+-- -----------------------------------------------------------------------------------------------------------------
+
+-- "scene:create()"
+-- Initialize the scene here.
+function scene:create( event )
+    local sceneGroup = self.view
 
     -- create start function
 
@@ -90,6 +91,10 @@ function scene:show( event )
 
     if ( event.phase == "will" ) then
         -- Called when the scene is still off screen (but is about to come on screen).
+
+        -- Show banner ad
+        ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
+
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
         -- Insert code here to make the scene come alive.
@@ -114,6 +119,9 @@ function scene:hide( event )
         -- Example: stop timers, stop animation, stop audio, etc.
     elseif ( event.phase == "did" ) then
         -- Called immediately after scene goes off screen.
+
+        -- remove the current ad
+        ads.hide()
     end
 end
 
