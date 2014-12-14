@@ -22,10 +22,9 @@ composer.myGlobals = {}
 
 local _myG = composer.myGlobals
 
--- shorter variable name for contentWidth
--- all scale/size values will be a percentage of the contentWidth, so a 512w rectangle on a 768w display (512/768) would be: cW*0.667
--- mW is multiplierWidth for converting existing values easier ( 768 divided by 100 to get a percentage for multiplying instead of dividing)
+-- Play count variable to track number of plays for ad display purposes.
 
+_myG.playCount = 0
 
 -- Now that our variables are set, let's start the game.
 
