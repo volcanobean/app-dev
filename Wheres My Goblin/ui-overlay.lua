@@ -47,6 +47,8 @@ function scene:create( event )
     _myG.introComplete = "false"
     local bannerState = "up"
     local signState = "goblin"
+    local arrowState = "down"
+    local settingsActive = "true"
 
     --local debug
 
@@ -106,6 +108,140 @@ function scene:create( event )
         --audio.play( mySound )
         timer.performWithDelay( 2000, stopAudio )
     end
+
+    -- Settings sprites
+    
+    local settingsSheetInfo = require("settings-sheet")
+    local settingsSheet = graphics.newImageSheet( "images/settings.png", settingsSheetInfo:getSheet() )
+    local settingsFrames  = { start=1, count=5 }
+
+    local settingsX = 665*mW
+
+    local homeBtnY = 80*mW
+    local replayBtnY = 208*mW
+    local audioBtnY = 340*mW
+
+    local arrowBtn = display.newSprite( settingsSheet, settingsFrames )
+    arrowBtn:setFrame(2)
+    arrowBtn.anchorY = 0 
+    arrowBtn.x = settingsX
+    arrowBtn.y = -44*mW
+    
+    local homeBtn = display.newSprite( settingsSheet, settingsFrames )
+    homeBtn:setFrame(3)
+    homeBtn.anchorY = 0 
+    homeBtn.x = settingsX
+    homeBtn.y = homeBtnY
+
+    local replayBtn = display.newSprite( settingsSheet, settingsFrames )
+    replayBtn:setFrame(4)
+    replayBtn.anchorY = 0 
+    replayBtn.x = settingsX
+    replayBtn.y = replayBtnY
+
+    local audioBtn = display.newSprite( settingsSheet, settingsFrames )
+    audioBtn:setFrame(1)
+    audioBtn.anchorY = 0 
+    audioBtn.x = settingsX
+    audioBtn.y = audioBtnY
+
+    audioBtn.yScale=0.25
+    audioBtn.alpha=0
+    replayBtn.yScale=0.5
+    replayBtn.alpha=0
+    homeBtn.yScale=0.5
+    homeBtn.alpha=0
+
+    sceneGroup:insert( audioBtn )
+    sceneGroup:insert( replayBtn )
+    sceneGroup:insert( homeBtn  )
+    sceneGroup:insert( arrowBtn )
+
+    -- settings-related functions
+    
+    local function settingsActiveTrue()
+        settingsActive = "true"
+        print ("settingsActive: " .. settingsActive)
+    end 
+
+    local function settingsActiveFalse()
+        settingsActive = "false"
+        print ("settingsActive: " .. settingsActive)
+    end 
+
+    local function arrowImageDown()
+        arrowBtn:setFrame(2)
+    end
+
+    local function arrowImageUp()
+        arrowBtn:setFrame(5)
+    end
+
+    local function settingsOpen()
+        settingsActiveFalse()
+        transition.to( homeBtn, { time=1, time=1, alpha=1 })
+        transition.to( homeBtn, { delay=1, time=150, y=homeBtnY+48*mW, yScale=1, transition=easing.outSine })
+        transition.to( homeBtn, { delay=150, time=150, y=homeBtnY, transition=easing.outSine })
+        transition.to( replayBtn, { delay=250, time=1, alpha=1 })
+        transition.to( replayBtn, { delay=250, time=150, y=replayBtnY+50*mW, yScale=1, transition=easing.outSine })
+        transition.to( replayBtn, { delay=400, time=150, y=replayBtnY, transition=easing.outSine })
+        transition.to( audioBtn, { delay=500, time=1, alpha=1 })
+        transition.to( audioBtn, { delay=500, time=150, y=audioBtnY+50*mW, yScale=1, transition=easing.outSine })
+        transition.to( audioBtn, { delay=650, time=150, y=audioBtnY, transition=easing.outSine })
+        timer.performWithDelay( 700, arrowImageUp )
+        timer.performWithDelay( 700, settingsActiveTrue )
+    end
+
+    local function settingsClose()
+        settingsActiveFalse()
+        transition.to( audioBtn, { time=100, yScale=0.25, transition=easing.outSine })
+        transition.to( audioBtn, { delay=100, time=1, alpha=0 })
+        transition.to( replayBtn, { delay=100, time=75, yScale=0.5, transition=easing.outSine  })
+        transition.to( replayBtn, { delay=175, time=1, alpha=0 })
+        transition.to( homeBtn, { delay=175, time=60, yScale=0.5, transition=easing.outSine  })
+        transition.to( homeBtn, { delay=235, time=1, alpha=0 })
+        timer.performWithDelay( 235, arrowImageDown )
+        timer.performWithDelay( 235, settingsActiveTrue )
+    end
+
+    local function clickArrow( event )
+        if( settingsActive == "true" ) then
+            if( arrowState == "up" ) then
+                arrowState = "down"
+                settingsClose()
+            elseif( arrowState == "down") then
+                arrowState = "up"
+                settingsOpen()
+            end
+        end
+        return true
+    end
+
+    local function clickHome( event )
+        if( settingsActive == "true" ) then
+            composer.gotoScene( "start-screen" )
+        end
+        return true
+    end
+
+    local function clickReplay( event )
+        if( settingsActive == "true" ) then
+            composer.gotoScene( "replay" )
+        end
+        return true
+    end
+
+    local function clickAudio( event )
+        if( settingsActive == "true" ) then
+            --show audio settings
+        end
+        return true
+    end
+
+    arrowBtn:addEventListener( "tap", clickArrow )
+    homeBtn:addEventListener( "tap", clickHome )
+    replayBtn:addEventListener( "tap", clickReplay )
+    audioBtn:addEventListener( "tap", clickAudio )
 
     -- Banner sprites
 
@@ -215,6 +351,7 @@ function scene:create( event )
 
     local bannerUpY
     local bannerDownY
+    local bannerStretchY
 
     local bannerGroup = display.newGroup()
     bannerGroup:insert( banner )
@@ -228,6 +365,7 @@ function scene:create( event )
         matchGroup.y = -940*mW
         bannerUpY = 0 --0
         bannerDownY = cH*0.91 --440
+        bannerStretchY = 50*mW
     elseif( screenRatio > 0.6 ) and ( screenRatio < 0.7 ) then
         -- if we're on shorter mobile devices
         bannerGroup.anchorY = 1
@@ -235,44 +373,38 @@ function scene:create( event )
         matchGroup.y = -940*mW
         bannerUpY = 0 --0
         bannerDownY = cH*0.82 --440
+        bannerStretchY = 50*mW
      else
         -- if we're on a taller thinner device
         bannerGroup.anchorY = 0
         banner.anchorY = 0
         matchGroup.y = 120*mW
         bannerUpY = -1050*mW
-        bannerDownY = 0
+        bannerDownY = -50*mW
+        bannerStretchY = 50*mW
     end
 
     bannerGroup.y = bannerUpY
     bannerGroup.x = display.contentCenterX
+    -- set inital banner values
+    transition.to( bannerGroup, { time=1, y=bannerUpY, yScale=0.5 })
 
     -- animate banner
 
     local function bannerPlayDown()
         bannerState = "down"
-        print( bannerState ) 
-        transition.to( bannerGroup, { time=500, y=bannerDownY, transition=easing.outSine } )
+        print( bannerState )
+        transition.to( bannerGroup, { time=350, y=bannerDownY+bannerStretchY, yScale=1, transition=easing.outSine })
+        transition.to( bannerGroup, { delay=350, time=200, y=bannerDownY, transition=easing.outSine })
         transition.to( shader, { time=300, alpha=0.5 } )
     end
 
     local function bannerPlayUp()
         bannerState = "up"
         print( bannerState ) 
-        transition.to( bannerGroup, { time=500, y=bannerUpY, transition=easing.outSine } )
+        transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
         transition.to( shader, { time=300, alpha=0 } )
     end
-
-    -- back to home
-
-    local function returnHome( event )
-        composer.gotoScene( "start-screen" )
-        return true
-    end
-
-    local homeButton = display.newText( "<- HOME", 100, 50, native.systemFont, 30 )
-    homeButton:addEventListener( "tap", returnHome )
-    sceneGroup:insert( homeButton )
 
     -- gear sprite
 
@@ -437,6 +569,7 @@ function scene:create( event )
     function _myG.startGamePlay()
         _myG.introComplete = "true"
         _myG.uiActive = "true"
+        settingsActive = "true"
         _myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
     end
 
@@ -450,7 +583,7 @@ function scene:create( event )
     -- INTRO ANIMATION:
 
     uiActiveTrue() -- temporarily true to allow first animation
-    crankTimer = timer.performWithDelay( 600, turnCrank )
+    crankTimer = timer.performWithDelay( 800, turnCrank )
 
 --end scene:create
 end 

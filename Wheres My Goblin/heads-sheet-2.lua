@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:af9f2ed8716df29fba6cf57ea5b8c7ee:6436282a909f24794df0f854452169ba:df20e5a99330c3aec1aa6a51b5b12b0e$
+-- $TexturePacker:SmartUpdate:38f3a5aeb571857f21badca9ba9f4b3f:23e2c075b69f4c9f6119cbf8165f2fa0:df20e5a99330c3aec1aa6a51b5b12b0e$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -18,27 +18,27 @@ SheetInfo.sheet =
     frames = {
     
         {
-            -- head-goggles
+            -- head-helmet
             x=2*mW,
             y=2*mW,
-            width=396*mW,
-            height=201*mW,
+            width=274*mW,
+            height=258*mW,
 
-            sourceX = 65*mW,
-            sourceY = 93*mW,
+            sourceX = 126*mW,
+            sourceY = 37*mW,
             sourceWidth = 512*mW,
             sourceHeight = 313*mW
         },
     },
     
     sheetContentWidth = 512*mW,
-    sheetContentHeight = 256*mW
+    sheetContentHeight = 512*mW
 }
 
 SheetInfo.frameIndex =
 {
 
-    ["head-goggles"] = 1,
+    ["head-helmet"] = 1,
 }
 
 function SheetInfo:getSheet()

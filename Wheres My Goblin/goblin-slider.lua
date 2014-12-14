@@ -362,9 +362,12 @@ function scene:create( event )
     end
 
     -- Create guide for center of screen
+
+    --[[
     local centerRule = display.newRect( display.contentCenterX, 500, 10, 1000 )
     centerRule:setFillColor( 0, 1, 1, 0.25 )
     sceneGroup:insert( centerRule )
+    ]]--
 
     -- Create hit areas to control ribbon scroll
 
@@ -372,18 +375,24 @@ function scene:create( event )
     hitRibbon1:setFillColor( 0, 1, 1, 0.25 )
     hitRibbon1.id = 1
     hitRibbon1:addEventListener( "touch", scrollMe )
+    --hitRibbon1.isVisible = false
+    --hitRibbon1.isHitTestable = true
     sceneGroup:insert( hitRibbon1 )
 
     local hitRibbon2 = display.newRect( display.contentCenterX, display.contentCenterY-(32*mW), display.contentWidth, 262*mW ) --500,262
     hitRibbon2:setFillColor( 0, 1, 1, 0.25 )
     hitRibbon2.id = 2
     hitRibbon2:addEventListener( "touch", scrollMe )
+    --hitRibbon2.isVisible = false
+    --hitRibbon2.isHitTestable = true
     sceneGroup:insert( hitRibbon2 )
 
     local hitRibbon3 = display.newRect( display.contentCenterX, display.contentCenterY+(238*mW), display.contentWidth, 275*mW ) --770,275
     hitRibbon3:setFillColor( 0, 1, 1, 0.25 )
     hitRibbon3.id = 3
     hitRibbon3:addEventListener( "touch", scrollMe )
+    --hitRibbon3.isVisible = false
+    --hitRibbon3.isHitTestable = true
     sceneGroup:insert( hitRibbon3 )
 
     -- We render the background image after the hit area so it is stacked on top, hiding the hit area.
