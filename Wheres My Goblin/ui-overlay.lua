@@ -82,7 +82,21 @@ function scene:create( event )
 
     -- Audio
 
-    -- temp function for debuggin, sans actual audio
+    -- Sound FX
+
+    local leverFX = audio.loadSound( "audio/lever-pull.wav" )
+
+    local function playLeverFX()
+        audio.play( leverFX )
+    end
+
+    local bannerFX = audio.loadSound( "audio/banner.wav" )
+
+    local function playBannerFX()
+        audio.play( bannerFX )
+    end
+
+    -- Voices
 
     local mySound = audio.loadSound( "audio/wmg-mason-01.wav" )
 
@@ -394,6 +408,7 @@ function scene:create( event )
     local function bannerPlayDown()
         bannerState = "down"
         print( bannerState )
+        playBannerFX()
         transition.to( bannerGroup, { time=350, y=bannerDownY+bannerStretchY, yScale=1, transition=easing.outSine })
         transition.to( bannerGroup, { delay=350, time=200, y=bannerDownY, transition=easing.outSine })
         transition.to( shader, { time=300, alpha=0.5 } )
@@ -425,7 +440,8 @@ function scene:create( event )
 
     local function handlePlay( seqVar )
         if seqVar == "down" then
-            transition.to( gearHandle, { time=400, rotation=100, transition=easing.outSine } )
+            transition.to( gearHandle, { time=700, rotation=100, transition=easing.outSine } )
+            playLeverFX()
         elseif seqVar == "up" then
             transition.to( gearHandle, { time=400, rotation=0, transition=easing.outSine } )
         end
@@ -556,10 +572,10 @@ function scene:create( event )
             handlePlay( "down" )
             gearForward()
             if ( _myG.introComplete == "false" ) then
-                timer.performWithDelay( 600, bannerPlayDown )
+                timer.performWithDelay( 700, bannerPlayDown )
                 timer.performWithDelay( 1400, audioWheresMyGoblin )
             else
-                timer.performWithDelay( 300, compareGoblins )
+                timer.performWithDelay( 700, compareGoblins )
             end
             bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
         end
