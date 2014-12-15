@@ -671,13 +671,13 @@ function scene:show( event )
         print( "----" )
         print( "playCount: " .. _myG.playCount )
         print( "----" )
-        
+
         -- Hide the goblin slider on initial game load.
         _myG.ribbon[1].alpha=0
         _myG.ribbon[2].alpha=0
         _myG.ribbon[3].alpha=0
 
-        -- show interstitial ad
+        -- show interstitial ad after 3 completed gameplays
 
         if( _myG.playCount == 4) then
         --if ( ads.isLoaded("interstitial") ) then

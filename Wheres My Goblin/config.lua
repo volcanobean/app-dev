@@ -5,6 +5,7 @@ application =
 	{
 		scale = "adaptive",
 		fps = 30,
+		audioPlayFrequency = 22050
 		
 		imageSuffix =
 		{
