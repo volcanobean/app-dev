@@ -147,6 +147,16 @@ function scene:create( event )
         blockSnapLeft[i] = blockSnap[i] + blockGroupWidth
     end
 
+    -- Audio
+
+    -- Sound FX
+
+    local swipeFX = audio.loadSound( "audio/swipe.wav" )
+
+    local function playSwipeFX()
+        audio.play( swipeFX )
+    end
+
     -- Function to check for a swipe vs a touch and drag
 
     local function swipeTimer()
@@ -332,12 +342,17 @@ function scene:create( event )
                                 activeBlockSnap = blockSnapRight[1]
                                 transition.to( _myG.ribbon[activeRibbon], { time=300, transition=easing.outSine, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
                                 -- note: shift to center will get the active block on completion
+                                -- play sound fx
+                                playSwipeFX()
+                                
                                 -- debug
                                 -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                            -- else, if we're not at the end but still in the center region
                            elseif ( blockRegion == "center" ) then
                                 nextBlockSnap = _myG.ribbon[activeRibbon].activeBlock + 1
                                 transition.to( _myG.ribbon[activeRibbon], { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
+                                -- play sound fx
+                                playSwipeFX()
                                 -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
                                 _myG.ribbon[activeRibbon].activeBlock = nextBlockSnap
                                 -- debug
@@ -345,6 +360,8 @@ function scene:create( event )
                             -- else if we are not in the center region (because of a very fast/long swipe going into the right region before code trigger)
                             else
                                 -- don't do the full swipe animation, just shift to the next block
+                                -- play sound fx
+                                playSwipeFX()
                                 transition.to( _myG.ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
                             end
 
@@ -356,12 +373,16 @@ function scene:create( event )
                                 blockRegion = "left"
                                 activeBlockSnap = blockSnapLeft[_myG.blockCount]
                                 transition.to( _myG.ribbon[activeRibbon], { time=300, transition=easing.outSine, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
+                                -- play sound fx
+                                playSwipeFX()
                                 -- debug
                                 -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                              -- else, if we're not at the end but still in the center region
                            elseif ( blockRegion == "center" ) then
                                 nextBlockSnap = _myG.ribbon[activeRibbon].activeBlock - 1
                                 transition.to( _myG.ribbon[activeRibbon], { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
+                                -- play sound fx
+                                playSwipeFX()
                                 -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
                                 _myG.ribbon[activeRibbon].activeBlock = nextBlockSnap
                                 -- debug
@@ -370,6 +391,8 @@ function scene:create( event )
                             else
                                 -- don't do the full swipe animation, just shift to the next block
                                 transition.to( _myG.ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
+                                -- play sound fx
+                                playSwipeFX()
                             end
                         end
 
@@ -643,9 +666,13 @@ function scene:create( event )
         transition.to( _myG.ribbon[3], { time=600, alpha=1 } )
         -- begin animation
         transition.to( _myG.ribbon[1], { delay=700, time=275, x=blockEnd[end1] + _myG.blockWidth/2 + _myG.blockMargin } )
+        timer.performWithDelay( 700, playSwipeFX )
         transition.to( _myG.ribbon[1], { delay=1400, time=275, x=blockEnd[end2] + _myG.blockWidth/2 + _myG.blockMargin } )
+        timer.performWithDelay( 1400, playSwipeFX )
         transition.to( _myG.ribbon[2], { delay=2100, time=275, x=blockEnd[end3] + _myG.blockWidth/2 + _myG.blockMargin } )
+        timer.performWithDelay( 2100, playSwipeFX )
         transition.to( _myG.ribbon[3], { delay=2800, time=275, x=blockEnd[end4] + _myG.blockWidth/2 + _myG.blockMargin } )
+        timer.performWithDelay( 2800, playSwipeFX )
         -- set ative block values based on post-animation start position
         _myG.ribbon[1].activeBlock = end2
         _myG.ribbon[2].activeBlock = end3
