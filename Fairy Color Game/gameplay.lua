@@ -54,6 +54,10 @@ function scene:create( event )
         fairy:setFrame (3)
     end  
 
+    local enemy = display.newRect( 450, 250, 200, 100 )
+    enemy:setFillColor(1, 0, 1, 1)
+    physics.addBody(enemy, "static", { bounce=5, density=5 } )
+
     -- Color glowballs to collect
 
     local colorGlow = {}
