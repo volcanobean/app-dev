@@ -14,11 +14,11 @@ local cW = display.contentWidth
 local cH = display.contentHeight
 local mW = 0.0013020833*cW
 
- -- Ad code
+-- Ad code
 
 local ads = require( "ads" )
     local bannerAppID = "ca-app-pub-7094148843149156/1832646501"  -- admob, iOS banner
-    local interstitialAppID = "ca-app-pub-7094148843149156/3309379704" -- admob, iOS interstitial
+    --local interstitialAppID = "ca-app-pub-7094148843149156/3309379704" -- admob, iOS interstitial
     local adProvider = "admob"
 
     local function adListener( event )
