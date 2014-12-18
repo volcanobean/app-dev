@@ -90,7 +90,13 @@ function scene:create( event )
         audio.play( leverFX )
     end
 
-    local bannerFX = audio.loadSound( "audio/banner.wav" )
+    local leverShortFX = audio.loadSound( "audio/lever-short.wav" )
+
+    local function playLeverShortFX()
+        audio.play( leverShortFX )
+    end
+
+    local bannerFX = audio.loadSound( "audio/banner-short.wav" )
 
     local function playBannerFX()
         audio.play( bannerFX )
@@ -416,7 +422,8 @@ function scene:create( event )
 
     local function bannerPlayUp()
         bannerState = "up"
-        print( bannerState ) 
+        print( bannerState )
+        playBannerFX()
         transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
         transition.to( shader, { time=300, alpha=0 } )
     end
@@ -444,6 +451,7 @@ function scene:create( event )
             playLeverFX()
         elseif seqVar == "up" then
             transition.to( gearHandle, { time=400, rotation=0, transition=easing.outSine } )
+            playLeverShortFX()
         end
     end
 
