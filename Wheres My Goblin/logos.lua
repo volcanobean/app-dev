@@ -25,6 +25,29 @@ local mW = 0.0013020833*cW
 function scene:create( event )
     local sceneGroup = self.view
 
+    -- Audio
+
+    local unicorgiVO = audio.loadSound( "audio/unicorgi-vo.wav" )
+    local introNote = audio.loadSound( "audio/unicorgi-intro-note.wav" )
+    local introTone = audio.loadSound( "audio/unicorgi-intro-tone.wav" )
+    local swooshFX = audio.loadSound( "audio/swipe.wav" )
+
+    local function playUnicorgiVO()
+        audio.play( unicorgiVO )
+    end
+
+    local function playIntroNote()
+        audio.play( introNote )
+    end
+
+    local function playIntroTone()
+        audio.play( introTone )
+    end
+    
+    local function playSwooshFX()
+        audio.play( swooshFX )
+    end
+
     -- build logo elements
 
     local background = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth, 1366*mW )
@@ -64,14 +87,14 @@ function scene:create( event )
     local letterI2 = display.newText( "I", 639*mW, textY, "HelveticaLTStd-Blk", textSize )
     letterI2:setFillColor( 1, 0.639, 0.368, 1 )
 
-    sceneGroup:insert( letterU )
-    sceneGroup:insert( letterN )
-    sceneGroup:insert( letterI )
-    sceneGroup:insert( letterC )
+    sceneGroup:insert( letterI2 )
+    sceneGroup:insert( letterG )
     sceneGroup:insert( letterO )
     sceneGroup:insert( letterR )
-    sceneGroup:insert( letterG )
-    sceneGroup:insert( letterI2 )
+    sceneGroup:insert( letterC )
+    sceneGroup:insert( letterI )
+    sceneGroup:insert( letterU )
+    sceneGroup:insert( letterN )
 
     local function gotoStart( event ) 
         composer.gotoScene( "start-screen" )
@@ -79,7 +102,59 @@ function scene:create( event )
     end
 
     background:addEventListener( "tap", gotoStart )
-  
+
+    --animations
+
+    -- hide and wait
+    transition.to( pinkCircle, { time=0, alpha=0 })
+    transition.to( circleMask, { time=0, alpha=0 })
+    transition.to( unicorgi, { time=0, alpha=0 })
+    transition.to( pinkCircle, { delay=600, time=0, alpha=1 })
+    transition.to( circleMask, { delay=600, time=0, alpha=1 })
+    -- show and animate
+    transition.to( circleMask, { delay=600, time=0, xScale=0.1, yScale=0.1, y=cY-75*mW })
+    transition.to( pinkCircle, { delay=600, time=0, xScale=0.1, yScale=0.1 })
+    transition.to( circleMask, { delay=600, time=400, xScale=1.5, yScale=1.5, y=cY+177*mW, transition=easing.inQuad })
+    transition.to( pinkCircle, { delay=600, time=400, xScale=1.5, yScale=1.5, transition=easing.inQuad })
+    transition.to( circleMask, { delay=1000, time=200, xScale=1, yScale=1, y=cY+87*mW, transition=easing.outQuad })
+    transition.to( pinkCircle, { delay=1000, time=200, xScale=1, yScale=1, transition=easing.outQuad })
+    transition.to( unicorgi, { delay=1000, time=0, x=530*mW, y=cY+105*mW, alpha=1 })
+    transition.to( unicorgi, { delay=1000, time=300, x=398*mW, y=cY-125*mW, transition=easing.outQuad })
+
+    -- letters hide and wait
+    transition.to( letterU, { time=0, alpha=0, x= -236*mW })
+    transition.to( letterN, { time=0, alpha=0, x= -156*mW })
+    transition.to( letterI, { time=0, alpha=0, x= -101*mW })
+    transition.to( letterC, { time=0, alpha=0, x= -46*mW })
+    transition.to( letterO, { time=0, alpha=0, x=815*mW })
+    transition.to( letterR, { time=0, alpha=0, x=896*mW })
+    transition.to( letterG, { time=0, alpha=0, x=973*mW })
+    transition.to( letterI2, { time=0, alpha=0, x=1030*mW })
+    -- letters show
+    transition.to( letterU, { delay=1400, time=0, alpha=1, rotation= -360 })
+    transition.to( letterN, { delay=1400, time=0, alpha=1, rotation= -360 })
+    transition.to( letterI, { delay=1400, time=0, alpha=1, rotation= -360 })
+    transition.to( letterC, { delay=1400, time=0, alpha=1, rotation= -360 })
+    transition.to( letterO, { delay=1400, time=0, alpha=1, rotation=360 })
+    transition.to( letterR, { delay=1400, time=0, alpha=1, rotation= -180 })
+    transition.to( letterG, { delay=1400, time=0, alpha=1, rotation=360 })
+    transition.to( letterI2, { delay=1400, time=0, alpha=1, rotation=359 })
+    -- letters animated
+    transition.to( letterU, { delay=1666, time=366, x=155*mW, rotation=0, transition=easing.outQuad })
+    transition.to( letterN, { delay=1733, time=366, x=235*mW, rotation=0, transition=easing.outQuad })
+    transition.to( letterI, { delay=1530, time=433, x=290*mW, rotation=0, transition=easing.outQuad })
+    transition.to( letterC, { delay=1400, time=460, x=345*mW, rotation=0, transition=easing.outQuad })
+    transition.to( letterO, { delay=1530, time=460, x=425*mW, rotation=0, transition=easing.outQuad })
+    transition.to( letterR, { delay=1366, time=400, x=505*mW, rotation= -360, transition=easing.outQuad })
+    transition.to( letterG, { delay=1633, time=366, x=582*mW, rotation=0, transition=easing.outQuad })
+    transition.to( letterI2, { delay=1800, time=366, x=639*mW, rotation=0, transition=easing.outQuad })
+
+    -- just voice over
+    
+    timer.performWithDelay( 1200, playSwooshFX )
+    timer.performWithDelay( 1600, playIntroTone )
+    timer.performWithDelay( 2500, playUnicorgiVO )
+
 end
 
 -- "scene:show()"
@@ -94,7 +169,6 @@ function scene:show( event )
         -- Example: start timers, begin animation, play audio, etc.
 
         -- pre-load next scene
-
         print ( "loading start-screen" )
         composer.loadScene( "start-screen" )
     end

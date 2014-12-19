@@ -17,31 +17,43 @@ local mW = 0.0013020833*cW
 -- Ad code
 
 local ads = require( "ads" )
-    local bannerAppID = "ca-app-pub-7094148843149156/1832646501"  -- admob, iOS banner
-    --local interstitialAppID = "ca-app-pub-7094148843149156/3309379704" -- admob, iOS interstitial
-    local adProvider = "admob"
+local bannerAppID = "ca-app-pub-7094148843149156/1832646501"  -- admob, iOS banner
+--local interstitialAppID = "ca-app-pub-7094148843149156/3309379704" -- admob, iOS interstitial
+local adProvider = "admob"
 
-    local function adListener( event )
-        -- The 'event' table includes:
-        -- event.name: string value of "adsRequest"
-        -- event.response: message from the ad provider about the status of this request
-        -- event.phase: string value of "loaded", "shown", or "refresh"
-        -- event.type: string value of "banner" or "interstitial"
-        -- event.isError: boolean true or false
+local function adListener( event )
+    -- The 'event' table includes:
+    -- event.name: string value of "adsRequest"
+    -- event.response: message from the ad provider about the status of this request
+    -- event.phase: string value of "loaded", "shown", or "refresh"
+    -- event.type: string value of "banner" or "interstitial"
+    -- event.isError: boolean true or false
 
-        local msg = event.response
-        -- Quick debug message regarding the response from the library
-        print( "Message from the ads library: ", msg )
+    local msg = event.response
+    -- Quick debug message regarding the response from the library
+    print( "Message from the ads library: ", msg )
 
-        if ( event.isError ) then
-            print( "Error, no ad received", msg )
-        else
-            print( "Ah ha! Got one!" )
-        end
+    if ( event.isError ) then
+        print( "Error, no ad received", msg )
+    else
+        print( "Ah ha! Got one!" )
     end
+end
 
-    ads.init( adProvider, bannerAppID, adListener )
-    --ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
+ads.init( adProvider, bannerAppID, adListener )
+--ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
+
+-- audio
+
+local goblinTheme = audio.loadSound( "audio/goblin-theme-loop.wav" )
+
+local function playGoblinTheme()
+    audio.play( goblinTheme, { loops=-1 } )
+end
+
+local function stopGoblinTheme()
+    audio.stop()
+end
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
@@ -83,6 +95,7 @@ function scene:create( event )
     local startBtn = display.newText( "start", display.contentCenterX, display.contentCenterY+(200*mW), "Mathlete-SkinnySlant", 80*mW ) --875,80
     startBtn:addEventListener( "tap", startGame )
     sceneGroup:insert( startBtn )
+
 end
 
 -- "scene:show()"
@@ -101,10 +114,11 @@ function scene:show( event )
         -- Example: start timers, begin animation, play audio, etc.
 
         -- pre-load next scene
-
         print ( "loading goblin-slider" )
         composer.loadScene( "goblin-slider" )
 
+        -- play goblin theme
+        timer.performWithDelay( 600, playGoblinTheme )
     end
 end
 
@@ -117,6 +131,10 @@ function scene:hide( event )
         -- Called when the scene is on screen (but is about to go off screen).
         -- Insert code here to "pause" the scene.
         -- Example: stop timers, stop animation, stop audio, etc.
+
+        -- stop audio
+        stopGoblinTheme()
+
     elseif ( event.phase == "did" ) then
         -- Called immediately after scene goes off screen.
 
