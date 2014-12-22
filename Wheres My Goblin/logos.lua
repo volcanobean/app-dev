@@ -68,7 +68,13 @@ function scene:create( event )
     sceneGroup:insert( circleMask )
 
     local textY = cY+98*mW --610
-    local textSize = 110*mW
+    local textSizeRaw = 110*mW
+    -- Round raw value to whole number, no decimals
+    local textSize = math.floor(textSizeRaw+0.5)
+
+    -- experimenting with rounding to hopefully eliminate cropped text on devices
+    --print ( "textSize: " .. textSize )
+    --print( "Rounded: " .. math.floor(textSizeRaw+0.5))
 
     local letterU = display.newText( "U", 155*mW, textY, "HelveticaLTStd-Blk", textSize )
     letterU:setFillColor( 1, 0.368, 0.368, 1 )

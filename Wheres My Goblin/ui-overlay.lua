@@ -27,6 +27,7 @@ print ("screenRatio " .. screenRatio)
 
 local bannerStayTimer
 local crankTimer
+local signTimer
 
 -- -------------------------------------------------------------------------------
 
@@ -501,48 +502,51 @@ function scene:create( event )
     local function signSpinToCheck()
         signSprite:setSequence( "spinToCheck" )
         signSprite:play()
+        signState = "check"
     end
 
     local function signSpinFromCheck()
         signSprite:setSequence( "spinFromCheck" )
         signSprite:play()
+        signState = "goblin"
     end
 
     local function signSpinToX()
         signSprite:setSequence( "spinToX" )
         signSprite:play()
+        signState = "x"
     end
 
     local function signSpinFromX()
         signSprite:setSequence( "spinFromX" )
         signSprite:play()
+        signState = "goblin"
     end
 
     -- vicotry animation
 
     local function playVictoryScene()
         print ( "Victory!" )
+        uiActiveFalse()
     end
 
     -- Sign animation and match checking
 
     local function compareGoblins()
-        print "compareGoblins"
-        --_myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
-        -- if user successfully has a match
-        if matchBlocks[1] == _myG.ribbon[1].activeBlock and matchBlocks[2] == _myG.ribbon[2].activeBlock and matchBlocks[3] == _myG.ribbon[3].activeBlock then
-            signSpinToCheck()
-            signState = "check"
-            timer.performWithDelay( 700, audioThatsMyGoblin )
-            -- replace below with victory animation
-            --timer.performWithDelay( 3000, signSpinFromCheck )
-            --timer.performWithDelay( 3500, uiActiveTrue )
-            playVictoryScene()
-        else
-            signSpinToX()
-            signState = "x"
-            bannerPlayDown()
-            timer.performWithDelay( 700, audioNotMyGoblin )
+        if ( _myG.introComplete == "true" ) then
+            print "compareGoblins"
+            --_myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
+            -- if user successfully has a match
+            if matchBlocks[1] == _myG.ribbon[1].activeBlock and matchBlocks[2] == _myG.ribbon[2].activeBlock and matchBlocks[3] == _myG.ribbon[3].activeBlock then
+                signSpinToCheck()
+                timer.performWithDelay( 700, audioThatsMyGoblin )
+                -- you win!
+                playVictoryScene()
+            else
+                signSpinToX()
+                timer.performWithDelay( 700, audioNotMyGoblin )
+                signTimer = timer.performWithDelay( 2000, signSpinFromX )
+            end
         end
     end
 
@@ -556,8 +560,8 @@ function scene:create( event )
         print( "raiseBanner uiActive: " .. _myG.uiActive )
         if ( _myG.introComplete == "false" ) then
             _myG.loadSlider()
-        elseif ( signState == "x" ) then
-            signSpinFromX()
+        elseif ( signState ~= "check" ) then
+            --signSpinFromX()
             timer.performWithDelay( 500, uiActiveTrue )
         end
     end
@@ -583,6 +587,7 @@ function scene:create( event )
                 timer.performWithDelay( 700, bannerPlayDown )
                 timer.performWithDelay( 1400, audioWheresMyGoblin )
             else
+                timer.performWithDelay( 700, bannerPlayDown )
                 timer.performWithDelay( 700, compareGoblins )
             end
             bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
@@ -599,6 +604,7 @@ function scene:create( event )
 
     -- event listeners
 
+    signSprite:addEventListener( "tap", compareGoblins )
     gearSprite:addEventListener( "tap", turnCrank )
     gearHandle:addEventListener( "tap", turnCrank )
     shader:addEventListener( "tap", raiseBannerNow )
