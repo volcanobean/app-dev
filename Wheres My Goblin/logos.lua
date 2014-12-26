@@ -68,30 +68,60 @@ function scene:create( event )
     sceneGroup:insert( circleMask )
 
     local textY = cY+98*mW --610
-    local textSizeRaw = 110*mW
-    -- Round raw value to whole number, no decimals
-    local textSize = math.floor(textSizeRaw+0.5)
 
-    -- experimenting with rounding to hopefully eliminate cropped text on devices
-    --print ( "textSize: " .. textSize )
-    --print( "Rounded: " .. math.floor(textSizeRaw+0.5))
+    -- logo letter spritesheet
 
-    local letterU = display.newText( "U", 155*mW, textY, "HelveticaLTStd-Blk", textSize )
+    local letterSheetInfo = require("letter-sheet")
+    local letterSheet = graphics.newImageSheet( "images/letters.png", letterSheetInfo:getSheet() )
+    local letterFrames  = { start=1, count=7 }
+
+    local letterU = display.newSprite( letterSheet, letterFrames )
+    letterU:setFrame(7)
     letterU:setFillColor( 1, 0.368, 0.368, 1 )
-    local letterN = display.newText( "N", 235*mW, textY, "HelveticaLTStd-Blk", textSize )
+    letterU.x = 155*mW
+    letterU.y = textY
+    
+    local letterN = display.newSprite( letterSheet, letterFrames )
+    letterN:setFrame(4)
     letterN:setFillColor( 1, 0.639, 0.368, 1 )
-    local letterI = display.newText( "I", 290*mW, textY, "HelveticaLTStd-Blk", textSize )
+    letterN.x = 235*mW
+    letterN.y = textY
+    
+    local letterI = display.newSprite( letterSheet, letterFrames )
+    letterI:setFrame(3)
     letterI:setFillColor( 0.416, 1, 0.373, 1 )
-    local letterC = display.newText( "C", 345*mW, textY, "HelveticaLTStd-Blk", textSize )
+    letterI.x = 290*mW
+    letterI.y = textY
+    
+    local letterC = display.newSprite( letterSheet, letterFrames )
+    letterC:setFrame(1)
     letterC:setFillColor( 0.392, 0.976, 0.682, 1 )
-    local letterO = display.newText( "O", 425*mW, textY, "HelveticaLTStd-Blk", textSize )
+    letterC.x = 345*mW
+    letterC.y = textY-3*mW
+    
+    local letterO = display.newSprite( letterSheet, letterFrames )
+    letterO:setFrame(5)
     letterO:setFillColor( 0.369, 1, 0.909, 1 )
-    local letterR = display.newText( "R", 505*mW, textY, "HelveticaLTStd-Blk", textSize )
+    letterO.x = 425*mW
+    letterO.y = textY-3*mW
+    
+    local letterR = display.newSprite( letterSheet, letterFrames )
+    letterR:setFrame(6)
     letterR:setFillColor( 0.475, 0.384, 0.761, 1 )
-    local letterG = display.newText( "G", 582*mW, textY, "HelveticaLTStd-Blk", textSize )
+    letterR.x = 506*mW
+    letterR.y = textY
+
+    local letterG = display.newSprite( letterSheet, letterFrames )
+    letterG:setFrame(2)
     letterG:setFillColor( 1, 0.447, 0.369, 1)
-    local letterI2 = display.newText( "I", 639*mW, textY, "HelveticaLTStd-Blk", textSize )
+    letterG.x = 582*mW
+    letterG.y = textY-3*mW
+    
+    local letterI2 = display.newSprite( letterSheet, letterFrames )
+    letterI2:setFrame(3)
     letterI2:setFillColor( 1, 0.639, 0.368, 1 )
+    letterI2.x = 639*mW
+    letterI2.y = textY
 
     sceneGroup:insert( letterI2 )
     sceneGroup:insert( letterG )
@@ -151,7 +181,7 @@ function scene:create( event )
     transition.to( letterI, { delay=1530, time=433, x=290*mW, rotation=0, transition=easing.outQuad })
     transition.to( letterC, { delay=1400, time=460, x=345*mW, rotation=0, transition=easing.outQuad })
     transition.to( letterO, { delay=1530, time=460, x=425*mW, rotation=0, transition=easing.outQuad })
-    transition.to( letterR, { delay=1366, time=400, x=505*mW, rotation= -360, transition=easing.outQuad })
+    transition.to( letterR, { delay=1366, time=400, x=506*mW, rotation= -360, transition=easing.outQuad })
     transition.to( letterG, { delay=1633, time=366, x=582*mW, rotation=0, transition=easing.outQuad })
     transition.to( letterI2, { delay=1800, time=366, x=639*mW, rotation=0, transition=easing.outQuad })
 
