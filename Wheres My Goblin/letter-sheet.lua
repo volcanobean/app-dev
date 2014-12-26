@@ -31,9 +31,9 @@ SheetInfo.sheet =
         {
             -- letter-g
             x=86*mW,
-            y=90*mW,
+            y=89*mW, --90
             width=82*mW,
-            height=86*mW,
+            height=89*mW, --86
 
             sourceX = 0,
             sourceY = 0,
@@ -67,9 +67,9 @@ SheetInfo.sheet =
         {
             -- letter-o
             x=2*mW,
-            y=2*mW,
+            y=1*mW, --2
             width=85*mW,
-            height=86*mW,
+            height=89*mW, --86
 
             sourceX = 0,
             sourceY = 0,
@@ -91,9 +91,9 @@ SheetInfo.sheet =
         {
             -- letter-u
             x=89*mW,
-            y=2*mW,
+            y=1*mW, --2
             width=78*mW,
-            height=84*mW,
+            height=87*mW, --84
 
             sourceX = 0,
             sourceY = 2*mW,

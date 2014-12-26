@@ -75,6 +75,7 @@ function scene:create( event )
     local letterSheet = graphics.newImageSheet( "images/letters.png", letterSheetInfo:getSheet() )
     local letterFrames  = { start=1, count=7 }
 
+    --local letterU = display.newImageRect( letterSheet, 7, 78*mW, 84*mW )
     local letterU = display.newSprite( letterSheet, letterFrames )
     letterU:setFrame(7)
     letterU:setFillColor( 1, 0.368, 0.368, 1 )
