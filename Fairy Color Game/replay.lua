@@ -32,7 +32,8 @@ function scene:show( event )
         -- Example: start timers, begin animation, play audio, etc.
 
         composer.removeScene( "gameplay" )
-        composer.gotoScene( "start-screen" )
+        composer.removeScene("item-scene")
+        composer.gotoScene( "pick-player" )
 
     end
 end

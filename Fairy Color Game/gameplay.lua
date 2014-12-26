@@ -35,15 +35,15 @@ function scene:create( event )
     local fairySpriteOptions =
     {
         width = 115,
-        height = 159,
-        numFrames = 4
+        height = 158,
+        numFrames = 8
     }
-    local fairySheet = graphics.newImageSheet( "images/Spritesheet-Fairy-AB.png", fairySpriteOptions )
-    local fairyFrames = { start=1, count=4 }
+    local fairySheet = graphics.newImageSheet( "images/fairy-abcd-spritesheet.png", fairySpriteOptions )
+    local fairyFrames = { start=1, count=8 }
 
 
     local fairy = display.newSprite( fairySheet, fairyFrames )
-    fairy.x = display.contentWidth *0.10
+    fairy.x = display.contentWidth *0.90
     fairy.y = display.contentHeight *0.90
     physics.addBody( fairy, "dynamic" )
     sceneGroup:insert( fairy )
@@ -52,11 +52,17 @@ function scene:create( event )
         fairy:setFrame(1)  
     elseif _myG.player == "p2" then
         fairy:setFrame (3)
-    end  
+    elseif _myG.player == "p3" then
+        fairy:setFrame (5)
+    elseif _myG.player == "p4" then
+        fairy:setFrame (7)        
+    end 
 
-    local enemy = display.newRect( 450, 250, 200, 100 )
-    enemy:setFillColor(1, 0, 1, 1)
-    physics.addBody(enemy, "static", { bounce=5, density=5 } )
+    -- Obstacles -- 
+
+    --local enemy = display.newRect( 450, 250, 200, 100 )
+    --enemy:setFillColor(1, 0, 1, 1)
+    --physics.addBody(enemy, "static", { bounce=5, density=5 } )
 
     -- Color glowballs to collect
 
@@ -71,16 +77,29 @@ function scene:create( event )
         print ("Event:",event.x)
         if _myG.player == "p1" then
             if (fairy.x > event.x) then
-                fairy:setFrame (2) 
+                fairy:setFrame (1) 
             elseif (fairy.x <= event.x) then
-                fairy:setFrame (1)
+                fairy:setFrame (2)
             end
         elseif _myG.player == "p2" then 
             if (fairy.x > event.x) then
-                fairy:setFrame (4) 
+                fairy:setFrame (3) 
             elseif (fairy.x <= event.x) then
-                fairy:setFrame (3)
+                fairy:setFrame (4)
             end
+
+        elseif _myG.player == "p3" then 
+            if (fairy.x > event.x) then
+                fairy:setFrame (5) 
+            elseif (fairy.x <= event.x) then
+                fairy:setFrame (6)
+            end
+        elseif _myG.player == "p4" then 
+            if (fairy.x > event.x) then
+                fairy:setFrame (7) 
+            elseif (fairy.x <= event.x) then
+                fairy:setFrame (8)
+            end        
         end 
         return true
     end
@@ -91,8 +110,8 @@ function scene:create( event )
 
     local function createGlow( number )
         colorGlow[number] = display.newImage( "images/blueglow.png" )
-        colorGlow[number].x = math.random( 50, 700 )
-        colorGlow[number].y = math.random( 80, 1000 )
+        colorGlow[number].x = math.random( 25, 900 )
+        colorGlow[number].y = math.random( 25, 475 )
         local r = math.random( 0, 100 )
         local g = math.random( 0, 100 )
         local b = math.random( 0, 100 )
