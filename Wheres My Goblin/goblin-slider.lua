@@ -15,40 +15,6 @@ local cX = display.contentCenterX
 local cY = display.contentCenterY
 local mW = 0.0013020833*cW
 
--- Ad code
-
-local ads = require( "ads" )
-    --local bannerAppID = "ca-app-pub-7094148843149156/1832646501"  -- admob, iOS banner
-    local interstitialAppID = "ca-app-pub-7094148843149156/3309379704" -- admob, iOS interstitial
-    local adProvider = "admob"
-
-    local function adListener( event )
-        -- The 'event' table includes:
-        -- event.name: string value of "adsRequest"
-        -- event.response: message from the ad provider about the status of this request
-        -- event.phase: string value of "loaded", "shown", or "refresh"
-        -- event.type: string value of "banner" or "interstitial"
-        -- event.isError: boolean true or false
-
-        local msg = event.response
-        -- Quick debug message regarding the response from the library
-        print( "Message from the ads library: ", msg )
-
-        if ( event.isError ) then
-            print( "Error, no ad received", msg )
-        elseif ( event.phase == "loaded" ) then
-            -- an ad was preloaded
-            print( "Interstitial was Loaded" )
-        elseif ( event.phase == "shown" ) then
-            -- the ad was viewed and closed
-            print( "Interstitial was viewed and closed" )
-        end
-    end
-
-    ads.init( adProvider, interstitialAppID, adListener )
-    ads.load( "interstitial", { appId=interstitialAppID } )
-    --ads.show tiggered later
-
 -- Begin global settings
 -- Block and ribbon values. Adjust as needed
 
@@ -688,29 +654,11 @@ function scene:show( event )
     local sceneGroup = self.view
     if ( event.phase == "will" ) then
         -- Called when the scene is still off screen (but is about to come on screen).
-        
-        -- Play count variable to track number of plays for ad display purposes.
-
-        _myG.playCount = _myG.playCount+1
-        if( _myG.playCount == 5) then
-            _myG.playCount = 1
-        end
-        print( "----" )
-        print( "playCount: " .. _myG.playCount )
-        print( "----" )
 
         -- Hide the goblin slider on initial game load.
         _myG.ribbon[1].alpha=0
         _myG.ribbon[2].alpha=0
         _myG.ribbon[3].alpha=0
-
-        -- show interstitial ad after 3 completed gameplays
-
-        if( _myG.playCount == 4) then
-        --if ( ads.isLoaded("interstitial") ) then
-            ads.show( "interstitial", { appId=interstitialAppID } )
-        --end
-        end
         
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen

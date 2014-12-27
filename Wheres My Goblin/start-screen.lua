@@ -18,17 +18,12 @@ local mW = 0.0013020833*cW
 
 local ads = require( "ads" )
 local bannerAppID = "ca-app-pub-7094148843149156/1832646501"  -- admob, iOS banner
---local interstitialAppID = "ca-app-pub-7094148843149156/3309379704" -- admob, iOS interstitial
 local adProvider = "admob"
 
-local function adListener( event )
-    -- The 'event' table includes:
-    -- event.name: string value of "adsRequest"
-    -- event.response: message from the ad provider about the status of this request
-    -- event.phase: string value of "loaded", "shown", or "refresh"
-    -- event.type: string value of "banner" or "interstitial"
-    -- event.isError: boolean true or false
+_myG.adsLoaded = "true"
+_myG.adsHeight = 100*mW
 
+local function adListener( event )
     local msg = event.response
     -- Quick debug message regarding the response from the library
     print( "Message from the ads library: ", msg )
@@ -41,7 +36,6 @@ local function adListener( event )
 end
 
 ads.init( adProvider, bannerAppID, adListener )
---ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
 
 -- audio
 
@@ -105,8 +99,12 @@ function scene:show( event )
     if ( event.phase == "will" ) then
         -- Called when the scene is still off screen (but is about to come on screen).
 
-        -- Show banner ad
-        ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
+        -- Show banner ad when loaded
+        if ( ads.isLoaded("banner") ) then
+            ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
+            _myG.adsLoaded = "true"
+            _myG.adsHeight = ads.height()
+        end
 
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
