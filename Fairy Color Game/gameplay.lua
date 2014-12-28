@@ -28,8 +28,10 @@ function scene:create( event )
     print ("game p: " .. _myG.player)
 
 
-    local background = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight )
-    background:setFillColor(0,0,0,1)
+    local background = display.newImage ("images/test-bg.jpg", 3000, 1000)
+    background.x = display.contentCenterX
+    background.y = display.contentCenterY
+    --background:setFillColor(0,0,0,1)
     sceneGroup:insert( background )
 
     local fairySpriteOptions =
