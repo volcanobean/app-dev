@@ -15,7 +15,7 @@ local cX = display.contentCenterX
 local cY = display.contentCenterY
 local mW = 0.0013020833*cW
 local screenRatio = cW/cH
-print ("screenRatio " .. screenRatio)
+--print ("screenRatio " .. screenRatio)
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
@@ -129,6 +129,12 @@ function scene:create( event )
         --audio.play( mySound )
         timer.performWithDelay( 2000, stopAudio )
     end
+
+    local uiShader = display.newImageRect( "images/ui-shader.png", display.contentWidth, 403*mW )
+    uiShader.anchorY = 1
+    uiShader.x = display.contentCenterX
+    uiShader.y = cH
+    sceneGroup:insert( uiShader )
 
     -- Settings sprites
     
@@ -442,7 +448,8 @@ function scene:create( event )
     
     local gearHandle = display.newImage( gearSheet, 5 )
     gearHandle.x = 70*mW
-    gearHandle.y = display.contentHeight-(91*mW)
+    local gearHandleY = display.contentHeight-(91*mW)
+    gearHandle.y = gearHandleY
     gearHandle.anchorY = 1
     sceneGroup:insert( gearHandle )
 
@@ -529,6 +536,35 @@ function scene:create( event )
         print ( "Victory!" )
         uiActiveFalse()
     end
+
+    -- change UI placement if ad is present
+
+    if ( _myG.adsLoaded == "true" ) then
+        -- alter banner position on devices that are not taller/thinner 
+        if( screenRatio > 0.6 ) then
+            bannerDownY = cH-_myG.adsHeight-(80*mW)
+        end
+        --alter banner size on iPad
+        if( screenRatio >= 0.7 ) then
+            banner.height = 960*mW
+            matchGroup.y = -850*mW
+            mScale = 0.90
+            matchGroup:scale( mScale, mScale )
+        end
+
+        --move UI above banner
+        gearSprite.y = cH-_myG.adsHeight
+        gearHandle.y = gearHandleY-_myG.adsHeight
+        signSprite.y = cH-_myG.adsHeight
+        uiShader.y = cH-_myG.adsHeight
+
+        -- fake ad
+        local fakeAd = display.newRect( cX, cH, display.contentWidth, 100*mW )
+        fakeAd:setFillColor( 0.5, 0.5, 0.5, 1 )
+        fakeAd.anchorY = 1
+        sceneGroup:insert( fakeAd )
+    end
+
 
     -- Sign animation and match checking
 
