@@ -38,6 +38,11 @@ _myG.ribbonY3 = display.contentCenterY+(178*mW) --690
 -- "scene:create()"
 -- Initialize the scene here.
 
+-- debug
+
+--local adDebug = display.newText( "Create: " .. _myG.adsHeight, display.contentCenterX, 50, native.systemFont, 30 )
+--adDebug.text = "Show: " .. _myG.adsHeight
+
 function scene:create( event )
     local sceneGroup = self.view
 

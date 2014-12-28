@@ -21,7 +21,7 @@ local bannerAppID = "ca-app-pub-7094148843149156/1832646501"  -- admob, iOS bann
 local adProvider = "admob"
 
 _myG.adsLoaded = "true"
-_myG.adsHeight = 100*mW
+_myG.adsHeight = 90*mW
 
 local function adListener( event )
     local msg = event.response
@@ -100,11 +100,15 @@ function scene:show( event )
         -- Called when the scene is still off screen (but is about to come on screen).
 
         -- Show banner ad when loaded
-        if ( ads.isLoaded("banner") ) then
+        --if ( ads.isLoaded("banner") ) then
+            
             ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
             _myG.adsLoaded = "true"
-            _myG.adsHeight = ads.height()
-        end
+            --if( ads.height() ~= nil ) and ( ads.height() ~= 0 )then
+            --    _myG.adsHeight = ads.height()
+            --end
+
+        --end
 
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
@@ -137,7 +141,7 @@ function scene:hide( event )
         -- Called immediately after scene goes off screen.
 
         -- remove the current ad
-        ads.hide()
+        --ads.hide()
     end
 end
 

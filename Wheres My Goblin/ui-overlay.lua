@@ -559,10 +559,12 @@ function scene:create( event )
         uiShader.y = cH-_myG.adsHeight
 
         -- fake ad
+        --[[
         local fakeAd = display.newRect( cX, cH, display.contentWidth, 100*mW )
         fakeAd:setFillColor( 0.5, 0.5, 0.5, 1 )
         fakeAd.anchorY = 1
         sceneGroup:insert( fakeAd )
+        ]]--
     end
 
 
