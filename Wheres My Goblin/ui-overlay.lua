@@ -103,6 +103,12 @@ function scene:create( event )
         audio.play( bannerFX )
     end
 
+    local wrongFX = audio.loadSound( "audio/wrong-answer.wav" )
+
+    local function playWrongAnswerFX()
+        audio.play( wrongFX )
+    end
+
     -- Voices
 
     local mySound = audio.loadSound( "audio/wmg-mason-01.wav" )
@@ -144,9 +150,9 @@ function scene:create( event )
 
     local settingsX = 665*mW
 
-    local homeBtnY = 80*mW
-    local replayBtnY = 208*mW
-    local audioBtnY = 340*mW
+    local homeBtnY = 40*mW
+    local replayBtnY = 168*mW
+    local audioBtnY = 300*mW
 
     local arrowBtn = display.newSprite( settingsSheet, settingsFrames )
     arrowBtn:setFrame(2)
@@ -206,7 +212,7 @@ function scene:create( event )
 
     local function settingsOpen()
         settingsActiveFalse()
-        transition.to( homeBtn, { time=1, time=1, alpha=1 })
+        transition.to( homeBtn, { time=1, alpha=1 })
         transition.to( homeBtn, { delay=1, time=150, y=homeBtnY+48*mW, yScale=1, transition=easing.outSine })
         transition.to( homeBtn, { delay=150, time=150, y=homeBtnY, transition=easing.outSine })
         transition.to( replayBtn, { delay=250, time=1, alpha=1 })
@@ -530,9 +536,123 @@ function scene:create( event )
         signState = "goblin"
     end
 
-    -- vicotry animation
+    -- replay sign sprites
+
+    local replayShader = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth+10, display.contentHeight+10 )
+    replayShader:setFillColor( 0, 0, 0, 1 ) 
+    transition.to( replayShader, { time=0, alpha=0 } )
+    sceneGroup:insert( replayShader )
+
+    local replaySheetInfo = require("replay-sheet")
+    local replaySheet = graphics.newImageSheet( "images/replay-sheet.png", replaySheetInfo:getSheet() )
+    local replayFrames  = { start=1, count=3 }
+
+    local replayYesBtn = display.newSprite( replaySheet, replayFrames )
+    replayYesBtn:setFrame(3)
+    replayYesBtn.anchorY = 0 
+    replayYesBtn.x = 285*mW
+    replayYesBtn.y = cY
+    
+    local replayNoBtn = display.newSprite( replaySheet, replayFrames )
+    replayNoBtn:setFrame(1)
+    replayNoBtn.anchorY = 0 
+    replayNoBtn.x = 490*mW
+    replayNoBtn.y = cY
+
+    replayYesBtn:addEventListener( "tap", clickReplay )
+    replayNoBtn:addEventListener( "tap", clickHome )
+
+    local replayPaper = display.newSprite( replaySheet, replayFrames )
+    replayPaper:setFrame(2)
+    replayPaper.height = 303*mW
+    replayPaper.width =  568*mW
+    replayPaper.anchorY = 0 
+    replayPaper.x = cX
+    replayPaper.y = cY-275*mW
+
+    -- rope sprites
+
+    local ropeSheetInfo = require("ropes-sheet")
+    local ropeSheet = graphics.newImageSheet( "images/ropes.png", ropeSheetInfo:getSheet() )
+    local ropeFrames  = { start=1, count=2 }
+
+    local ropeL = display.newSprite( ropeSheet, ropeFrames )
+    ropeL:setFrame(1)
+    ropeL.anchorY = 1 
+    ropeL.x = 255*mW
+    ropeL.y = cY-233*mW
+    
+    local ropeR = display.newSprite( ropeSheet, ropeFrames )
+    ropeR:setFrame(2)
+    ropeR.anchorY = 1
+    ropeR.x = 512*mW
+    ropeR.y = cY-229*mW
+
+    -- sign group
+
+    local replaySign = display.newGroup()
+    replaySign:insert( replayPaper )
+    replaySign:insert( ropeL )
+    replaySign:insert( ropeR )
+
+    -- set inital sign position
+
+    transition.to( replaySign, { time=1, y=-270, yScale=0.5 })
+    transition.to( replayYesBtn, { time=1, y=cY-40*mW, yScale=0.25, alpha=0 })
+    transition.to( replayNoBtn, { time=1, y=cY-40*mW, yScale=0.25, alpha=0 })
+
+    sceneGroup:insert( replayShader )
+    sceneGroup:insert( replayYesBtn )
+    sceneGroup:insert( replayNoBtn )
+    sceneGroup:insert( replaySign )
+
+    -- animate replay sign
+
+    local function replayBtnsOpen()
+        transition.to( replayYesBtn, { time=1, alpha=1 })
+        transition.to( replayYesBtn, { delay=1, time=200, y=cY+75*mW, yScale=1, transition=easing.outSine })
+        transition.to( replayYesBtn, { delay=200, time=200, y=cY, transition=easing.outSine })
+        transition.to( replayNoBtn, { time=101, alpha=1 })
+        transition.to( replayNoBtn, { delay=101, time=200, y=cY+75*mW, yScale=1, transition=easing.outSine })
+        transition.to( replayNoBtn, { delay=300, time=200, y=cY, transition=easing.outSine })
+    end
+
+    --[[
+    local function replayBtnsClose()
+        transition.to( audioBtn, { time=100, yScale=0.25, transition=easing.outSine })
+        transition.to( audioBtn, { delay=100, time=1, alpha=0 })
+        transition.to( replayBtn, { delay=100, time=75, yScale=0.5, transition=easing.outSine  })
+        transition.to( replayBtn, { delay=175, time=1, alpha=0 })
+        transition.to( homeBtn, { delay=175, time=60, yScale=0.5, transition=easing.outSine  })
+        transition.to( homeBtn, { delay=235, time=1, alpha=0 })
+    end
+    ]]--
+
+    local function replaySignDown()
+        playBannerFX()
+        transition.to( replaySign, { time=350, y=50*mW, yScale=1, transition=easing.outSine })
+        transition.to( replaySign, { delay=350, time=200, y=0, transition=easing.outSine })
+        transition.to( replayShader, { time=300, alpha=0.5 } )
+        timer.performWithDelay( 200, replayBtnsOpen )
+    end
+
+    --[[
+    local function replaySignUp()
+        playBannerFX()
+        transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
+        transition.to( shader, { time=300, alpha=0 } )
+    end
+    ]]--
+
+    
+
+    local rpyBtn = display.newText( "Play Again", display.contentCenterX, 50, native.systemFont, 30 )
+    rpyBtn:addEventListener( "tap", replaySignDown )
+
+    -- victory animation
 
     local function playVictoryScene()
+        replaySignDown()
         print ( "Victory!" )
         uiActiveFalse()
     end
@@ -552,7 +672,7 @@ function scene:create( event )
             matchGroup:scale( mScale, mScale )
         end
 
-        --move UI above banner
+        --move UI above banner ad
         gearSprite.y = cH-_myG.adsHeight
         gearHandle.y = gearHandleY-_myG.adsHeight
         signSprite.y = cH-_myG.adsHeight
@@ -560,7 +680,7 @@ function scene:create( event )
 
         -- fake ad
         --[[
-        local fakeAd = display.newRect( cX, cH, display.contentWidth, 100*mW )
+        local fakeAd = display.newRect( cX, cH, display.contentWidth, 90*mW )
         fakeAd:setFillColor( 0.5, 0.5, 0.5, 1 )
         fakeAd.anchorY = 1
         sceneGroup:insert( fakeAd )
@@ -582,7 +702,8 @@ function scene:create( event )
                 playVictoryScene()
             else
                 signSpinToX()
-                timer.performWithDelay( 700, audioNotMyGoblin )
+                timer.performWithDelay( 600, playWrongAnswerFX )
+                timer.performWithDelay( 900, audioNotMyGoblin )
                 signTimer = timer.performWithDelay( 2000, signSpinFromX )
             end
         end

@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:bdeafbcdfc6982d761ad6b2e6a781bc6:c9648c18baa811ce1c76da0e0d5d613a:81aad88cedae2198d48186096928dacc$
+-- $TexturePacker:SmartUpdate:34fd497a37d788ed6ed5de6291abb32a:ce70113939587779caf0f86a9c259202:81aad88cedae2198d48186096928dacc$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -19,8 +19,8 @@ SheetInfo.sheet =
     
         {
             -- settings-audio
-            x=317*mW,
-            y=2*mW,
+            x=158*mW,
+            y=190*mW,
             width=156*mW,
             height=180*mW,
 
@@ -31,15 +31,15 @@ SheetInfo.sheet =
         },
         {
             -- settings-down
-            x=158*mW,
-            y=190*mW,
+            x=316*mW,
+            y=2*mW,
             width=155*mW,
-            height=181*mW,
+            height=141*mW,
 
             sourceX = 0,
             sourceY = 0,
             sourceWidth = 156*mW,
-            sourceHeight = 187*mW
+            sourceHeight = 142*mW
         },
         {
             -- settings-home
@@ -67,15 +67,15 @@ SheetInfo.sheet =
         },
         {
             -- settings-up
-            x=160*mW,
-            y=2*mW,
+            x=316*mW,
+            y=145*mW,
             width=155*mW,
-            height=181*mW,
+            height=141*mW,
 
             sourceX = 0,
             sourceY = 0,
             sourceWidth = 156*mW,
-            sourceHeight = 187*mW
+            sourceHeight = 142*mW
         },
     },
     
