@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:70ddaba1e203d8d08ec198ca1403216f:7363b6781e9cc264e4222fa4e406967f:eb95963157756aeaec9625538cb07942$
+-- $TexturePacker:SmartUpdate:12f90a7868614e96a227d136e6f1d401:e7f295cf7babdc68185a308a4ad81f65:eb95963157756aeaec9625538cb07942$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -22,12 +22,12 @@ SheetInfo.sheet =
             x=2*mW,
             y=274*mW,
             width=155*mW,
-            height=183*mW,
+            height=232*mW,
 
             sourceX = 0,
             sourceY = 0,
             sourceWidth = 155*mW,
-            sourceHeight = 183*mW
+            sourceHeight = 232*mW
         },
         {
             -- play-again
@@ -46,12 +46,12 @@ SheetInfo.sheet =
             x=159*mW,
             y=274*mW,
             width=156*mW,
-            height=180*mW,
+            height=227*mW,
 
             sourceX = 0,
             sourceY = 0,
             sourceWidth = 156*mW,
-            sourceHeight = 180*mW
+            sourceHeight = 227*mW
         },
     },
     

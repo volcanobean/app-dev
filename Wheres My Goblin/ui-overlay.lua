@@ -551,13 +551,11 @@ function scene:create( event )
     replayYesBtn:setFrame(3)
     replayYesBtn.anchorY = 0 
     replayYesBtn.x = 285*mW
-    replayYesBtn.y = cY
     
     local replayNoBtn = display.newSprite( replaySheet, replayFrames )
     replayNoBtn:setFrame(1)
     replayNoBtn.anchorY = 0 
     replayNoBtn.x = 490*mW
-    replayNoBtn.y = cY
 
     replayYesBtn:addEventListener( "tap", clickReplay )
     replayNoBtn:addEventListener( "tap", clickHome )
@@ -610,11 +608,11 @@ function scene:create( event )
 
     local function replayBtnsOpen()
         transition.to( replayYesBtn, { time=1, alpha=1 })
-        transition.to( replayYesBtn, { delay=1, time=200, y=cY+75*mW, yScale=1, transition=easing.outSine })
-        transition.to( replayYesBtn, { delay=200, time=200, y=cY, transition=easing.outSine })
+        transition.to( replayYesBtn, { delay=1, time=200, y=cY+25*mW, yScale=1, transition=easing.outSine })
+        transition.to( replayYesBtn, { delay=200, time=200, y=cY-45*mW, transition=easing.outSine })
         transition.to( replayNoBtn, { time=101, alpha=1 })
-        transition.to( replayNoBtn, { delay=101, time=200, y=cY+75*mW, yScale=1, transition=easing.outSine })
-        transition.to( replayNoBtn, { delay=300, time=200, y=cY, transition=easing.outSine })
+        transition.to( replayNoBtn, { delay=101, time=200, y=cY+25*mW, yScale=1, transition=easing.outSine })
+        transition.to( replayNoBtn, { delay=300, time=200, y=cY-45*mW, transition=easing.outSine })
     end
 
     --[[
