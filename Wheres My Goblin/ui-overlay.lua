@@ -146,7 +146,7 @@ function scene:create( event )
     
     local settingsSheetInfo = require("settings-sheet")
     local settingsSheet = graphics.newImageSheet( "images/settings.png", settingsSheetInfo:getSheet() )
-    local settingsFrames  = { start=1, count=5 }
+    local settingsFrames  = { start=1, count=6 }
 
     local settingsX = 665*mW
 
@@ -167,7 +167,7 @@ function scene:create( event )
     homeBtn.y = homeBtnY
 
     local replayBtn = display.newSprite( settingsSheet, settingsFrames )
-    replayBtn:setFrame(4)
+    replayBtn:setFrame(5)
     replayBtn.anchorY = 0 
     replayBtn.x = settingsX
     replayBtn.y = replayBtnY
@@ -207,7 +207,7 @@ function scene:create( event )
     end
 
     local function arrowImageUp()
-        arrowBtn:setFrame(5)
+        arrowBtn:setFrame(6)
     end
 
     local function settingsOpen()
@@ -264,9 +264,18 @@ function scene:create( event )
         return true
     end
 
+    local audioOn = "true"
+
     local function clickAudio( event )
         if( settingsActive == "true" ) then
             --show audio settings
+            if( audioOn == "true" ) then
+                audioBtn:setFrame(4)
+                audioOn = "false"
+            elseif( audioOn == "false" ) then
+                audioBtn:setFrame(1)
+                audioOn = "true"
+            end
         end
         return true
     end
@@ -642,15 +651,14 @@ function scene:create( event )
     end
     ]]--
 
-    
-
     local rpyBtn = display.newText( "Play Again", display.contentCenterX, 50, native.systemFont, 30 )
     rpyBtn:addEventListener( "tap", replaySignDown )
 
     -- victory animation
 
     local function playVictoryScene()
-        replaySignDown()
+        --replaySignDown()
+        _myG.yayGoblins()
         print ( "Victory!" )
         uiActiveFalse()
     end
@@ -676,15 +684,12 @@ function scene:create( event )
         signSprite.y = cH-_myG.adsHeight
         uiShader.y = cH-_myG.adsHeight
 
-        -- fake ad
-        --[[
-        local fakeAd = display.newRect( cX, cH, display.contentWidth, 90*mW )
-        fakeAd:setFillColor( 0.5, 0.5, 0.5, 1 )
-        fakeAd.anchorY = 1
-        sceneGroup:insert( fakeAd )
-        ]]--
+        -- fake ad, ad space
+        local adSpace = display.newRect( cX, cH, display.contentWidth, 90*mW )
+        adSpace:setFillColor( 0, 0, 0, 1 )
+        adSpace.anchorY = 1
+        sceneGroup:insert( adSpace ) 
     end
-
 
     -- Sign animation and match checking
 
@@ -718,7 +723,6 @@ function scene:create( event )
         if ( _myG.introComplete == "false" ) then
             _myG.loadSlider()
         elseif ( signState ~= "check" ) then
-            --signSpinFromX()
             timer.performWithDelay( 500, uiActiveTrue )
         end
     end
@@ -771,6 +775,9 @@ function scene:create( event )
 
     uiActiveTrue() -- temporarily true to allow first animation
     crankTimer = timer.performWithDelay( 800, turnCrank )
+
+    local waveBtn = display.newText( "YAAAA!!!", display.contentCenterX, 150, native.systemFont, 50 ) 
+    waveBtn:addEventListener( "tap", _myG.yayGoblins )
 
 --end scene:create
 end 

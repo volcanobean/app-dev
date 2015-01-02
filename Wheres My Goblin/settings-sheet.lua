@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:34fd497a37d788ed6ed5de6291abb32a:ce70113939587779caf0f86a9c259202:81aad88cedae2198d48186096928dacc$
+-- $TexturePacker:SmartUpdate:ebe7ce9a2a829f6858e97d1df4342e51:e997fe005116f523bdf13364ad2264fa:81aad88cedae2198d48186096928dacc$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -31,7 +31,7 @@ SheetInfo.sheet =
         },
         {
             -- settings-down
-            x=316*mW,
+            x=318*mW,
             y=2*mW,
             width=155*mW,
             height=141*mW,
@@ -54,6 +54,18 @@ SheetInfo.sheet =
             sourceHeight = 187*mW
         },
         {
+            -- settings-mute
+            x=160*mW,
+            y=2*mW,
+            width=156*mW,
+            height=180*mW,
+
+            sourceX = 0,
+            sourceY = 0,
+            sourceWidth = 156*mW,
+            sourceHeight = 187*mW
+        },
+        {
             -- settings-replay
             x=2*mW,
             y=2*mW,
@@ -67,7 +79,7 @@ SheetInfo.sheet =
         },
         {
             -- settings-up
-            x=316*mW,
+            x=318*mW,
             y=145*mW,
             width=155*mW,
             height=141*mW,
@@ -89,8 +101,9 @@ SheetInfo.frameIndex =
     ["settings-audio"] = 1,
     ["settings-down"] = 2,
     ["settings-home"] = 3,
-    ["settings-replay"] = 4,
-    ["settings-up"] = 5,
+    ["settings-mute"] = 4,
+    ["settings-replay"] = 5,
+    ["settings-up"] = 6,
 }
 
 function SheetInfo:getSheet()

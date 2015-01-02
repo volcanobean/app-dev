@@ -432,6 +432,250 @@ function scene:create( event )
 
     --_myG.background.isVisible = false
 
+    -- Cheering goblins
+
+    local yayGoblin = {}
+
+    local yaySheetInfo = require("yay-goblin-sheet")
+    local yaySheet = graphics.newImageSheet( "images/yay-goblin-sheet.png", yaySheetInfo:getSheet() )
+    local yayFrames = { start=1, count=5 }
+
+    local yayHeadSequence =
+    {
+        { name="headShake", frames={ 3, 5, 3, 4 }, time=600, loopCount=0 }
+    }
+
+    local yayHead = display.newSprite( yaySheet, yayHeadSequence )
+    yayHead.x = 0
+    yayHead.y = 0
+
+    local yayHead2 = display.newSprite( yaySheet, yayHeadSequence )
+    yayHead2.x = 0
+    yayHead2.y = 0
+
+    local yayHead3 = display.newSprite( yaySheet, yayHeadSequence )
+    yayHead3.x = 0
+    yayHead3.y = 0
+
+    local yayBody = display.newImage( yaySheet, 2 )
+    yayBody.x = 10*mW
+    yayBody.y = 150*mW
+
+    local yayBody2 = display.newImage( yaySheet, 2 )
+    yayBody2.x = 10*mW
+    yayBody2.y = 150*mW
+
+    local yayBody3 = display.newImage( yaySheet, 2 )
+    yayBody3.x = 10*mW
+    yayBody3.y = 150*mW
+
+    local yayArmL  = display.newImage( yaySheet, 1 )
+    yayArmL.anchorX = 1
+    yayArmL.anchorY = 0
+    -- middle
+    yayArmL.rotation = 90
+    yayArmL.x = -4*mW
+    yayArmL.y = 116*mW
+    -- up
+    --yayArmL.rotation = 135
+    --yayArmL.x = -40*mW
+    --yayArmL.y = 116*mW
+    -- down
+    --yayArmL.rotation = 50
+    --yayArmL.x = 20*mW
+    --yayArmL.y = 110*mW
+
+    local yayArmL2  = display.newImage( yaySheet, 1 )
+    yayArmL2.rotation = 90
+    yayArmL2.anchorX = 1
+    yayArmL2.anchorY = 0
+    yayArmL2.x = -4*mW
+    yayArmL2.y = 116*mW
+
+    local yayArmL3  = display.newImage( yaySheet, 1 )
+    yayArmL3.rotation = 90
+    yayArmL3.anchorX = 1
+    yayArmL3.anchorY = 0
+    yayArmL3.x = -4*mW
+    yayArmL3.y = 116*mW
+
+    local yayArmR  = display.newImage( yaySheet, 1 )
+    yayArmR.xScale = -1 
+    yayArmR.anchorX = 0
+    yayArmR.anchorY = 0
+    -- middle
+    --yayArmR.rotation = -90
+    --yayArmR.x = 10*mW
+    --yayArmR.y = 50*mW
+    -- up
+    --yayArmR.rotation = -150
+    --yayArmR.x = 10*mW
+    --yayArmR.y = 70*mW
+    -- down
+    yayArmR.rotation = -45
+    yayArmR.x = 30*mW
+    yayArmR.y = 40*mW
+
+
+    local yayArmR2  = display.newImage( yaySheet, 1 )
+    yayArmR2.xScale = -1 
+    yayArmR2.rotation = -90
+    yayArmR2.anchorX = 0
+    yayArmR2.anchorY = 0
+    yayArmR2.x = 10*mW
+    yayArmR2.y = 50*mW
+
+    local yayArmR3  = display.newImage( yaySheet, 1 )
+    yayArmR3.xScale = -1 
+    yayArmR3.rotation = -90
+    yayArmR3.anchorX = 0
+    yayArmR3.anchorY = 0
+    yayArmR3.x = 10*mW
+    yayArmR3.y = 50*mW
+
+    local yayGob1 = display.newGroup()
+    yayGob1:insert( yayArmL )
+    yayGob1:insert( yayArmR )
+    yayGob1:insert( yayBody )
+    yayGob1:insert( yayHead )
+    yayGob1.x = 110*mW
+    local yayGob1Y = cY-170*mW
+    yayGob1.y = yayGob1Y
+    yayGob1:scale( 0.65, 0.65 )
+    yayGob1.rotation = 25
+
+    local yayGob2 = display.newGroup()
+    yayGob2:insert( yayArmL2 )
+    yayGob2:insert( yayArmR2 )
+    yayGob2:insert( yayBody2 )
+    yayGob2:insert( yayHead2 )
+    yayGob2.x = 600*mW
+    local yayGob2Y = cY-160*mW
+    yayGob2.y = yayGob2Y
+    yayGob2.xScale = -1
+    yayGob2:scale( 0.45, 0.45 )
+    yayGob2.rotation = -30
+
+    local yayGob3 = display.newGroup()
+    yayGob3:insert( yayArmL3 )
+    yayGob3:insert( yayArmR3 )
+    yayGob3:insert( yayBody3 )
+    yayGob3:insert( yayHead3 )
+    yayGob3.x = 685*mW
+    local yayGob3Y = cY-270*mW
+    yayGob3.y = yayGob3Y
+    yayGob3:scale( 0.65, 0.65 )
+    yayGob3.rotation = -20
+
+    sceneGroup:insert( yayGob1 )
+    sceneGroup:insert( yayGob2 )
+    sceneGroup:insert( yayGob3 )
+
+    -- yay goblin animations
+
+    local function armWave()
+        -- left arm animations
+
+        transition.to( yayArmL, { time=100, x=-40*mW, y=116*mW, rotation=135 })
+        transition.to( yayArmL, { delay=100, time=100, x=-4*mW, y=116*mW, rotation=90 })
+        transition.to( yayArmL, { delay=200, time=100, x=20*mW, y=110*mW, rotation=50 })
+        transition.to( yayArmL, { delay=300, time=100, x=-4*mW, y=116*mW, rotation=90 })
+
+        transition.to( yayArmL2, { time=100, x=-40*mW, y=116*mW, rotation=135 })
+        transition.to( yayArmL2, { delay=100, time=100, x=-4*mW, y=116*mW, rotation=90 })
+        transition.to( yayArmL2, { delay=200, time=100, x=20*mW, y=110*mW, rotation=50 })
+        transition.to( yayArmL2, { delay=300, time=100, x=-4*mW, y=116*mW, rotation=90 })
+
+        transition.to( yayArmL3, { time=100, x=-40*mW, y=116*mW, rotation=135 })
+        transition.to( yayArmL3, { delay=100, time=100, x=-4*mW, y=116*mW, rotation=90 })
+        transition.to( yayArmL3, { delay=200, time=100, x=20*mW, y=110*mW, rotation=50 })
+        transition.to( yayArmL3, { delay=300, time=100, x=-4*mW, y=116*mW, rotation=90 })
+
+        -- right arm animations
+
+        transition.to( yayArmR, { time=100, x=30*mW, y=40*mW, rotation=-45 })
+        transition.to( yayArmR, { delay=100, time=100, x=10*mW, y=50*mW, rotation=-90 })
+        transition.to( yayArmR, { delay=200, time=100, x=10*mW, y=70*mW, rotation=-150 })
+        transition.to( yayArmR, { delay=300, time=100, x=10*mW, y=50*mW, rotation=-90 })
+
+        transition.to( yayArmR2, { time=100, x=30*mW, y=40*mW, rotation=-45 })
+        transition.to( yayArmR2, { delay=100, time=100, x=10*mW, y=50*mW, rotation=-90 })
+        transition.to( yayArmR2, { delay=200, time=100, x=10*mW, y=70*mW, rotation=-150 })
+        transition.to( yayArmR2, { delay=300, time=100, x=10*mW, y=50*mW, rotation=-90 })
+
+        transition.to( yayArmR3, { time=100, x=30*mW, y=40*mW, rotation=-45 })
+        transition.to( yayArmR3, { delay=100, time=100, x=10*mW, y=50*mW, rotation=-90 })
+        transition.to( yayArmR3, { delay=200, time=100, x=10*mW, y=70*mW, rotation=-150 })
+        transition.to( yayArmR3, { delay=300, time=100, x=10*mW, y=50*mW, rotation=-90, onComplete=armWave })
+    end
+
+    -- set default hidden positions
+
+    transition.to( yayGob1, { time=1, y=yayGob1Y+100*mW, alpha=0 })
+    transition.to( yayGob2, { time=1, y=yayGob2Y+100*mW, alpha=0 })
+    transition.to( yayGob3, { time=1, y=yayGob3Y+100*mW, alpha=0 })
+
+
+    function _myG.yayGoblins( event )
+        -- start loops
+
+        yayHead:play()
+        yayHead2:play()
+        yayHead3:play()
+        armWave()
+        
+        --pop up
+        
+        transition.to( yayGob1, { time=1, alpha=1 })
+        transition.to( yayGob1, { delay=1, time=200, y=yayGob1Y-65*mW, transition=easing.outSine })
+        transition.to( yayGob1, { delay=200, time=200, y=yayGob1Y, transition=easing.outSine })
+        
+        transition.to( yayGob2, { delay=50, time=1, alpha=1 })
+        transition.to( yayGob2, { delay=51, time=200, y=yayGob2Y-65*mW, transition=easing.outSine })
+        transition.to( yayGob2, { delay=250, time=200, y=yayGob2Y, transition=easing.outSine })
+        
+        transition.to( yayGob3, { time=1, alpha=1 })
+        transition.to( yayGob3, { delay=1, time=200, y=yayGob3Y-65*mW, transition=easing.outSine })
+        transition.to( yayGob3, { delay=200, time=200, y=yayGob3Y, transition=easing.outSine })
+        
+        -- back down
+        
+        local downDelay = 2000
+
+        transition.to( yayGob1, { delay=downDelay, time=200, y=yayGob1Y-65*mW })
+        transition.to( yayGob1, { delay=downDelay+200, time=200, y=yayGob1Y+100*mW })
+        transition.to( yayGob1, { delay=downDelay+401, time=1, alpha=0 })
+        
+        transition.to( yayGob2, { delay=downDelay+50, time=200, y=yayGob2Y-65*mW })
+        transition.to( yayGob2, { delay=downDelay+250, time=200, y=yayGob2Y+100*mW })
+        transition.to( yayGob2, { delay=downDelay+451, time=1, alpha=0 })
+    
+        transition.to( yayGob3, { delay=downDelay, time=200, y=yayGob3Y-65*mW })
+        transition.to( yayGob3, { delay=downDelay+200, time=200, y=yayGob3Y+100*mW })
+        transition.to( yayGob3, { delay=downDelay+401, time=1, alpha=0 })
+
+        return true
+    end
+
+    --local waveBtn = display.newText( "YAAAA!!!", display.contentCenterX, 150, native.systemFont, 50 ) 
+    --waveBtn:addEventListener( "tap", _myG.yayGoblins )
+    
+    -- Extra bushes to hide cheering goblins at game end. 
+
+    local bushLeft = display.newImageRect( "images/bush-left.png", 115*mW, 352*mW )
+    bushLeft.anchorX = 0
+    bushLeft.x = 0
+    bushLeft.y = cY+38*mW
+
+    local bushRight = display.newImageRect( "images/bush-right.png", 337*mW, 489*mW )
+    bushRight.anchorX = 1
+    bushRight.x = cW
+    bushRight.y = cY+63*mW
+
+    sceneGroup:insert( bushLeft )
+    sceneGroup:insert( bushRight )
+
+
     local uiShader = display.newImageRect( "images/ui-shader.png", display.contentWidth, 403*mW )
     uiShader.anchorY = 1
     uiShader.x = display.contentCenterX

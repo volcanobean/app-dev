@@ -31,4 +31,5 @@ _myG.playCount = 0
 print("-----")
 print ("end of main")
 
-composer.gotoScene( "logos" )
+--composer.gotoScene( "logos" )
+composer.gotoScene( "start-screen" )
