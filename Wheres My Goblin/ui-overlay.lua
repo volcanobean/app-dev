@@ -657,10 +657,10 @@ function scene:create( event )
     -- victory animation
 
     local function playVictoryScene()
-        --replaySignDown()
-        _myG.yayGoblins()
-        print ( "Victory!" )
         uiActiveFalse()
+        _myG.yayGoblins()
+        timer.performWithDelay( 3000, replaySignDown )
+        print ( "Victory!" )
     end
 
     -- change UI placement if ad is present
@@ -693,21 +693,49 @@ function scene:create( event )
 
     -- Sign animation and match checking
 
-    local function compareGoblins()
-        if ( _myG.introComplete == "true" ) then
-            print "compareGoblins"
-            --_myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
-            -- if user successfully has a match
+    local function signCompare( event )
+        if ( _myG.uiActive == "true" ) and ( _myG.introComplete == "true" ) then
+            uiActiveFalse()
             if matchBlocks[1] == _myG.ribbon[1].activeBlock and matchBlocks[2] == _myG.ribbon[2].activeBlock and matchBlocks[3] == _myG.ribbon[3].activeBlock then
+                -- if we have a match, don't lower the banner. Play victory animation.
                 signSpinToCheck()
                 timer.performWithDelay( 700, audioThatsMyGoblin )
                 -- you win!
-                playVictoryScene()
+                timer.performWithDelay( 1200, playVictoryScene )
             else
+                -- if we don't have a match, lower the banner, etc
                 signSpinToX()
                 timer.performWithDelay( 600, playWrongAnswerFX )
                 timer.performWithDelay( 900, audioNotMyGoblin )
                 signTimer = timer.performWithDelay( 2000, signSpinFromX )
+                timer.performWithDelay( 2500, uiActiveTrue )
+            end
+        end
+        return true
+    end
+
+    local function compareGoblins()
+        if ( _myG.introComplete == "false" ) then
+            -- if this is the intro, skip the comparison and just lower the banner
+            timer.performWithDelay( 700, bannerPlayDown )
+            timer.performWithDelay( 1400, audioWheresMyGoblin )
+            --bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
+        elseif ( _myG.introComplete == "true" ) then
+            -- else do our comparison
+            if matchBlocks[1] == _myG.ribbon[1].activeBlock and matchBlocks[2] == _myG.ribbon[2].activeBlock and matchBlocks[3] == _myG.ribbon[3].activeBlock then
+                -- if we have a match, don't lower the banner. Play victory animation.
+                signSpinToCheck()
+                timer.performWithDelay( 700, audioThatsMyGoblin )
+                -- you win!
+                timer.performWithDelay( 1200, playVictoryScene )
+            else
+                -- if we don't have a match, lower the banner, etc
+                signSpinToX()
+                --timer.performWithDelay( 600, playWrongAnswerFX )
+                timer.performWithDelay( 700, bannerPlayDown )
+                timer.performWithDelay( 900, audioNotMyGoblin )
+                signTimer = timer.performWithDelay( 2000, signSpinFromX )
+                --bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
             end
         end
     end
@@ -744,13 +772,8 @@ function scene:create( event )
             uiActiveFalse()
             handlePlay( "down" )
             gearForward()
-            if ( _myG.introComplete == "false" ) then
-                timer.performWithDelay( 700, bannerPlayDown )
-                timer.performWithDelay( 1400, audioWheresMyGoblin )
-            else
-                timer.performWithDelay( 700, bannerPlayDown )
-                timer.performWithDelay( 700, compareGoblins )
-            end
+            compareGoblins()
+            -- add comapre code here
             bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
         end
         return true
@@ -765,7 +788,7 @@ function scene:create( event )
 
     -- event listeners
 
-    signSprite:addEventListener( "tap", compareGoblins )
+    signSprite:addEventListener( "tap", signCompare )
     gearSprite:addEventListener( "tap", turnCrank )
     gearHandle:addEventListener( "tap", turnCrank )
     shader:addEventListener( "tap", raiseBannerNow )
