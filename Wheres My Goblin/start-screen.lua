@@ -12,6 +12,8 @@ local _myG = composer.myGlobals
 
 local cW = display.contentWidth
 local cH = display.contentHeight
+local cX = display.contentCenterX
+local cY = display.contentCenterY
 local mW = 0.0013020833*cW
 
 -- Ad code
@@ -48,6 +50,8 @@ end
 local function stopGoblinTheme()
     audio.stop()
 end
+
+local blackMask 
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
@@ -90,6 +94,10 @@ function scene:create( event )
     startBtn:addEventListener( "tap", startGame )
     sceneGroup:insert( startBtn )
 
+    blackMask = display.newRect( cX, cY, cW, cH )
+    blackMask:setFillColor( 0, 0, 0, 1 )
+    sceneGroup:insert( blackMask )
+
 end
 
 -- "scene:show()"
@@ -121,6 +129,7 @@ function scene:show( event )
 
         -- play goblin theme
         timer.performWithDelay( 600, playGoblinTheme )
+        transition.to( blackMask, { delay=600, time=400, alpha=0 } )
     end
 end
 

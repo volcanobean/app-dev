@@ -28,12 +28,17 @@ function scene:create( event )
     -- Audio
 
     local unicorgiVO = audio.loadSound( "audio/unicorgi-vo.wav" )
+    local vbVO = audio.loadSound( "audio/unicorgi-vo.wav" )
     local introNote = audio.loadSound( "audio/unicorgi-intro-note.wav" )
     local introTone = audio.loadSound( "audio/unicorgi-intro-tone.wav" )
     local swooshFX = audio.loadSound( "audio/swipe.wav" )
 
     local function playUnicorgiVO()
         audio.play( unicorgiVO )
+    end
+
+    local function playVbVO()
+        audio.play( vbVO )
     end
 
     local function playIntroNote()
@@ -186,11 +191,101 @@ function scene:create( event )
     transition.to( letterG, { delay=1633, time=366, x=582*mW, rotation=0, transition=easing.outQuad })
     transition.to( letterI2, { delay=1800, time=366, x=639*mW, rotation=0, transition=easing.outQuad })
 
-    -- just voice over
+    -- Volcano Bean assets
+
+    local whiteMask = display.newRect( cX, cY, cW, cH )
+    whiteMask:setFillColor( 1, 1, 1, 1 )
+    sceneGroup:insert( whiteMask )
+
+    local function whiteToBlack()
+        whiteMask:setFillColor( 0, 0, 0, 1 )
+    end
+
+    local vbText = display.newImageRect( "images/vb-text.png", 584.5*mW, 76.5*mW )
+    vbText.x = cX
+    vbText.y = cY+120*mW
+
+    local vbSheetInfo = require("sprout-sheet")
+    local vbSheet = graphics.newImageSheet( "images/sprout.png", vbSheetInfo:getSheet() )
+    local vbFrames  = { start=1, count=9 }
+
+    local vbSpritesX = cX
+    local vbSpritesY = cY-120*mW
+
+    local vbFire = display.newSprite( vbSheet, vbFrames )
+    vbFire:setFrame(9)
+    vbFire.x = vbSpritesX
+    vbFire.y = vbSpritesY
+
+    local sproutSeq = {
+        { name="sprout", frames={ 1, 2, 3, 4, 5, 6, 7, 8 }, time=500, loopCount=1 }
+    }
+
+    local vbSprout = display.newSprite( vbSheet, sproutSeq )
+    vbSprout:setFrame(1)
+    vbSprout.x = vbSpritesX
+    vbSprout.y = vbSpritesY
+
+    sceneGroup:insert( vbText )
+    sceneGroup:insert( vbFire )
+    sceneGroup:insert( vbSprout )
+    sceneGroup:insert( whiteMask )
+
+
+    local function playSprout()
+        transition.to( vbSprout, { time=0, alpha=1 } )
+        vbSprout:setSequence( "sprout" )
+        vbSprout:play()
+    end
+
+    -- set positions
+
+    transition.to( whiteMask, { time=0, alpha=0 } )
+    transition.to( vbText, { time=0, alpha=0 } )
+    transition.to( vbFire, { time=0, alpha=0 } )
+    transition.to( vbSprout, { time=0, alpha=0 } )
+
+    -- play Unicorgi animation
     
     timer.performWithDelay( 1200, playSwooshFX )
     timer.performWithDelay( 1600, playIntroTone )
     timer.performWithDelay( 2500, playUnicorgiVO )
+
+    -- fade out
+
+    transition.to( whiteMask, { delay=4000, time=300, alpha=1 } )
+    
+    transition.to( letterI2, { delay=4305, time=1, alpha=0 } )
+    transition.to( letterG, { delay=4305, time=1, alpha=0 } )
+    transition.to( letterO, { delay=4305, time=1, alpha=0 } )
+    transition.to( letterR, { delay=4305, time=1, alpha=0 } )
+    transition.to( letterC, { delay=4305, time=1, alpha=0 } )
+    transition.to( letterI, { delay=4305, time=1, alpha=0 } )
+    transition.to( letterU, { delay=4305, time=1, alpha=0 } )
+    transition.to( letterN, { delay=4305, time=1, alpha=0 } )
+    transition.to( unicorgi, { delay=4305, time=1, alpha=0 } )
+    transition.to( pinkCircle, { delay=4305, time=1, alpha=0 } )
+    transition.to( circleMask, { delay=4305, time=1, alpha=0 } )
+
+    transition.to( whiteMask, { delay=4310, time=1, alpha=0 } )
+
+    -- play Volcano Bean animation
+
+    transition.to( vbText, { delay=4500, time=400, alpha=1 } )
+    transition.to( vbFire, { delay=4500, time=400, alpha=1 } )
+    timer.performWithDelay( 5000, playSprout )
+    timer.performWithDelay( 5750, playVbVO )
+
+    --transition.to( vbSprout, { time=1, alpha=1 } )
+
+    timer.performWithDelay( 7500, whiteToBlack )
+    transition.to( whiteMask, { delay=7501, time=300, alpha=1 } )
+
+    local function nextScene()
+        composer.gotoScene( "start-screen" )
+    end
+
+    timer.performWithDelay( 7801, nextScene )
 
 end
 

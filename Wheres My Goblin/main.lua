@@ -28,8 +28,5 @@ _myG.playCount = 0
 
 -- Now that our variables are set, let's start the game.
 
-print("-----")
-print ("end of main")
-
---composer.gotoScene( "logos" )
-composer.gotoScene( "start-screen" )
+composer.gotoScene( "logos" )
+--composer.gotoScene( "start-screen" )
