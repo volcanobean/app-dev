@@ -83,9 +83,9 @@ function scene:create( event )
     sceneGroup:insert( _myG.background )
 
     -- game title
-    local titleText1 = display.newText( "where's", display.contentCenterX, display.contentCenterY-(322*mW), "Mathlete-Skinny", 125*mW ) --300,125
-    local titleText2 = display.newText( "my", display.contentCenterX, display.contentCenterY-(212*mW), "Mathlete-Skinny", 125*mW ) --410,125
-    local titleText3 = display.newText( "goblin?", display.contentCenterX, display.contentCenterY-(112*mW), "Mathlete-Skinny", 125*mW) --510,125
+    local titleText1 = display.newText( "where's", display.contentCenterX, display.contentCenterY-(222*mW), "Mathlete-Skinny", 125*mW ) --300,125
+    local titleText2 = display.newText( "my", display.contentCenterX, display.contentCenterY-(112*mW), "Mathlete-Skinny", 125*mW ) --410,125
+    local titleText3 = display.newText( "goblin?", display.contentCenterX, display.contentCenterY-(12*mW), "Mathlete-Skinny", 125*mW) --510,125
     sceneGroup:insert( titleText1 )
     sceneGroup:insert( titleText2 )
     sceneGroup:insert( titleText3 )
@@ -97,6 +97,12 @@ function scene:create( event )
     blackMask = display.newRect( cX, cY, cW, cH )
     blackMask:setFillColor( 0, 0, 0, 1 )
     sceneGroup:insert( blackMask )
+
+    -- fake ad, ad space
+    local adSpace = display.newRect( cX, cH, display.contentWidth, 90*mW )
+    adSpace:setFillColor( 0, 0, 0, 1 )
+    adSpace.anchorY = 1
+    sceneGroup:insert( adSpace ) 
 
 end
 

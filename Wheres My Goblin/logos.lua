@@ -28,7 +28,7 @@ function scene:create( event )
     -- Audio
 
     local unicorgiVO = audio.loadSound( "audio/unicorgi-vo.wav" )
-    local vbVO = audio.loadSound( "audio/unicorgi-vo.wav" )
+    local vbVO = audio.loadSound( "audio/volcanobean-vo.wav" )
     local introNote = audio.loadSound( "audio/unicorgi-intro-note.wav" )
     local introTone = audio.loadSound( "audio/unicorgi-intro-tone.wav" )
     local swooshFX = audio.loadSound( "audio/swipe.wav" )
@@ -226,9 +226,20 @@ function scene:create( event )
     vbSprout.x = vbSpritesX
     vbSprout.y = vbSpritesY
 
+    --[[
+    local wGradient = {
+        type="gradient",
+        color1={ 1, 1, 1, 1 }, color2={ 1, 1, 1, 0 }, direction="down"
+    }
+
+    local vbFader = display.newRect( cX, cY, cW, cH )
+    vbFader:setFillColor( wGradient )
+    ]]--
+
     sceneGroup:insert( vbText )
     sceneGroup:insert( vbFire )
     sceneGroup:insert( vbSprout )
+    --sceneGroup:insert( vbFader )
     sceneGroup:insert( whiteMask )
 
 
@@ -273,8 +284,8 @@ function scene:create( event )
 
     transition.to( vbText, { delay=4500, time=400, alpha=1 } )
     transition.to( vbFire, { delay=4500, time=400, alpha=1 } )
-    timer.performWithDelay( 5000, playSprout )
-    timer.performWithDelay( 5750, playVbVO )
+    timer.performWithDelay( 4700, playSprout )
+    timer.performWithDelay( 4700, playVbVO )
 
     --transition.to( vbSprout, { time=1, alpha=1 } )
 

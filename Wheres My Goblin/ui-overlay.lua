@@ -111,7 +111,10 @@ function scene:create( event )
 
     -- Voices
 
-    local mySound = audio.loadSound( "audio/wmg-mason-01.wav" )
+    local whereGoblin = audio.loadSound( "audio/mason-where-goblin.wav" )
+    local notGoblin = audio.loadSound( "audio/mason-not-my-goblin.wav" )
+    local thatGoblin = audio.loadSound( "audio/mason-thats-my-goblin.wav" )
+    local yayGoblin = audio.loadSound( "audio/yays.wav" )
 
     local function stopAudio()
         goblinText.text = ""
@@ -120,20 +123,26 @@ function scene:create( event )
     local function audioWheresMyGoblin()
         goblinText.text = "Where's my goblin?" 
         -- Play sound
-        audio.play( mySound )
-        timer.performWithDelay( 2000, stopAudio )
+        audio.play( whereGoblin )
+        --timer.performWithDelay( 2000, stopAudio )
     end
 
     local function audioThatsMyGoblin()
         goblinText.text = "That's my goblin!" 
-        --audio.play( mySound )
-        timer.performWithDelay( 2000, stopAudio )
+        audio.play( thatGoblin )
+        --timer.performWithDelay( 2000, stopAudio )
     end
 
     local function audioNotMyGoblin()
         goblinText.text = "That's not my goblin." 
-        --audio.play( mySound )
-        timer.performWithDelay( 2000, stopAudio )
+        audio.play( notGoblin )
+        --timer.performWithDelay( 2000, stopAudio )
+    end
+
+    local function audioYay()
+        goblinText.text = "Yay!" 
+        audio.play( yayGoblin )
+        --timer.performWithDelay( 2000, stopAudio )
     end
 
     local uiShader = display.newImageRect( "images/ui-shader.png", display.contentWidth, 403*mW )
@@ -659,6 +668,7 @@ function scene:create( event )
     local function playVictoryScene()
         uiActiveFalse()
         _myG.yayGoblins()
+        audio.play( yayGoblin )
         timer.performWithDelay( 3000, replaySignDown )
         print ( "Victory!" )
     end
@@ -706,7 +716,7 @@ function scene:create( event )
                 -- if we don't have a match, lower the banner, etc
                 signSpinToX()
                 timer.performWithDelay( 600, playWrongAnswerFX )
-                timer.performWithDelay( 900, audioNotMyGoblin )
+                --timer.performWithDelay( 700, audioNotMyGoblin )
                 signTimer = timer.performWithDelay( 2000, signSpinFromX )
                 timer.performWithDelay( 2500, uiActiveTrue )
             end
@@ -733,7 +743,7 @@ function scene:create( event )
                 signSpinToX()
                 --timer.performWithDelay( 600, playWrongAnswerFX )
                 timer.performWithDelay( 700, bannerPlayDown )
-                timer.performWithDelay( 900, audioNotMyGoblin )
+                timer.performWithDelay( 1400, audioNotMyGoblin )
                 signTimer = timer.performWithDelay( 2000, signSpinFromX )
                 --bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
             end
