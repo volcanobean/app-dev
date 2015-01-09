@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:7c8e697c5cda772cbc84123f1e04279e:295983983142631486b72ef47eeabad7:246703efdebcd2225ad8f2bcf38b9d09$
+-- $TexturePacker:SmartUpdate:ac7013b1d1c19c5218f46ee7b3c892cb:0db299d9745cfcf06939dabfc4122134:246703efdebcd2225ad8f2bcf38b9d09$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -18,62 +18,50 @@ SheetInfo.sheet =
     frames = {
     
         {
-            -- torso-10
+            -- torso-bomb
+            x=396*mW,
+            y=2*mW,
+            width=397*mW,
+            height=351*mW,
+
+            sourceX = 27*mW,
+            sourceY = 15*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 512*mW
+        },
+        {
+            -- torso-knight
             x=2*mW,
             y=2*mW,
-            width=379*mW,
-            height=472*mW,
+            width=392*mW,
+            height=412*mW,
 
             sourceX = 60*mW,
-            sourceY = 40*mW,
+            sourceY = 11*mW,
             sourceWidth = 512*mW,
             sourceHeight = 512*mW
         },
         {
-            -- torso-2
-            x=383*mW,
-            y=2*mW,
-            width=379*mW,
-            height=472*mW,
-
-            sourceX = 60*mW,
-            sourceY = 40*mW,
-            sourceWidth = 512*mW,
-            sourceHeight = 512*mW
-        },
-        {
-            -- torso-5
+            -- torso-napolean
             x=2*mW,
-            y=476*mW,
-            width=342*mW,
-            height=381*mW,
+            y=416*mW,
+            width=337*mW,
+            height=388*mW,
 
-            sourceX = 92*mW,
-            sourceY = 39*mW,
+            sourceX = 105*mW,
+            sourceY = 13*mW,
             sourceWidth = 512*mW,
             sourceHeight = 512*mW
         },
         {
-            -- torso-6
-            x=346*mW,
-            y=476*mW,
-            width=342*mW,
-            height=381*mW,
+            -- torso-sweater
+            x=341*mW,
+            y=416*mW,
+            width=340*mW,
+            height=378*mW,
 
-            sourceX = 86*mW,
-            sourceY = 39*mW,
-            sourceWidth = 512*mW,
-            sourceHeight = 512*mW
-        },
-        {
-            -- torso-8
-            x=690*mW,
-            y=476*mW,
-            width=332*mW,
-            height=341*mW,
-
-            sourceX = 96*mW,
-            sourceY = 9*mW,
+            sourceX = 89*mW,
+            sourceY = 23*mW,
             sourceWidth = 512*mW,
             sourceHeight = 512*mW
         },
@@ -86,11 +74,10 @@ SheetInfo.sheet =
 SheetInfo.frameIndex =
 {
 
-    ["torso-10"] = 1,
-    ["torso-2"] = 2,
-    ["torso-5"] = 3,
-    ["torso-6"] = 4,
-    ["torso-8"] = 5,
+    ["torso-bomb"] = 1,
+    ["torso-knight"] = 2,
+    ["torso-napolean"] = 3,
+    ["torso-sweater"] = 4,
 }
 
 function SheetInfo:getSheet()

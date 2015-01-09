@@ -342,13 +342,14 @@ function scene:create( event )
         -- Generate head
         local matchNumber = math.random( _myG.blockCount )
         matchBlocks[1] = matchNumber
-        if ( matchNumber <= 9 ) then
+        --if ( matchNumber <= 10 ) then
             -- if random number is within range of first sheet...
-            headMatchSheetInfo = require("heads-sheet-1")
-            headMatchSheet = graphics.newImageSheet( "images/heads-1.png", headMatchSheetInfo:getSheet() )
-            headMatchFrames = { start=1, count=9 }
+            headMatchSheetInfo = require("heads-sheet")
+            headMatchSheet = graphics.newImageSheet( "images/heads.png", headMatchSheetInfo:getSheet() )
+            headMatchFrames = { start=1, count=10 }
             headMatch = display.newSprite( headMatchSheet, headMatchFrames )
             headMatch:setFrame( matchNumber )
+        --[[
         else
             -- else use the second sheet tp pick up where we left off
             headMatchSheetInfo = require("heads-sheet-2")
@@ -357,24 +358,25 @@ function scene:create( event )
             headMatch = display.newSprite( headMatchSheet, headMatchFrames )
             headMatch:setFrame( matchNumber-9 )
         end
+        ]]--
 
         -- Generate torso
         matchNumber = math.random( _myG.blockCount )
         matchBlocks[2] = matchNumber
-        if ( matchNumber <= 5 ) then
+        if ( matchNumber <= 6 ) then
             -- if random number is within range of first sheet...
             torsoMatchSheetInfo = require("torso-sheet-1")
             torsoMatchSheet = graphics.newImageSheet( "images/torso-1.png", torsoMatchSheetInfo:getSheet() )
-            torsoMatchFrames = { start=1, count=5 }
+            torsoMatchFrames = { start=1, count=6 }
             torsoMatch = display.newSprite( torsoMatchSheet, torsoMatchFrames )
             torsoMatch:setFrame( matchNumber )
         else
             -- else use the second sheet tp pick up where we left off
             torsoMatchSheetInfo = require("torso-sheet-2")
             torsoMatchSheet = graphics.newImageSheet( "images/torso-2.png", torsoMatchSheetInfo:getSheet() )
-            torsoMatchFrames = { start=1, count=5 }
+            torsoMatchFrames = { start=1, count=4 }
             torsoMatch = display.newSprite( torsoMatchSheet, torsoMatchFrames )
-            torsoMatch:setFrame( matchNumber-5 )
+            torsoMatch:setFrame( matchNumber-6 )
         end
 
         -- Generate legs

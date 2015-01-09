@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:2d535b71cba6af640f154e637e49edc4:c07f7c7b8dd5acd1ea708ed9c24a7570:df20e5a99330c3aec1aa6a51b5b12b0e$
+-- $TexturePacker:SmartUpdate:d30ab6aff7d6a93875bf1c74f503469a:dcfbdd281a933279e7247f69bb3d0c45:b7a99079db8de5a3ff6948a2803acac4$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -19,109 +19,121 @@ SheetInfo.sheet =
     
         {
             -- head-cheshire
-            x=317*mW,
-            y=518*mW,
-            width=313*mW,
-            height=265*mW,
+            x=308*mW,
+            y=240*mW,
+            width=287*mW,
+            height=241*mW,
 
-            sourceX = 109*mW,
-            sourceY = 35*mW,
+            sourceX = 116*mW,
+            sourceY = 33*mW,
             sourceWidth = 512*mW,
             sourceHeight = 313*mW
         },
         {
             -- head-classic
-            x=2*mW,
+            x=376*mW,
             y=2*mW,
-            width=403*mW,
-            height=259*mW,
+            width=367*mW,
+            height=236*mW,
 
-            sourceX = 71*mW,
+            sourceX = 87*mW,
             sourceY = 44*mW,
             sourceWidth = 512*mW,
             sourceHeight = 313*mW
         },
         {
             -- head-fool
-            x=632*mW,
-            y=591*mW,
-            width=291*mW,
-            height=275*mW,
+            x=534*mW,
+            y=715*mW,
+            width=265*mW,
+            height=250*mW,
 
-            sourceX = 109*mW,
-            sourceY = 38*mW,
+            sourceX = 113*mW,
+            sourceY = 46*mW,
             sourceWidth = 512*mW,
             sourceHeight = 313*mW
         },
         {
             -- head-gentleman
-            x=2*mW,
-            y=263*mW,
-            width=305*mW,
-            height=281*mW,
+            x=745*mW,
+            y=2*mW,
+            width=277*mW,
+            height=255*mW,
 
-            sourceX = 116*mW,
-            sourceY = 32*mW,
+            sourceX = 122*mW,
+            sourceY = 36*mW,
             sourceWidth = 512*mW,
             sourceHeight = 313*mW
         },
         {
             -- head-goggles
-            x=309*mW,
-            y=315*mW,
-            width=396*mW,
-            height=201*mW,
+            x=2*mW,
+            y=2*mW,
+            width=372*mW,
+            height=189*mW,
 
-            sourceX = 65*mW,
-            sourceY = 93*mW,
+            sourceX = 68*mW,
+            sourceY = 94*mW,
             sourceWidth = 512*mW,
             sourceHeight = 313*mW
         },
         {
             -- head-grump
             x=2*mW,
-            y=546*mW,
-            width=313*mW,
-            height=273*mW,
+            y=193*mW,
+            width=304*mW,
+            height=265*mW,
 
-            sourceX = 100*mW,
-            sourceY = 23*mW,
+            sourceX = 103*mW,
+            sourceY = 17*mW,
             sourceWidth = 512*mW,
             sourceHeight = 313*mW
         },
         {
             -- head-helmet
-            x=735*mW,
-            y=2*mW,
-            width=274*mW,
-            height=258*mW,
+            x=290*mW,
+            y=483*mW,
+            width=244*mW,
+            height=230*mW,
 
-            sourceX = 126*mW,
-            sourceY = 37*mW,
+            sourceX = 137*mW,
+            sourceY = 41*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 313*mW
+        },
+        {
+            -- head-hood
+            x=288*mW,
+            y=715*mW,
+            width=244*mW,
+            height=257*mW,
+
+            sourceX = 147*mW,
+            sourceY = 40*mW,
             sourceWidth = 512*mW,
             sourceHeight = 313*mW
         },
         {
             -- head-skicap
-            x=407*mW,
-            y=2*mW,
-            width=326*mW,
-            height=311*mW,
+            x=2*mW,
+            y=715*mW,
+            width=284*mW,
+            height=270*mW,
 
-            sourceX = 85*mW,
-            sourceY = 1*mW,
+            sourceX = 101*mW,
+            sourceY = 6*mW,
             sourceWidth = 512*mW,
             sourceHeight = 313*mW
         },
         {
             -- head-tongue
-            x=707*mW,
-            y=315*mW,
-            width=311*mW,
-            height=274*mW,
+            x=2*mW,
+            y=460*mW,
+            width=286*mW,
+            height=253*mW,
 
-            sourceX = 127*mW,
-            sourceY = 33*mW,
+            sourceX = 134*mW,
+            sourceY = 47*mW,
             sourceWidth = 512*mW,
             sourceHeight = 313*mW
         },
@@ -141,8 +153,9 @@ SheetInfo.frameIndex =
     ["head-goggles"] = 5,
     ["head-grump"] = 6,
     ["head-helmet"] = 7,
-    ["head-skicap"] = 8,
-    ["head-tongue"] = 9,
+    ["head-hood"] = 8,
+    ["head-skicap"] = 9,
+    ["head-tongue"] = 10,
 }
 
 function SheetInfo:getSheet()
