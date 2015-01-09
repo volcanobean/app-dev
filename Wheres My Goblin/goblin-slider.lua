@@ -125,7 +125,9 @@ function scene:create( event )
     local swipeFX = audio.loadSound( "audio/swipe.wav" )
 
     local function playSwipeFX()
-        audio.play( swipeFX )
+        if( _myG.audioOn == "true" ) then
+            audio.play( swipeFX )
+        end
     end
 
     -- Function to check for a swipe vs a touch and drag

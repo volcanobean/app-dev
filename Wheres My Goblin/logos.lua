@@ -16,6 +16,10 @@ local cX = display.contentCenterX
 local cY = display.contentCenterY
 local mW = 0.0013020833*cW
 
+-- Initial audio state is ON
+
+_myG.audioOn = "true"
+
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
 -- -----------------------------------------------------------------------------------------------------------------

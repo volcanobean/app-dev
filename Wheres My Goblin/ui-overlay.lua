@@ -88,25 +88,33 @@ function scene:create( event )
     local leverFX = audio.loadSound( "audio/lever-pull.wav" )
 
     local function playLeverFX()
-        audio.play( leverFX )
+        if ( _myG.audioOn == "true" ) then
+            audio.play( leverFX )
+        end
     end
 
     local leverShortFX = audio.loadSound( "audio/lever-short.wav" )
 
     local function playLeverShortFX()
-        audio.play( leverShortFX )
+        if( _myG.audioOn == "true" ) then
+            audio.play( leverShortFX )
+        end
     end
 
     local bannerFX = audio.loadSound( "audio/banner-short.wav" )
 
     local function playBannerFX()
-        audio.play( bannerFX )
+        if( _myG.audioOn == "true" ) then
+            audio.play( bannerFX )
+        end
     end
 
     local wrongFX = audio.loadSound( "audio/wrong-answer.wav" )
 
     local function playWrongAnswerFX()
-        audio.play( wrongFX )
+        if( _myG.audioOn == "true" ) then
+            audio.play( wrongFX )
+        end
     end
 
     -- Voices
@@ -123,25 +131,33 @@ function scene:create( event )
     local function audioWheresMyGoblin()
         goblinText.text = "Where's my goblin?" 
         -- Play sound
-        audio.play( whereGoblin )
+        if( _myG.audioOn == "true" ) then
+            audio.play( whereGoblin )
+        end
         --timer.performWithDelay( 2000, stopAudio )
     end
 
     local function audioThatsMyGoblin()
         goblinText.text = "That's my goblin!" 
-        audio.play( thatGoblin )
+        if( _myG.audioOn == "true" ) then
+            audio.play( thatGoblin )
+        end
         --timer.performWithDelay( 2000, stopAudio )
     end
 
     local function audioNotMyGoblin()
         goblinText.text = "That's not my goblin." 
-        audio.play( notGoblin )
+        if( _myG.audioOn == "true" ) then
+            audio.play( notGoblin )
+        end
         --timer.performWithDelay( 2000, stopAudio )
     end
 
     local function audioYay()
         goblinText.text = "Yay!" 
-        audio.play( yayGoblin )
+        if( _myG.audioOn == "true" ) then
+            audio.play( yayGoblin )
+        end
         --timer.performWithDelay( 2000, stopAudio )
     end
 
@@ -273,17 +289,16 @@ function scene:create( event )
         return true
     end
 
-    local audioOn = "true"
-
     local function clickAudio( event )
         if( settingsActive == "true" ) then
             --show audio settings
-            if( audioOn == "true" ) then
+            if( _myG.audioOn == "true" ) then
                 audioBtn:setFrame(4)
-                audioOn = "false"
-            elseif( audioOn == "false" ) then
+                _myG.audioOn = "false"
+                audio.stop()
+            elseif( _myG.audioOn == "false" ) then
                 audioBtn:setFrame(1)
-                audioOn = "true"
+                _myG.audioOn = "true"
             end
         end
         return true
@@ -660,15 +675,14 @@ function scene:create( event )
     end
     ]]--
 
-    local rpyBtn = display.newText( "Play Again", display.contentCenterX, 50, native.systemFont, 30 )
-    rpyBtn:addEventListener( "tap", replaySignDown )
-
     -- victory animation
 
     local function playVictoryScene()
         uiActiveFalse()
         _myG.yayGoblins()
-        audio.play( yayGoblin )
+        if( _myG.audioOn == "true" ) then
+            audio.play( yayGoblin )
+        end
         timer.performWithDelay( 3000, replaySignDown )
         print ( "Victory!" )
     end
@@ -808,9 +822,6 @@ function scene:create( event )
 
     uiActiveTrue() -- temporarily true to allow first animation
     crankTimer = timer.performWithDelay( 800, turnCrank )
-
-    local waveBtn = display.newText( "YAAAA!!!", display.contentCenterX, 150, native.systemFont, 50 ) 
-    waveBtn:addEventListener( "tap", _myG.yayGoblins )
 
 --end scene:create
 end 

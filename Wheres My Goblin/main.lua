@@ -22,9 +22,6 @@ composer.myGlobals = {}
 
 local _myG = composer.myGlobals
 
--- Play count variable to track number of plays for ad display purposes.
-
-_myG.playCount = 0
 
 -- Now that our variables are set, let's start the game.
 

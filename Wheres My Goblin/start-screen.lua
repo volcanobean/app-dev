@@ -44,7 +44,9 @@ ads.init( adProvider, bannerAppID, adListener )
 local goblinTheme = audio.loadSound( "audio/goblin-theme-loop.wav" )
 
 local function playGoblinTheme()
-    audio.play( goblinTheme, { loops=-1 } )
+    if ( _myG.audioOn == "true" ) then
+        audio.play( goblinTheme, { loops=-1 } )
+    end
 end
 
 local function stopGoblinTheme()
