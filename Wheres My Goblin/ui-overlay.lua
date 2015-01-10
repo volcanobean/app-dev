@@ -406,7 +406,7 @@ function scene:create( event )
     -- assign Y values now that objects have been created
 
     headMatch.y = 385*mW
-    torsoMatch.y = 695*mW
+    torsoMatch.y = 675*mW
     legMatch.y = 850*mW
 
     local mScale = 0.83 
