@@ -85,15 +85,24 @@ function scene:create( event )
     sceneGroup:insert( _myG.background )
 
     -- game title
-    local titleText1 = display.newText( "where's", display.contentCenterX, display.contentCenterY-(222*mW), "Mathlete-Skinny", 125*mW ) --300,125
-    local titleText2 = display.newText( "my", display.contentCenterX, display.contentCenterY-(112*mW), "Mathlete-Skinny", 125*mW ) --410,125
-    local titleText3 = display.newText( "goblin?", display.contentCenterX, display.contentCenterY-(12*mW), "Mathlete-Skinny", 125*mW) --510,125
-    sceneGroup:insert( titleText1 )
-    sceneGroup:insert( titleText2 )
-    sceneGroup:insert( titleText3 )
+    local titleText1 = display.newText( "where's my", display.contentCenterX, display.contentCenterY-(180*mW), "Mathlete-Skinny", 135*mW )
+    local titleText1b = display.newText( "where's my", display.contentCenterX+3*mW, display.contentCenterY-(177*mW), "Mathlete-Skinny", 135*mW )
+    titleText1b:setFillColor( 0, 0, 0, 0.8 )
+    local titleText2 = display.newText( "goblin?", display.contentCenterX, display.contentCenterY-(60*mW), "Mathlete-Skinny", 235*mW)
+    local titleText2b = display.newText( "goblin?", display.contentCenterX+5*mW, display.contentCenterY-(55*mW), "Mathlete-Skinny", 235*mW)
+    titleText2b:setFillColor( 0, 0, 0, 0.8 )
 
-    local startBtn = display.newText( "start", display.contentCenterX, display.contentCenterY+(200*mW), "Mathlete-SkinnySlant", 80*mW ) --875,80
+    sceneGroup:insert( titleText1b )
+    sceneGroup:insert( titleText1 )
+    sceneGroup:insert( titleText2b )
+    sceneGroup:insert( titleText2 )
+
+    local startBtn = display.newText( "tap to start", display.contentCenterX, display.contentCenterY+(200*mW), "Mathlete-SkinnySlant", 80*mW )
+    startBtn:setFillColor( 0.8, 0.97, 0.63, 1 )
+    local startBtn2 = display.newText( "tap to start", display.contentCenterX+3, display.contentCenterY+(203*mW), "Mathlete-SkinnySlant", 80*mW )
+    startBtn2:setFillColor( 0, 0, 0, 0.8 )
     startBtn:addEventListener( "tap", startGame )
+    sceneGroup:insert( startBtn2 )
     sceneGroup:insert( startBtn )
 
     -- Settings sprites

@@ -20,7 +20,7 @@ local mW = 0.0013020833*cW
 
 _myG.blockCount = 10
 _myG.blockWidth = 512*mW
-_myG.blockMargin = 90*mW
+_myG.blockMargin = 120*mW
 
 _myG.blockHeight1 = 312*mW
 _myG.blockHeight2 = 540*mW
