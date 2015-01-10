@@ -53,7 +53,11 @@ local function stopGoblinTheme()
     audio.stop()
 end
 
+--
+
 local blackMask 
+
+local tapGroup
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
@@ -102,8 +106,13 @@ function scene:create( event )
     local startBtn2 = display.newText( "tap to start", display.contentCenterX+3, display.contentCenterY+(203*mW), "Mathlete-SkinnySlant", 80*mW )
     startBtn2:setFillColor( 0, 0, 0, 0.8 )
     startBtn:addEventListener( "tap", startGame )
-    sceneGroup:insert( startBtn2 )
-    sceneGroup:insert( startBtn )
+
+    tapGroup = display.newGroup()
+    tapGroup:insert( startBtn2 )
+    tapGroup:insert( startBtn )
+
+    sceneGroup:insert( tapGroup )
+    transition.to( tapGroup, { time=1, y=50, alpha=0 } )
 
     -- Settings sprites
     
@@ -250,6 +259,7 @@ function scene:show( event )
         -- play goblin theme
         timer.performWithDelay( 600, playGoblinTheme )
         transition.to( blackMask, { delay=600, time=400, alpha=0 } )
+        transition.to( tapGroup, { delay=1200, time=800, y=0, alpha=1, transition=easing.outSine } )
     end
 end
 
