@@ -39,25 +39,12 @@ end
 
 ads.init( adProvider, bannerAppID, adListener )
 
--- audio
 
-local goblinTheme = audio.loadSound( "audio/goblin-theme-loop.wav" )
-
-local function playGoblinTheme()
-    if ( _myG.audioOn == "true" ) then
-        audio.play( goblinTheme, { loops=-1 } )
-    end
-end
-
-local function stopGoblinTheme()
-    audio.stop()
-end
-
---
+-- Forward declarations
 
 local blackMask 
-
 local tapGroup
+local playGoblinTheme
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
@@ -67,6 +54,20 @@ local tapGroup
 -- Initialize the scene here.
 function scene:create( event )
     local sceneGroup = self.view
+
+    -- audio
+
+    local goblinTheme = audio.loadSound( "audio/goblin-theme-loop.wav" )
+
+    function playGoblinTheme()
+        if ( _myG.audioOn == "true" ) then
+            audio.play( goblinTheme, { loops=-1 } )
+        end
+    end
+
+    local function stopGoblinTheme()
+        audio.stop()
+    end
 
     -- create start function
 
@@ -112,7 +113,7 @@ function scene:create( event )
     tapGroup:insert( startBtn )
 
     sceneGroup:insert( tapGroup )
-    transition.to( tapGroup, { time=1, y=50, alpha=0 } )
+    
 
     -- Settings sprites
     
@@ -236,21 +237,14 @@ function scene:show( event )
     if ( event.phase == "will" ) then
         -- Called when the scene is still off screen (but is about to come on screen).
 
-        -- Show banner ad when loaded
-        --if ( ads.isLoaded("banner") ) then
-            
-            ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
-            _myG.adsLoaded = "true"
-            --if( ads.height() ~= nil ) and ( ads.height() ~= 0 )then
-            --    _myG.adsHeight = ads.height()
-            --end
-
-        --end
+        -- Show banner ad
+        ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
+ 
+        -- Set pre-animated object positions
+        transition.to( tapGroup, { time=1, y=50, alpha=0 } )
 
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
-        -- Insert code here to make the scene come alive.
-        -- Example: start timers, begin animation, play audio, etc.
 
         -- pre-load next scene
         print ( "loading goblin-slider" )
