@@ -759,7 +759,7 @@ function scene:create( event )
                 --timer.performWithDelay( 600, playWrongAnswerFX )
                 timer.performWithDelay( 700, bannerPlayDown )
                 timer.performWithDelay( 1400, audioNotMyGoblin )
-                signTimer = timer.performWithDelay( 2000, signSpinFromX )
+                signTimer = timer.performWithDelay( 4000, signSpinFromX )
                 --bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
             end
         end
