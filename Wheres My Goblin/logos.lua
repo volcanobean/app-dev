@@ -30,6 +30,7 @@ local playUnicorgiVO
 local playSprout
 local playVbVO
 local whiteToBlack
+local nextScene
 
 -- objects
 
@@ -218,11 +219,11 @@ function scene:create( event )
         vbSprout:play()
     end
 
-    local function nextScene()
+    function nextScene()
         composer.gotoScene( "start-screen" )
     end
 
-    timer.performWithDelay( 7801, nextScene )
+    
 
 end
 
@@ -334,6 +335,8 @@ function scene:show( event )
 
         timer.performWithDelay( 7500, whiteToBlack )
         transition.to( whiteMask, { delay=7501, time=300, alpha=1 } )
+
+        timer.performWithDelay( 7801, nextScene )
 
     end
 end

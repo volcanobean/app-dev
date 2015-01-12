@@ -425,6 +425,35 @@ function scene:create( event )
     --hitRibbon3.isHitTestable = true
     sceneGroup:insert( hitRibbon3 )
 
+    -- hit ribbon blockers
+    -- sometimes trying to use the lever or sign trigger a leg swipe, so we need to fake a larger no-swipe area.
+
+    local function blockHits( event )
+        -- no code, just prevent stuff under it from being triggered.
+        return true
+    end
+
+    local gearBlock = display.newRect( 0, display.contentHeight, 125, 400 )
+    gearBlock.anchorX = 0
+    gearBlock.anchorY = 1
+    if ( _myG.adsLoaded == "true" ) then
+        gearBlock.y = display.contentHeight-(91*mW)
+    end
+
+    local signBlock = display.newRect( display.contentWidth, display.contentHeight, 250, 200 )
+    signBlock.anchorX = 1
+    signBlock.anchorY = 1
+    if ( _myG.adsLoaded == "true" ) then
+        signBlock.y = display.contentHeight-(91*mW)
+    end
+
+    sceneGroup:insert( gearBlock )
+    sceneGroup:insert( signBlock )
+
+    gearBlock:addEventListener( "touch", blockHits )
+    signBlock:addEventListener( "touch", blockHits )
+
+
     -- We render the background image after the hit area so it is stacked on top, hiding the hit area.
     
     _myG.background = display.newImageRect( "images/forest-bg.jpg", display.contentWidth, 1366*mW)
@@ -541,7 +570,7 @@ function scene:create( event )
     yayGob1:insert( yayBody )
     yayGob1:insert( yayHead )
     yayGob1.x = 110*mW
-    local yayGob1Y = cY-170*mW
+    local yayGob1Y = cY-130*mW
     yayGob1.y = yayGob1Y
     yayGob1:scale( 0.65, 0.65 )
     yayGob1.rotation = 25
@@ -552,7 +581,7 @@ function scene:create( event )
     yayGob2:insert( yayBody2 )
     yayGob2:insert( yayHead2 )
     yayGob2.x = 600*mW
-    local yayGob2Y = cY-160*mW
+    local yayGob2Y = cY-120*mW
     yayGob2.y = yayGob2Y
     yayGob2.xScale = -1
     yayGob2:scale( 0.45, 0.45 )
@@ -564,7 +593,7 @@ function scene:create( event )
     yayGob3:insert( yayBody3 )
     yayGob3:insert( yayHead3 )
     yayGob3.x = 685*mW
-    local yayGob3Y = cY-270*mW
+    local yayGob3Y = cY-230*mW
     yayGob3.y = yayGob3Y
     yayGob3:scale( 0.65, 0.65 )
     yayGob3.rotation = -20
@@ -629,30 +658,30 @@ function scene:create( event )
         --pop up
         
         transition.to( yayGob1, { time=1, alpha=1 })
-        transition.to( yayGob1, { delay=1, time=200, y=yayGob1Y-65*mW, transition=easing.outSine })
+        transition.to( yayGob1, { delay=1, time=200, y=yayGob1Y-15*mW, transition=easing.outSine })
         transition.to( yayGob1, { delay=200, time=200, y=yayGob1Y, transition=easing.outSine })
         
         transition.to( yayGob2, { delay=50, time=1, alpha=1 })
-        transition.to( yayGob2, { delay=51, time=200, y=yayGob2Y-65*mW, transition=easing.outSine })
+        transition.to( yayGob2, { delay=51, time=200, y=yayGob2Y-15*mW, transition=easing.outSine })
         transition.to( yayGob2, { delay=250, time=200, y=yayGob2Y, transition=easing.outSine })
         
         transition.to( yayGob3, { time=1, alpha=1 })
-        transition.to( yayGob3, { delay=1, time=200, y=yayGob3Y-65*mW, transition=easing.outSine })
+        transition.to( yayGob3, { delay=1, time=200, y=yayGob3Y-15*mW, transition=easing.outSine })
         transition.to( yayGob3, { delay=200, time=200, y=yayGob3Y, transition=easing.outSine })
         
         -- back down
         
         local downDelay = 2000
 
-        transition.to( yayGob1, { delay=downDelay, time=200, y=yayGob1Y-65*mW })
+        transition.to( yayGob1, { delay=downDelay, time=200, y=yayGob1Y-15*mW })
         transition.to( yayGob1, { delay=downDelay+200, time=200, y=yayGob1Y+100*mW })
         transition.to( yayGob1, { delay=downDelay+401, time=1, alpha=0 })
         
-        transition.to( yayGob2, { delay=downDelay+50, time=200, y=yayGob2Y-65*mW })
+        transition.to( yayGob2, { delay=downDelay+50, time=200, y=yayGob2Y-15*mW })
         transition.to( yayGob2, { delay=downDelay+250, time=200, y=yayGob2Y+100*mW })
         transition.to( yayGob2, { delay=downDelay+451, time=1, alpha=0 })
     
-        transition.to( yayGob3, { delay=downDelay, time=200, y=yayGob3Y-65*mW })
+        transition.to( yayGob3, { delay=downDelay, time=200, y=yayGob3Y-15*mW })
         transition.to( yayGob3, { delay=downDelay+200, time=200, y=yayGob3Y+100*mW })
         transition.to( yayGob3, { delay=downDelay+401, time=1, alpha=0 })
 
@@ -676,6 +705,9 @@ function scene:create( event )
 
     sceneGroup:insert( bushLeft )
     sceneGroup:insert( bushRight )
+    
+    --bushLeft.isVisible = false
+    --bushRight.isVisible = false
 
 
     local uiShader = display.newImageRect( "images/ui-shader.png", display.contentWidth, 403*mW )

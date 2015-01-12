@@ -45,6 +45,7 @@ ads.init( adProvider, bannerAppID, adListener )
 local blackMask 
 local tapGroup
 local playGoblinTheme
+local stopGoblinTheme
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
@@ -65,7 +66,7 @@ function scene:create( event )
         end
     end
 
-    local function stopGoblinTheme()
+    function stopGoblinTheme()
         audio.stop()
     end
 
@@ -241,7 +242,7 @@ function scene:show( event )
         ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
  
         -- Set pre-animated object positions
-        transition.to( tapGroup, { time=1, y=50, alpha=0 } )
+        transition.to( tapGroup, { time=0, y=50, alpha=0 } )
 
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.

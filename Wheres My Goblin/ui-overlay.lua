@@ -28,6 +28,18 @@ local screenRatio = cW/cH
 local bannerStayTimer
 local crankTimer
 local signTimer
+local uiActiveTrue
+local turnCrank
+
+local replayShader
+local replaySign
+local replayYesBtn
+local replayNoBtn
+local bannerGroup
+
+local bannerUpY
+local bannerDownY
+local bannerStretchY
 
 -- -------------------------------------------------------------------------------
 
@@ -76,7 +88,7 @@ function scene:create( event )
         activeText.text = "UI Active: " .. _myG.uiActive
     end
 
-    local function uiActiveTrue()
+    function uiActiveTrue()
         _myG.uiActive = "true"
         activeText.text = "UI Active: " .. _myG.uiActive
     end
@@ -417,11 +429,7 @@ function scene:create( event )
     matchGroup:insert( headMatch )
     matchGroup:scale( mScale, mScale )
 
-    local bannerUpY
-    local bannerDownY
-    local bannerStretchY
-
-    local bannerGroup = display.newGroup()
+    bannerGroup = display.newGroup()
     bannerGroup:insert( banner )
     bannerGroup:insert( matchGroup )
     sceneGroup:insert( bannerGroup )
@@ -454,8 +462,6 @@ function scene:create( event )
 
     bannerGroup.y = bannerUpY
     bannerGroup.x = display.contentCenterX
-    -- set inital banner values
-    transition.to( bannerGroup, { time=1, y=bannerUpY, yScale=0.5 })
 
     -- animate banner
 
@@ -573,21 +579,20 @@ function scene:create( event )
 
     -- replay sign sprites
 
-    local replayShader = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth+10, display.contentHeight+10 )
+    replayShader = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth+10, display.contentHeight+10 )
     replayShader:setFillColor( 0, 0, 0, 1 ) 
-    transition.to( replayShader, { time=0, alpha=0 } )
     sceneGroup:insert( replayShader )
 
     local replaySheetInfo = require("replay-sheet")
     local replaySheet = graphics.newImageSheet( "images/replay-sheet.png", replaySheetInfo:getSheet() )
     local replayFrames  = { start=1, count=3 }
 
-    local replayYesBtn = display.newSprite( replaySheet, replayFrames )
+    replayYesBtn = display.newSprite( replaySheet, replayFrames )
     replayYesBtn:setFrame(3)
     replayYesBtn.anchorY = 0 
     replayYesBtn.x = 285*mW
     
-    local replayNoBtn = display.newSprite( replaySheet, replayFrames )
+    replayNoBtn = display.newSprite( replaySheet, replayFrames )
     replayNoBtn:setFrame(1)
     replayNoBtn.anchorY = 0 
     replayNoBtn.x = 490*mW
@@ -623,16 +628,10 @@ function scene:create( event )
 
     -- sign group
 
-    local replaySign = display.newGroup()
+    replaySign = display.newGroup()
     replaySign:insert( replayPaper )
     replaySign:insert( ropeL )
     replaySign:insert( ropeR )
-
-    -- set inital sign position
-
-    transition.to( replaySign, { time=1, y=-270, yScale=0.5 })
-    transition.to( replayYesBtn, { time=1, y=cY-40*mW, yScale=0.25, alpha=0 })
-    transition.to( replayNoBtn, { time=1, y=cY-40*mW, yScale=0.25, alpha=0 })
 
     sceneGroup:insert( replayShader )
     sceneGroup:insert( replayYesBtn )
@@ -789,7 +788,7 @@ function scene:create( event )
         return true
     end
 
-    local function turnCrank( event )
+    function turnCrank( event )
         print ( "turnCrank" )
         if ( bannerState == "down" ) then
             raiseBannerNow()
@@ -799,7 +798,6 @@ function scene:create( event )
             handlePlay( "down" )
             gearForward()
             compareGoblins()
-            -- add comapre code here
             bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
         end
         return true
@@ -819,12 +817,6 @@ function scene:create( event )
     gearHandle:addEventListener( "tap", turnCrank )
     shader:addEventListener( "tap", raiseBannerNow )
 
-
-    -- INTRO ANIMATION:
-
-    uiActiveTrue() -- temporarily true to allow first animation
-    crankTimer = timer.performWithDelay( 800, turnCrank )
-
 --end scene:create
 end 
 
@@ -834,8 +826,25 @@ function scene:show( event )
 
     if ( event.phase == "will" ) then
         -- Called when the scene is still off screen (but is about to come on screen).
+
+        transition.to( replayShader, { time=0, alpha=0 } )
+
+        -- set inital banner values
+        transition.to( bannerGroup, { time=0, y=bannerUpY, yScale=0.5 })
+
+        -- set inital sign position
+        transition.to( replaySign, { time=0, y=-270, yScale=0.5 })
+        transition.to( replayYesBtn, { time=0, y=cY-40*mW, yScale=0.25, alpha=0 })
+        transition.to( replayNoBtn, { time=0, y=cY-40*mW, yScale=0.25, alpha=0 })
+
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
+
+        -- INTRO ANIMATION:
+
+        uiActiveTrue() -- temporarily true to allow first animation
+        crankTimer = timer.performWithDelay( 800, turnCrank )
+
     end
 end
 
