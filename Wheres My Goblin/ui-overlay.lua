@@ -787,6 +787,10 @@ function scene:create( event )
         print( "raiseBannerNow" )
         timer.cancel( bannerStayTimer )
         raiseBanner()
+        if (signState == "x") then
+            timer.cancel( signTimer )
+            signSpinFromX()
+        end
         print( "raiseBannerNow uiActive: " .. _myG.uiActive )
         return true
     end

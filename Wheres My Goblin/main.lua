@@ -6,6 +6,11 @@
 -- Copyright (C) 2014-2015 Volcano Bean, LLC. All Rights Reserved.
 ------------------------------------------------------------
 
+-- Load Corona Profiler
+
+--profiler = require "Profiler"
+--profiler.startProfiler({ time=10000, delay=1000, mode=3 })
+
 -- hide device status bar
 
 display.setStatusBar( display.HiddenStatusBar )
