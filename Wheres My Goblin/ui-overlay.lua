@@ -41,6 +41,8 @@ local bannerUpY
 local bannerDownY
 local bannerStretchY
 
+local notGobPlayed = "false"
+
 -- -------------------------------------------------------------------------------
 
 -- "scene:create()"
@@ -159,8 +161,9 @@ function scene:create( event )
 
     local function audioNotMyGoblin()
         goblinText.text = "That's not my goblin." 
-        if( _myG.audioOn == "true" ) then
+        if( _myG.audioOn == "true" ) and ( notGobPlayed == "false") then
             audio.play( notGoblin )
+            notGobPlayed = "true"
         end
         --timer.performWithDelay( 2000, stopAudio )
     end
