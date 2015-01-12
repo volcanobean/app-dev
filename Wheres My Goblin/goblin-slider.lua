@@ -433,14 +433,14 @@ function scene:create( event )
         return true
     end
 
-    local gearBlock = display.newRect( 0, display.contentHeight, 125, 400 )
+    local gearBlock = display.newRect( 0, display.contentHeight, 125*mW, 400*mW )
     gearBlock.anchorX = 0
     gearBlock.anchorY = 1
     if ( _myG.adsLoaded == "true" ) then
         gearBlock.y = display.contentHeight-(91*mW)
     end
 
-    local signBlock = display.newRect( display.contentWidth, display.contentHeight, 250, 200 )
+    local signBlock = display.newRect( display.contentWidth, display.contentHeight, 250*mW, 200*mW )
     signBlock.anchorX = 1
     signBlock.anchorY = 1
     if ( _myG.adsLoaded == "true" ) then
