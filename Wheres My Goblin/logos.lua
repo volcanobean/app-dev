@@ -268,75 +268,75 @@ function scene:show( event )
         -- play Unicorgi animation
 
         -- unhide
-        transition.to( pinkCircle, { delay=600, time=0, alpha=1 })
-        transition.to( circleMask, { delay=600, time=0, alpha=1 })
+        transition.to( pinkCircle, { delay=1000, time=0, alpha=1 })
+        transition.to( circleMask, { delay=1000, time=0, alpha=1 })
 
-        transition.to( circleMask, { delay=600, time=0, xScale=0.1, yScale=0.1, y=cY-75*mW })
-        transition.to( pinkCircle, { delay=600, time=0, xScale=0.1, yScale=0.1 })
-        transition.to( circleMask, { delay=600, time=400, xScale=1.5, yScale=1.5, y=cY+177*mW, transition=easing.inQuad })
-        transition.to( pinkCircle, { delay=600, time=400, xScale=1.5, yScale=1.5, transition=easing.inQuad })
-        transition.to( circleMask, { delay=1000, time=200, xScale=1, yScale=1, y=cY+87*mW, transition=easing.outQuad })
-        transition.to( pinkCircle, { delay=1000, time=200, xScale=1, yScale=1, transition=easing.outQuad })
-        transition.to( unicorgi, { delay=1000, time=0, x=530*mW, y=cY+105*mW, alpha=1 })
-        transition.to( unicorgi, { delay=1000, time=300, x=398*mW, y=cY-125*mW, transition=easing.outQuad })
+        transition.to( circleMask, { delay=1000, time=0, xScale=0.1, yScale=0.1, y=cY-75*mW })
+        transition.to( pinkCircle, { delay=1000, time=0, xScale=0.1, yScale=0.1 })
+        transition.to( circleMask, { delay=1000, time=400, xScale=1.5, yScale=1.5, y=cY+177*mW, transition=easing.inQuad })
+        transition.to( pinkCircle, { delay=1000, time=400, xScale=1.5, yScale=1.5, transition=easing.inQuad })
+        transition.to( circleMask, { delay=1400, time=200, xScale=1, yScale=1, y=cY+87*mW, transition=easing.outQuad })
+        transition.to( pinkCircle, { delay=1400, time=200, xScale=1, yScale=1, transition=easing.outQuad })
+        transition.to( unicorgi, { delay=1400, time=0, x=530*mW, y=cY+105*mW, alpha=1 })
+        transition.to( unicorgi, { delay=1400, time=300, x=398*mW, y=cY-125*mW, transition=easing.outQuad })
 
-        timer.performWithDelay( 1200, playSwooshFX )
+        timer.performWithDelay( 1600, playSwooshFX )
 
         --unhide letters
-        transition.to( letterU, { delay=1400, time=0, alpha=1, rotation= -360 })
-        transition.to( letterN, { delay=1400, time=0, alpha=1, rotation= -360 })
-        transition.to( letterI, { delay=1400, time=0, alpha=1, rotation= -360 })
-        transition.to( letterC, { delay=1400, time=0, alpha=1, rotation= -360 })
-        transition.to( letterO, { delay=1400, time=0, alpha=1, rotation=360 })
-        transition.to( letterR, { delay=1400, time=0, alpha=1, rotation= -180 })
-        transition.to( letterG, { delay=1400, time=0, alpha=1, rotation=360 })
-        transition.to( letterI2, { delay=1400, time=0, alpha=1, rotation=359 })
+        transition.to( letterU, { delay=1800, time=0, alpha=1, rotation= -360 })
+        transition.to( letterN, { delay=1800, time=0, alpha=1, rotation= -360 })
+        transition.to( letterI, { delay=1800, time=0, alpha=1, rotation= -360 })
+        transition.to( letterC, { delay=1800, time=0, alpha=1, rotation= -360 })
+        transition.to( letterO, { delay=1800, time=0, alpha=1, rotation=360 })
+        transition.to( letterR, { delay=1800, time=0, alpha=1, rotation= -180 })
+        transition.to( letterG, { delay=1800, time=0, alpha=1, rotation=360 })
+        transition.to( letterI2, { delay=1800, time=0, alpha=1, rotation=359 })
 
-        timer.performWithDelay( 1600, playIntroTone )
+        timer.performWithDelay( 2000, playIntroTone )
 
         -- animate letters
-        transition.to( letterU, { delay=1666, time=366, x=155*mW, rotation=0, transition=easing.outQuad })
-        transition.to( letterN, { delay=1733, time=366, x=235*mW, rotation=0, transition=easing.outQuad })
-        transition.to( letterI, { delay=1530, time=433, x=290*mW, rotation=0, transition=easing.outQuad })
-        transition.to( letterC, { delay=1400, time=460, x=345*mW, rotation=0, transition=easing.outQuad })
-        transition.to( letterO, { delay=1530, time=460, x=425*mW, rotation=0, transition=easing.outQuad })
-        transition.to( letterR, { delay=1366, time=400, x=506*mW, rotation= -360, transition=easing.outQuad })
-        transition.to( letterG, { delay=1633, time=366, x=582*mW, rotation=0, transition=easing.outQuad })
-        transition.to( letterI2, { delay=1800, time=366, x=639*mW, rotation=0, transition=easing.outQuad })
+        transition.to( letterU, { delay=2066, time=366, x=155*mW, rotation=0, transition=easing.outQuad })
+        transition.to( letterN, { delay=2133, time=366, x=235*mW, rotation=0, transition=easing.outQuad })
+        transition.to( letterI, { delay=1930, time=433, x=290*mW, rotation=0, transition=easing.outQuad })
+        transition.to( letterC, { delay=1800, time=460, x=345*mW, rotation=0, transition=easing.outQuad })
+        transition.to( letterO, { delay=1930, time=460, x=425*mW, rotation=0, transition=easing.outQuad })
+        transition.to( letterR, { delay=1766, time=400, x=506*mW, rotation= -360, transition=easing.outQuad })
+        transition.to( letterG, { delay=2033, time=366, x=582*mW, rotation=0, transition=easing.outQuad })
+        transition.to( letterI2, { delay=2200, time=366, x=639*mW, rotation=0, transition=easing.outQuad })
 
-        timer.performWithDelay( 2500, playUnicorgiVO )
+        timer.performWithDelay( 2900, playUnicorgiVO )
 
         -- fade out
 
-        transition.to( whiteMask, { delay=4000, time=300, alpha=1 } )
+        transition.to( whiteMask, { delay=4400, time=300, alpha=1 } )
         
-        transition.to( letterI2, { delay=4305, time=1, alpha=0 } )
-        transition.to( letterG, { delay=4305, time=1, alpha=0 } )
-        transition.to( letterO, { delay=4305, time=1, alpha=0 } )
-        transition.to( letterR, { delay=4305, time=1, alpha=0 } )
-        transition.to( letterC, { delay=4305, time=1, alpha=0 } )
-        transition.to( letterI, { delay=4305, time=1, alpha=0 } )
-        transition.to( letterU, { delay=4305, time=1, alpha=0 } )
-        transition.to( letterN, { delay=4305, time=1, alpha=0 } )
-        transition.to( unicorgi, { delay=4305, time=1, alpha=0 } )
-        transition.to( pinkCircle, { delay=4305, time=1, alpha=0 } )
-        transition.to( circleMask, { delay=4305, time=1, alpha=0 } )
+        transition.to( letterI2, { delay=4705, time=0, alpha=0 } )
+        transition.to( letterG, { delay=4705, time=0, alpha=0 } )
+        transition.to( letterO, { delay=4705, time=0, alpha=0 } )
+        transition.to( letterR, { delay=4705, time=0, alpha=0 } )
+        transition.to( letterC, { delay=4705, time=0, alpha=0 } )
+        transition.to( letterI, { delay=4705, time=0, alpha=0 } )
+        transition.to( letterU, { delay=4705, time=0, alpha=0 } )
+        transition.to( letterN, { delay=4705, time=0, alpha=0 } )
+        transition.to( unicorgi, { delay=4705, time=0, alpha=0 } )
+        transition.to( pinkCircle, { delay=4705, time=0, alpha=0 } )
+        transition.to( circleMask, { delay=4705, time=0, alpha=0 } )
 
-        transition.to( whiteMask, { delay=4310, time=1, alpha=0 } )
+        transition.to( whiteMask, { delay=4710, time=1, alpha=0 } )
 
         -- play Volcano Bean animation
 
-        transition.to( vbText, { delay=4500, time=400, alpha=1 } )
-        transition.to( vbFire, { delay=4500, time=400, alpha=1 } )
-        timer.performWithDelay( 4700, playSprout )
-        timer.performWithDelay( 4700, playVbVO )
+        transition.to( vbText, { delay=5000, time=400, alpha=1 } )
+        transition.to( vbFire, { delay=5000, time=400, alpha=1 } )
+        timer.performWithDelay( 5200, playSprout )
+        timer.performWithDelay( 5200, playVbVO )
 
         --transition.to( vbSprout, { time=1, alpha=1 } )
 
-        timer.performWithDelay( 7500, whiteToBlack )
-        transition.to( whiteMask, { delay=7501, time=300, alpha=1 } )
+        timer.performWithDelay( 8000, whiteToBlack )
+        transition.to( whiteMask, { delay=8001, time=300, alpha=1 } )
 
-        timer.performWithDelay( 7801, nextScene )
+        timer.performWithDelay( 9000, nextScene )
 
     end
 end
