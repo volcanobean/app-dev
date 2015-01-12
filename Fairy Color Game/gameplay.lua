@@ -28,11 +28,22 @@ function scene:create( event )
     print ("game p: " .. _myG.player)
 
 
-    local background = display.newImage ("images/test-bg.jpg", 3000, 1000)
-    background.x = display.contentCenterX
-    background.y = display.contentCenterY
+    local background = display.newImageRect ("images/test-bg.jpg", 3000, 1000)
+    background.x = display.contentWidth * 0.0
+    background.y = display.contentHeight * 1
+    background.anchorX = 0
+    background.anchorY = 1
     --background:setFillColor(0,0,0,1)
-    sceneGroup:insert( background )
+
+    --display.newRect( x, y, width, height )
+    local stageHit = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight )
+    sceneGroup:insert ( stageHit )
+
+      local theWorld = display.newGroup()
+    theWorld:insert( background )
+    --theWorld:insert ( fairy )
+
+    sceneGroup:insert( theWorld )
 
     local fairySpriteOptions =
     {
@@ -60,6 +71,9 @@ function scene:create( event )
         fairy:setFrame (7)        
     end 
 
+
+
+
     -- Obstacles -- 
 
     --local enemy = display.newRect( 450, 250, 200, 100 )
@@ -72,8 +86,66 @@ function scene:create( event )
 
     --Moving fairy--
 
-    local function touchScreen( event )
+   local function touchScreen( event )
+        
+        --local distanceX = fairy.x - event.x
+        --local distanceY = fairy.y - event.y
         transition.to( fairy, { time=1000, x=event.x, y=event.y })
+        print("----")
+        print ("Fairy:",fairy.x)
+        print ("Event:",event.x)
+
+        
+
+
+        if _myG.player == "p1" then
+            -- fairy moves Right
+            if (fairy.x > event.x) then
+                fairy:setFrame (1) 
+                --if ( theWorld.x >= 0) then
+                   -- transition.to(theWorld, {time=1000, x= distanceX }) 
+                    --transition.to(theWorld, {time=1000, y= distanceY })
+                --end
+            -- else Left 
+            elseif (fairy.x <= event.x) then
+                fairy:setFrame (2)    
+                --if background.x =< 0 then
+            end
+        elseif _myG.player == "p2" then 
+            if (fairy.x > event.x) then
+                fairy:setFrame (3) 
+            elseif (fairy.x <= event.x) then
+                fairy:setFrame (4)
+            end
+
+        elseif _myG.player == "p3" then 
+            if (fairy.x > event.x) then
+                fairy:setFrame (5) 
+            elseif (fairy.x <= event.x) then
+                fairy:setFrame (6)
+            end
+        elseif _myG.player == "p4" then 
+            if (fairy.x > event.x) then
+                fairy:setFrame (7) 
+            elseif (fairy.x <= event.x) then
+                fairy:setFrame (8)
+            end        
+        end 
+        return true
+    end
+
+
+   stageHit:addEventListener( "tap", touchScreen )
+
+function moveWorld (event)
+    theWorld.x = 0 - fairy.x
+end    
+  
+Runtime:addEventListener( "enterFrame", moveWorld )  
+
+
+--[[    local function bgTouchScreen( event )
+        transition.to( theWorld, { time=1000, x=event.x, y=event.y })
         print("----")
         print ("Fairy:",fairy.x)
         print ("Event:",event.x)
@@ -105,15 +177,16 @@ function scene:create( event )
         end 
         return true
     end
+    --]]
 
-   background:addEventListener( "tap", touchScreen )
+   --stageHit:addEventListener( "tap", bgTouchScreen )
 
     -- Define creation of Glow
 
     local function createGlow( number )
         colorGlow[number] = display.newImage( "images/blueglow.png" )
-        colorGlow[number].x = math.random( 25, 900 )
-        colorGlow[number].y = math.random( 25, 475 )
+        colorGlow[number].x = math.random( 20, 2980 )
+        colorGlow[number].y = math.random( 10, 980 )
         local r = math.random( 0, 100 )
         local g = math.random( 0, 100 )
         local b = math.random( 0, 100 )
@@ -144,7 +217,7 @@ function scene:create( event )
         createGlow(i)
         --Moving Glow
         local function moveGlow()
-            transition.to( colorGlow[i], { time=math.random(10000, 40000), x=math.random(50, 700), y=math.random(80, 1000), onComplete=moveGlow })
+            transition.to( colorGlow[i], { time=math.random(10000, 200000), x=math.random(50, 700), y=math.random(80, 1000), onComplete=moveGlow })
         end
         moveGlow()
         colorGlow[i]:addEventListener( "collision", onCollision )

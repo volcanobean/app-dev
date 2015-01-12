@@ -3,7 +3,7 @@ application =
 
 	content =
 	{
-		scale = "adaptive",
+		scale = "letterbox",
 		fps = 30,
 		--audioPlayFrequency = 22050
 		
