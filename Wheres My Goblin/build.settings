@@ -111,11 +111,11 @@ settings =
 
             UIAppFonts =
             {
-                "fonts/HelveticaLTStd-Blk.ttf",
-                "fonts/Mathlete-Bulky.ttf",
-                "fonts/Mathlete-BulkySlant.ttf",
-                "fonts/Mathlete-Skinny.ttf",
-                "fonts/Mathlete-SkinnySlant.ttf"
+                "HelveticaLTStd-Blk.ttf",
+                "Mathlete-Bulky.ttf",
+                "Mathlete-BulkySlant.ttf",
+                "Mathlete-Skinny.ttf",
+                "Mathlete-SkinnySlant.ttf"
             },
         }
     },

@@ -15,7 +15,7 @@ local cX = display.contentCenterX
 local cY = display.contentCenterY
 local mW = 0.0013020833*cW
 local screenRatio = cW/cH
---print ("screenRatio " .. screenRatio)
+print ("screenRatio " .. screenRatio)
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
@@ -445,6 +445,7 @@ function scene:create( event )
         bannerUpY = 0 --0
         bannerDownY = cH*0.91 --440
         bannerStretchY = 50*mW
+        print( "more than 0.7")
     elseif( screenRatio > 0.6 ) and ( screenRatio < 0.7 ) then
         -- if we're on shorter mobile devices
         bannerGroup.anchorY = 1
@@ -453,6 +454,8 @@ function scene:create( event )
         bannerUpY = 0 --0
         bannerDownY = cH*0.82 --440
         bannerStretchY = 50*mW
+        print( "between 0.6 and 0.7")
+        print( bannerDownY )
      else
         -- if we're on a taller thinner device
         bannerGroup.anchorY = 0
@@ -665,6 +668,7 @@ function scene:create( event )
 
     local function replaySignDown()
         playBannerFX()
+        transition.to( replaySign, { time=1, alpha=1 })
         transition.to( replaySign, { time=350, y=50*mW, yScale=1, transition=easing.outSine })
         transition.to( replaySign, { delay=350, time=200, y=0, transition=easing.outSine })
         transition.to( replayShader, { time=300, alpha=0.5 } )
@@ -840,7 +844,8 @@ function scene:show( event )
         transition.to( bannerGroup, { time=0, y=bannerUpY, yScale=0.5 })
 
         -- set inital sign position
-        transition.to( replaySign, { time=0, y=-270, yScale=0.5 })
+        transition.to( replaySign, { time=0, y=-300, yScale=0.5 })
+        transition.to( replaySign, { time=1, alpha=0 }) 
         transition.to( replayYesBtn, { time=0, y=cY-40*mW, yScale=0.25, alpha=0 })
         transition.to( replayNoBtn, { time=0, y=cY-40*mW, yScale=0.25, alpha=0 })
 
