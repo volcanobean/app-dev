@@ -19,8 +19,11 @@ local mW = 0.0013020833*cW
 -- Ad code
 
 local ads = require( "ads" )
-local bannerAppID = "ca-app-pub-7094148843149156/1832646501"  -- admob, iOS banner
+local bannerAppID = "ca-app-pub-7094148843149156/7291607302"  -- admob, iOS banner
 local adProvider = "admob"
+if ( system.getInfo( "platformName" ) == "Android" ) then
+    bannerAppID = "ca-app-pub-7094148843149156/5814874106"  -- admob, Android banner
+end
 
 _myG.adsLoaded = "true"
 _myG.adsHeight = 90*mW
