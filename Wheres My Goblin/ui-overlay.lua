@@ -13,7 +13,7 @@ local cW = display.contentWidth
 local cH = display.contentHeight
 local cX = display.contentCenterX
 local cY = display.contentCenterY
-local mW = 0.0013020833*cW
+local mW = 0.0013022*cW
 local screenRatio = cW/cH
 print ("screenRatio " .. screenRatio)
 
