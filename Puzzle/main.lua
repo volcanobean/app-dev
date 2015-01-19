@@ -1,3 +1,6 @@
+-- hide device status bar
+display.setStatusBar( display.HiddenStatusBar )
+
 -- Hit areas
 
 local h1 = display.newRect( 200, 100, 50, 75 )
