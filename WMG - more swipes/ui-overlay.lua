@@ -31,6 +31,8 @@ local signTimer
 local uiActiveTrue
 local turnCrank
 
+local signSprite
+local signIsUp
 local replayShader
 local replaySign
 local replayYesBtn
@@ -51,6 +53,13 @@ local notGobPlayed = "false"
 -- "scene:create()"
 function scene:create( event )
     local sceneGroup = self.view
+
+    local startX
+    local endX
+    local startY
+    local endY
+    local startTime
+    local endTime
 
     -- Create table to hold data for goblin match
 
@@ -319,7 +328,35 @@ function scene:create( event )
         return true
     end
 
-    arrowBtn:addEventListener( "tap", clickArrow )
+    --[[
+    local function swipeArrow( event )
+        if ( event.phase == "began" ) then
+            display.getCurrentStage():setFocus( event.target )
+            event.target.isFocus = true
+            startY = event.y
+            startTime = event.time
+        elseif ( event.target.isFocus ) then
+            if( event.phase == "moved") then
+                endY = event.y
+            elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
+                endY = event.y
+                endTime = event.time
+                display.getCurrentStage():setFocus( nil )
+                event.target.isFocus = false
+                local totalTime = endTime - startTime
+                if( startY== endY ) then
+                    -- this is a tap
+                    clickArrow()
+                elseif ( totalTime < 200 ) and ( startY ~= endY ) then
+                    clickArrow()
+                end
+            end
+        end
+        return true
+    end
+    ]]--
+
+    arrowBtn:addEventListener( "touch", clickArrow )
     homeBtn:addEventListener( "tap", clickHome )
     replayBtn:addEventListener( "tap", clickReplay )
     audioBtn:addEventListener( "tap", clickAudio )
@@ -561,7 +598,7 @@ function scene:create( event )
 
     local signSheetInfo = require("sign-sheet")
     local signSheet = graphics.newImageSheet( "images/sign-sheet.png", signSheetInfo:getSheet() )
-    local signSprite = display.newSprite( signSheet, signSequence )
+    signSprite = display.newSprite( signSheet, signSequence )
     signSprite.anchorY = 1
     signSprite.x = 654*mW
     signSprite.y = cH 
@@ -767,20 +804,25 @@ function scene:create( event )
             timer.performWithDelay( 1400, audioWheresMyGoblin )
             --bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
         elseif ( _myG.introComplete == "true" ) then
+            -- raise sign if needed
+            if( signIsUp == "false" ) then
+                transition.to( signSprite, { time=400, y=cH-_myG.adsHeight, transition=easing.outSine })
+                signIsUp = true
+            end
             -- else do our comparison
             if matchBlocks[1] == _myG.ribbon[1].activeBlock and matchBlocks[2] == _myG.ribbon[2].activeBlock and matchBlocks[3] == _myG.ribbon[3].activeBlock then
                 -- if we have a match, don't lower the banner. Play victory animation.
-                signSpinToCheck()
-                timer.performWithDelay( 700, audioThatsMyGoblin )
+                timer.performWithDelay( 400, signSpinToCheck )
+                timer.performWithDelay( 1100, audioThatsMyGoblin )
                 -- you win!
-                timer.performWithDelay( 1200, playVictoryScene )
+                timer.performWithDelay( 1600, playVictoryScene )
             else
                 -- if we don't have a match, lower the banner, etc
-                signSpinToX()
+                timer.performWithDelay( 400, signSpinToX )
                 --timer.performWithDelay( 600, playWrongAnswerFX )
-                timer.performWithDelay( 700, bannerPlayDown )
-                timer.performWithDelay( 1400, audioNotMyGoblin )
-                signTimer = timer.performWithDelay( 4000, signSpinFromX )
+                timer.performWithDelay( 1100, bannerPlayDown )
+                timer.performWithDelay( 1800, audioNotMyGoblin )
+                signTimer = timer.performWithDelay( 4400, signSpinFromX )
                 --bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
             end
         end
@@ -823,15 +865,14 @@ function scene:create( event )
             handlePlay( "down" )
             gearForward()
             compareGoblins()
-            bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
+            if ( _myG.introComplete == "false" ) then
+                bannerStayTimer = timer.performWithDelay( 8000, raiseBanner )
+            else
+                bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
+            end
         end
         return true
     end
-
-    local startX
-    local endX
-    local startTime
-    local endTime
 
     local function handleSwipe( event )
         if ( event.phase == "began" ) then
@@ -864,11 +905,11 @@ function scene:create( event )
             event.target.isFocus = true
             startX = event.x
             startTime = event.time
+            endX = event.x
         elseif ( event.target.isFocus ) then
             if( event.phase == "moved") then
                 endX = event.x
                 local difX = endX - startX
-                print( startX .. " | " .. endX .. " | " .. difX )
                 if( event.target.rotation > -1 and event.target.rotation < 101 ) then
                     event.target.rotation = difX*0.25
                     if( event.target.rotation > 29) then
@@ -878,15 +919,15 @@ function scene:create( event )
             elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
                 endX = event.x
                 endTime = event.time
-                display.getCurrentStage():setFocus( nil )
-                event.target.isFocus = false
                 local totalTime = endTime - startTime
-                if ( totalTime < 100 ) and ( startX == endX ) then
+                if ( totalTime < 400 ) and ( startX == endX ) then
                     -- this is a tap
                     turnCrank()
                 elseif( event.target.rotation < 30 )then
                     transition.to( gearHandle, { time=200, rotation=0, transition=easing.outSine } )
                 end
+                display.getCurrentStage():setFocus( nil )
+                event.target.isFocus = false
             end
         end
         return true
@@ -916,6 +957,8 @@ function scene:show( event )
 
     if ( event.phase == "will" ) then
         -- Called when the scene is still off screen (but is about to come on screen).
+        signIsUp = "false"
+        transition.to( signSprite, {time=0, y=cH+100*mW} )
 
         transition.to( replayShader, { time=0, alpha=0 } )
 
