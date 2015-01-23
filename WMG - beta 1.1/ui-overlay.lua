@@ -30,6 +30,7 @@ local crankTimer
 local signTimer
 local uiActiveTrue
 local turnCrank
+local uiShader2
 
 local signSprite
 local signIsUp
@@ -185,11 +186,19 @@ function scene:create( event )
         --timer.performWithDelay( 2000, stopAudio )
     end
 
-    local uiShader = display.newImageRect( "images/ui-shader.png", display.contentWidth, 403*mW )
-    uiShader.anchorY = 1
-    uiShader.x = display.contentCenterX
-    uiShader.y = cH
-    sceneGroup:insert( uiShader )
+    local uiShader1 = display.newImageRect( "images/ui-shader-1.png", 385*mW, 399*mW )
+    uiShader1.anchorX = 0
+    uiShader1.anchorY = 1
+    uiShader1.x = 0
+    uiShader1.y = cH
+    sceneGroup:insert( uiShader1 )
+
+    uiShader2 = display.newImageRect( "images/ui-shader-2.png", 384*mW, 295*mW )
+    uiShader2.anchorX = 1
+    uiShader2.anchorY = 1
+    uiShader2.x = cW
+    uiShader2.y = cH
+    sceneGroup:insert( uiShader2 )
 
     -- Settings sprites
     
@@ -765,7 +774,8 @@ function scene:create( event )
         gearSprite.y = cH-_myG.adsHeight
         gearHandle.y = gearHandleY-_myG.adsHeight
         signSprite.y = cH-_myG.adsHeight
-        uiShader.y = cH-_myG.adsHeight
+        uiShader1.y = cH-_myG.adsHeight
+        uiShader2.y = cH-_myG.adsHeight
 
         -- fake ad, ad space
         local adSpace = display.newRect( cX, cH, display.contentWidth, 90*mW )
@@ -807,6 +817,7 @@ function scene:create( event )
             -- raise sign if needed
             if( signIsUp == "false" ) then
                 transition.to( signSprite, { time=400, y=cH-_myG.adsHeight, transition=easing.outSine })
+                transition.to( uiShader2, { time=800, alpha=1 })
                 signIsUp = true
             end
             -- else do our comparison
@@ -866,7 +877,7 @@ function scene:create( event )
             gearForward()
             compareGoblins()
             if ( _myG.introComplete == "false" ) then
-                bannerStayTimer = timer.performWithDelay( 8000, raiseBanner )
+                bannerStayTimer = timer.performWithDelay( 6000, raiseBanner )
             else
                 bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
             end
@@ -958,9 +969,10 @@ function scene:show( event )
     if ( event.phase == "will" ) then
         -- Called when the scene is still off screen (but is about to come on screen).
         signIsUp = "false"
-        transition.to( signSprite, {time=0, y=cH+100*mW} )
+        transition.to( signSprite, { time=0, y=cH+100*mW })
+        transition.to( uiShader2, { time=0, alpha=0 })
 
-        transition.to( replayShader, { time=0, alpha=0 } )
+        transition.to( replayShader, { time=0, alpha=0 })
 
         -- set inital banner values
         transition.to( bannerGroup, { time=0, y=bannerUpY, yScale=0.5 })

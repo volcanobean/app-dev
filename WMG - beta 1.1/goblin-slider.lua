@@ -873,22 +873,9 @@ function scene:create( event )
 
     function _myG.loadSlider()
         -- get random values for start position
-        local random1 = math.random( 1, _myG.blockCount-2 )
-        local random2 = math.random( 1, _myG.blockCount-1 )
+        local random1 = math.random( 1, _myG.blockCount )
+        local random2 = math.random( 1, _myG.blockCount )
         local random3 = math.random( 2, _myG.blockCount )
-        -- get offset values
-        local end1 = random1+1
-        local end2 = random1+2
-        local end3 = random2+1
-        local end4 = random3-1
-        if( end2 > _myG.blockCount ) then
-            end2 = _myG.blockCount
-        end
-        if( end3 > _myG.blockCount ) then
-            end3 = _myG.blockCount
-        end
-        print( random1,random2,random3 )
-        print( end2,end3,end4 )
         -- set inital positions
         transition.to( _myG.ribbon[1], { time=0, x=blockEnd[random1] + _myG.blockWidth/2 + _myG.blockMargin } )
         transition.to( _myG.ribbon[2], { time=0, x=blockEnd[random2] + _myG.blockWidth/2 + _myG.blockMargin } )
@@ -897,21 +884,26 @@ function scene:create( event )
         transition.to( _myG.ribbon[1], { time=600, alpha=1 } )
         transition.to( _myG.ribbon[2], { time=600, alpha=1 } )
         transition.to( _myG.ribbon[3], { time=600, alpha=1 } )
-        -- begin animation
-        transition.to( _myG.ribbon[1], { delay=700, time=275, x=blockEnd[end1] + _myG.blockWidth/2 + _myG.blockMargin } )
-        timer.performWithDelay( 700, playSwipeFX )
-        transition.to( _myG.ribbon[1], { delay=1400, time=275, x=blockEnd[end2] + _myG.blockWidth/2 + _myG.blockMargin } )
-        timer.performWithDelay( 1400, playSwipeFX )
-        transition.to( _myG.ribbon[2], { delay=2100, time=275, x=blockEnd[end3] + _myG.blockWidth/2 + _myG.blockMargin } )
-        timer.performWithDelay( 2100, playSwipeFX )
-        transition.to( _myG.ribbon[3], { delay=2800, time=275, x=blockEnd[end4] + _myG.blockWidth/2 + _myG.blockMargin } )
-        timer.performWithDelay( 2800, playSwipeFX )
-        -- set ative block values based on post-animation start position
-        _myG.ribbon[1].activeBlock = end2
-        _myG.ribbon[2].activeBlock = end3
-        _myG.ribbon[3].activeBlock = end4
-        timer.performWithDelay( 3100, _myG.startGamePlay )
+        -- set active block values based on post-animation start position
+        _myG.ribbon[1].activeBlock = random1
+        _myG.ribbon[2].activeBlock = random2
+        _myG.ribbon[3].activeBlock = random3
+        timer.performWithDelay( 700, _myG.startGamePlay )
     end
+
+
+    -- COLOR EXPERIMENTS
+    
+    --[[
+    headsA[1]:setFillColor( 1, 1, 0, 1 )
+    headsB[1]:setFillColor( 1, 1, 0, 1 )
+
+    headsA[2]:setFillColor( 1, 0, 1, 1 )
+    headsB[2]:setFillColor( 1, 0, 1, 1 )
+
+    legsA[5]:setFillColor( 1, 0, 1, 1 )
+    legsB[5]:setFillColor( 1, 0, 1, 1 )
+    ]]--
 
 --end scene:create
 end 
