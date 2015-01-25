@@ -43,6 +43,7 @@ local bannerGroup
 local bannerUpY
 local bannerDownY
 local bannerStretchY
+local getMatchParts
 
 local notGobPlayed = "false"
 
@@ -68,6 +69,9 @@ function scene:create( event )
     matchBlocks[1] = 1
     matchBlocks[2] = 1
     matchBlocks[3] = 1
+    _myG.headsMatch.activeBlock = 1
+    _myG.torsoMatch.activeBlock = 1
+    _myG.legsMatch.activeBlock = 1
 
     _myG.introComplete = "false"
     local bannerState = "up"
@@ -80,7 +84,7 @@ function scene:create( event )
     local goblinText = display.newText( "", display.contentCenterX, 985, native.systemFont, 30 )  
     local activeText = display.newText( "UI Active: " .. _myG.uiActive, display.contentCenterX, 950, native.systemFont, 30 ) 
 
-    local matchBlocksText = display.newText( "Match these: " .. matchBlocks[1] .. ", " .. matchBlocks[2] .. ", " .. matchBlocks[3], display.contentCenterX, 20, native.systemFont, 30 )
+    local matchBlocksText = display.newText( "Match these: " .. _myG.headsMatch.activeBlock .. ", " .. _myG.torsoMatch.activeBlock .. ", " .. _myG.legsMatch.activeBlock, display.contentCenterX, 20, native.systemFont, 30 )
     _myG.activeRibbonsText = display.newText( "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock, display.contentCenterX, 60, native.systemFont, 30 )
 
     sceneGroup:insert( goblinText )
@@ -90,7 +94,7 @@ function scene:create( event )
 
     goblinText.isVisible = false
     activeText.isVisible = false
-    matchBlocksText.isVisible = false
+    --matchBlocksText.isVisible = false
     _myG.activeRibbonsText.isVisible = false
 
     -- UI on/off functions
@@ -310,6 +314,7 @@ function scene:create( event )
 
     local function clickHome( event )
         if( settingsActive == "true" ) then
+            composer.removeScene( "goblin-slider" )
             composer.gotoScene( "start-screen" )
         end
         return true
@@ -336,34 +341,6 @@ function scene:create( event )
         end
         return true
     end
-
-    --[[
-    local function swipeArrow( event )
-        if ( event.phase == "began" ) then
-            display.getCurrentStage():setFocus( event.target )
-            event.target.isFocus = true
-            startY = event.y
-            startTime = event.time
-        elseif ( event.target.isFocus ) then
-            if( event.phase == "moved") then
-                endY = event.y
-            elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
-                endY = event.y
-                endTime = event.time
-                display.getCurrentStage():setFocus( nil )
-                event.target.isFocus = false
-                local totalTime = endTime - startTime
-                if( startY== endY ) then
-                    -- this is a tap
-                    clickArrow()
-                elseif ( totalTime < 200 ) and ( startY ~= endY ) then
-                    clickArrow()
-                end
-            end
-        end
-        return true
-    end
-    ]]--
 
     arrowBtn:addEventListener( "touch", clickArrow )
     homeBtn:addEventListener( "tap", clickHome )
@@ -398,98 +375,52 @@ function scene:create( event )
 
     -- Add goblin match pieces to banner
 
-    local headMatch
-    local headMatchSheetInfo
-    local headMatchSheet
-    local headMatchFrames
+    local matchGroup = display.newGroup()
 
-    local torsoMatch
-    local torsoMatchSheetInfo
-    local torsoMatchSheet
-    local torsoMatchFrames
+    function getMatchParts()
 
-    local legMatch
-    local legMatchSheetInfo
-    local legMatchSheet
-    local legMatchFrames
-
-    local function getMatchParts()
-        -- Generate head
-        local matchNumber = math.random( _myG.blockCount )
-        matchBlocks[1] = matchNumber
-        --if ( matchNumber <= 10 ) then
-            -- if random number is within range of first sheet...
-            headMatchSheetInfo = require("heads-sheet")
-            headMatchSheet = graphics.newImageSheet( "images/heads.png", headMatchSheetInfo:getSheet() )
-            headMatchFrames = { start=1, count=10 }
-            headMatch = display.newSprite( headMatchSheet, headMatchFrames )
-            headMatch:setFrame( matchNumber )
-        --[[
-        else
-            -- else use the second sheet tp pick up where we left off
-            headMatchSheetInfo = require("heads-sheet-2")
-            headMatchSheet = graphics.newImageSheet( "images/heads-2.png", headMatchSheetInfo:getSheet() )
-            headMatchFrames = { start=1, count=1 }
-            headMatch = display.newSprite( headMatchSheet, headMatchFrames )
-            headMatch:setFrame( matchNumber-9 )
+        -- LEGS
+        local r1 = math.random( _myG.blockCount )
+        _myG.legsMatch.activeBlock = r1
+        for i=1, _myG.blockCount do
+            _myG.legsMatch[i].isVisible = false
         end
-        ]]--
+        _myG.legsMatch[r1].isVisible = true
+        matchGroup:insert( _myG.legsMatch[r1] )
 
-        -- Generate torso
-        matchNumber = math.random( _myG.blockCount )
-        matchBlocks[2] = matchNumber
-        if ( matchNumber <= 6 ) then
-            -- if random number is within range of first sheet...
-            torsoMatchSheetInfo = require("torso-sheet-1")
-            torsoMatchSheet = graphics.newImageSheet( "images/torso-1.png", torsoMatchSheetInfo:getSheet() )
-            torsoMatchFrames = { start=1, count=6 }
-            torsoMatch = display.newSprite( torsoMatchSheet, torsoMatchFrames )
-            torsoMatch:setFrame( matchNumber )
-        else
-            -- else use the second sheet tp pick up where we left off
-            torsoMatchSheetInfo = require("torso-sheet-2")
-            torsoMatchSheet = graphics.newImageSheet( "images/torso-2.png", torsoMatchSheetInfo:getSheet() )
-            torsoMatchFrames = { start=1, count=4 }
-            torsoMatch = display.newSprite( torsoMatchSheet, torsoMatchFrames )
-            torsoMatch:setFrame( matchNumber-6 )
+        -- TORSO
+        local r2 = math.random( _myG.blockCount )
+        _myG.torsoMatch.activeBlock = r2
+        for i=1, _myG.blockCount do
+            _myG.torsoMatch[i].isVisible = false
         end
+        _myG.torsoMatch[r2].isVisible = true
+        matchGroup:insert( _myG.torsoMatch[r2] )
 
-        -- Generate legs
-        matchNumber = math.random( _myG.blockCount )
-        matchBlocks[3] = matchNumber
-        if ( matchNumber <= 6 ) then
-            -- if random number is within range of first sheet...
-            legMatchSheetInfo = require("legs-sheet-1")
-            legMatchSheet = graphics.newImageSheet( "images/legs-1.png", legMatchSheetInfo:getSheet() )
-            legMatchFrames = { start=1, count=6 }
-            legMatch = display.newSprite( legMatchSheet, legMatchFrames )
-            legMatch:setFrame( matchNumber )
-        else
-            -- else use the second sheet tp pick up where we left off
-            legMatchSheetInfo = require("legs-sheet-2")
-            legMatchSheet = graphics.newImageSheet( "images/legs-2.png", legMatchSheetInfo:getSheet() )
-            legMatchFrames = { start=1, count=4 }
-            legMatch = display.newSprite( legMatchSheet, legMatchFrames )
-            legMatch:setFrame( matchNumber-6 )
+        -- HEAD
+        local r3 = math.random( _myG.blockCount )
+        _myG.headsMatch.activeBlock = r3
+        for i=1, _myG.blockCount do
+            _myG.headsMatch[i].isVisible = false
         end
+        _myG.headsMatch[r3].isVisible = true
+        matchGroup:insert( _myG.headsMatch[r3] )
+
+        -- assign Y values now that objects have been created
+
+        _myG.headsMatch[r3].y = 385*mW
+        _myG.torsoMatch[r2].y = 675*mW
+        _myG.legsMatch[r1].y = 850*mW
+
+        -- debug
+        matchBlocksText.text = "Match these: " .. _myG.headsMatch.activeBlock .. ", " .. _myG.torsoMatch.activeBlock .. ", " .. _myG.legsMatch.activeBlock
     end
 
     -- generate intial values
 
-    getMatchParts()
-
-    -- assign Y values now that objects have been created
-
-    headMatch.y = 385*mW
-    torsoMatch.y = 675*mW
-    legMatch.y = 850*mW
+    --getMatchParts()
 
     local mScale = 0.83 
-
-    local matchGroup = display.newGroup()
-    matchGroup:insert( legMatch )
-    matchGroup:insert( torsoMatch )
-    matchGroup:insert( headMatch )
     matchGroup:scale( mScale, mScale )
 
     bannerGroup = display.newGroup()
@@ -789,7 +720,7 @@ function scene:create( event )
     local function signCompare( event )
         if ( _myG.uiActive == "true" ) and ( _myG.introComplete == "true" ) then
             uiActiveFalse()
-            if matchBlocks[1] == _myG.ribbon[1].activeBlock and matchBlocks[2] == _myG.ribbon[2].activeBlock and matchBlocks[3] == _myG.ribbon[3].activeBlock then
+            if _myG.headsMatch.activeBlock == _myG.ribbon[1].activeBlock and _myG.torsoMatch.activeBlock == _myG.ribbon[2].activeBlock and _myG.legsMatch.activeBlock == _myG.ribbon[3].activeBlock then
                 -- if we have a match, don't lower the banner. Play victory animation.
                 signSpinToCheck()
                 timer.performWithDelay( 700, audioThatsMyGoblin )
@@ -821,7 +752,7 @@ function scene:create( event )
                 signIsUp = true
             end
             -- else do our comparison
-            if matchBlocks[1] == _myG.ribbon[1].activeBlock and matchBlocks[2] == _myG.ribbon[2].activeBlock and matchBlocks[3] == _myG.ribbon[3].activeBlock then
+            if _myG.headsMatch.activeBlock == _myG.ribbon[1].activeBlock and _myG.torsoMatch.activeBlock == _myG.ribbon[2].activeBlock and _myG.legsMatch.activeBlock == _myG.ribbon[3].activeBlock then
                 -- if we have a match, don't lower the banner. Play victory animation.
                 timer.performWithDelay( 400, signSpinToCheck )
                 timer.performWithDelay( 1100, audioThatsMyGoblin )
@@ -968,6 +899,9 @@ function scene:show( event )
 
     if ( event.phase == "will" ) then
         -- Called when the scene is still off screen (but is about to come on screen).
+
+        getMatchParts()
+
         signIsUp = "false"
         transition.to( signSprite, { time=0, y=cH+100*mW })
         transition.to( uiShader2, { time=0, alpha=0 })

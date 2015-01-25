@@ -8,6 +8,9 @@
 -- local sprite = display.newSprite( myImageSheet , {frames={sheetInfo:getFrameIndex("sprite")}} )
 --
 
+local cW = display.contentWidth
+local mW = 0.0013022*cW
+
 local SheetInfo = {}
 
 SheetInfo.sheet =
@@ -16,92 +19,92 @@ SheetInfo.sheet =
     
         {
             -- legs-bermuda
-            x=2,
-            y=656,
-            width=326,
-            height=349,
+            x=2*mW,
+            y=656*mW,
+            width=326*mW,
+            height=349*mW,
 
-            sourceX = 92,
-            sourceY = 24,
-            sourceWidth = 512,
-            sourceHeight = 396
+            sourceX = 92*mW,
+            sourceY = 24*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 396*mW
         },
         {
             -- legs-buccaneer
-            x=708,
-            y=656,
-            width=312,
-            height=363,
+            x=708*mW,
+            y=656*mW,
+            width=312*mW,
+            height=363*mW,
 
-            sourceX = 96,
-            sourceY = 1,
-            sourceWidth = 512,
-            sourceHeight = 396
+            sourceX = 96*mW,
+            sourceY = 1*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 396*mW
         },
         {
             -- legs-dancer
-            x=269,
-            y=323,
-            width=480,
-            height=331,
+            x=269*mW,
+            y=323*mW,
+            width=480*mW,
+            height=331*mW,
 
-            sourceX = 17,
-            sourceY = 46,
-            sourceWidth = 512,
-            sourceHeight = 396
+            sourceX = 17*mW,
+            sourceY = 46*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 396*mW
         },
         {
             -- legs-prisoner
-            x=330,
-            y=656,
-            width=376,
-            height=363,
+            x=330*mW,
+            y=656*mW,
+            width=376*mW,
+            height=363*mW,
 
-            sourceX = 97,
-            sourceY = 16,
-            sourceWidth = 512,
-            sourceHeight = 396
+            sourceX = 97*mW,
+            sourceY = 16*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 396*mW
         },
         {
             -- legs-wizard-color
-            x=415,
-            y=2,
-            width=369,
-            height=319,
+            x=415*mW,
+            y=2*mW,
+            width=369*mW,
+            height=319*mW,
 
-            sourceX = 114,
-            sourceY = 44,
-            sourceWidth = 512,
-            sourceHeight = 396
+            sourceX = 114*mW,
+            sourceY = 44*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 396*mW
         },
         {
             -- legs-wizard
-            x=2,
-            y=2,
-            width=411,
-            height=293,
+            x=2*mW,
+            y=2*mW,
+            width=411*mW,
+            height=293*mW,
 
-            sourceX = 63,
-            sourceY = 76,
-            sourceWidth = 512,
-            sourceHeight = 396
+            sourceX = 63*mW,
+            sourceY = 76*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 396*mW
         },
         {
             -- legs-yeehaw
-            x=2,
-            y=297,
-            width=265,
-            height=343,
+            x=2*mW,
+            y=297*mW,
+            width=265*mW,
+            height=343*mW,
 
-            sourceX = 130,
-            sourceY = 18,
-            sourceWidth = 512,
-            sourceHeight = 396
+            sourceX = 130*mW,
+            sourceY = 18*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 396*mW
         },
     },
     
-    sheetContentWidth = 1024,
-    sheetContentHeight = 1024
+    sheetContentWidth = 1024*mW,
+    sheetContentHeight = 1024*mW
 }
 
 SheetInfo.frameIndex =

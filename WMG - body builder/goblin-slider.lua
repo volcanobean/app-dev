@@ -18,7 +18,14 @@ local mW = 0.0013022*cW
 -- Begin global settings
 -- Block and ribbon values. Adjust as needed
 
-_myG.blockCount = 10
+if( _myG.difficulty == "easy" ) then
+    _myG.blockCount = 10
+elseif( _myG.difficulty == "medium" ) then
+    _myG.blockCount = 20
+elseif( _myG.difficulty == "hard" ) then
+    _myG.blockCount = 30
+end
+
 _myG.blockWidth = 512*mW
 _myG.blockMargin = 120*mW
 
@@ -30,6 +37,9 @@ _myG.ribbonY1 = display.contentCenterY-(287*mW) --225
 _myG.ribbonY2 = display.contentCenterY+(8*mW) --520
 _myG.ribbonY3 = display.contentCenterY+(178*mW) --690
 
+local randomizeHeads
+local randomizeTorso
+local randomizeLegs
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
@@ -50,6 +60,7 @@ function scene:create( event )
     -- This table is in my globals so it can be accessed by other scenes
 
     _myG.ribbon = {}
+    _myG.matchBlocks = {}
 
     local ribbonX = (display.contentWidth - _myG.blockWidth)*0.5 - _myG.blockMargin
     local ribbonStartX = ribbonX -- store starting X value for future reference
@@ -58,7 +69,7 @@ function scene:create( event )
     local blockRegion = "center"
     local activeRibbon = 1
     local activeBlockSnap = ribbonX
-    -- local activeBlockText = display.newText( "ARibbon: " .. activeRibbon .. ", ABlock: 1, Region: " .. blockRegion, display.contentCenterX, 50, native.systemFont, 30 )
+    local activeBlockText = display.newText( "ARibbon: " .. activeRibbon .. ", ABlock: 1, Region: " .. blockRegion, display.contentCenterX, 50, native.systemFont, 30 )
     -- sceneGroup:insert( activeBlockText )
 
     -- duplicate image blocks for the purpose of x pos swapping to simulate loop
@@ -148,7 +159,7 @@ function scene:create( event )
             end
             blockRegion = "right"
             -- debug
-            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+            activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
         
         -- if we're to the left of the main blocks (positive x pos)
         elseif( currentX > (ribbonStartX + _myG.blockWidth*0.5)) then
@@ -165,7 +176,7 @@ function scene:create( event )
             end
             blockRegion = "left"
             -- debug
-            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+            activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
 
         -- if x pos is in the main block area
         else
@@ -182,7 +193,7 @@ function scene:create( event )
             end
             blockRegion = "center"
             -- debug
-            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+            activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
         end
         --print ( blockRegion )
     end
@@ -419,15 +430,6 @@ function scene:create( event )
         return true
     end
 
-    --[[
-    local gearBlock = display.newRect( 0, display.contentHeight, 125*mW, 400*mW )
-    gearBlock.anchorX = 0
-    gearBlock.anchorY = 1
-    if ( _myG.adsLoaded == "true" ) then
-        gearBlock.y = display.contentHeight-(91*mW)
-    end
-    ]]--
-
     local signBlock = display.newRect( display.contentWidth, display.contentHeight, 250*mW, 200*mW )
     signBlock.anchorX = 1
     signBlock.anchorY = 1
@@ -435,12 +437,9 @@ function scene:create( event )
         signBlock.y = display.contentHeight-(91*mW)
     end
 
-    --sceneGroup:insert( gearBlock )
     sceneGroup:insert( signBlock )
 
-    --gearBlock:addEventListener( "touch", blockHits )
     signBlock:addEventListener( "touch", blockHits )
-
 
     -- We render the background image after the hit area so it is stacked on top, hiding the hit area.
     
@@ -676,8 +675,8 @@ function scene:create( event )
         return true
     end
 
-    --local waveBtn = display.newText( "YAAAA!!!", display.contentCenterX, 150, native.systemFont, 50 ) 
-    --waveBtn:addEventListener( "tap", _myG.yayGoblins )
+    --local waveBtC = display.newText( "YAAAA!!!", display.contentCenterX, 150, native.systemFont, 50 ) 
+    --waveBtC:addEventListener( "tap", _myG.yayGoblins )
     
     -- Extra bushes to hide cheering goblins at game end. 
 
@@ -697,12 +696,15 @@ function scene:create( event )
     --bushLeft.isVisible = false
     --bushRight.isVisible = false
 
-
     local uiShader = display.newImageRect( "images/ui-shader.png", display.contentWidth, 403*mW )
     uiShader.anchorY = 1
     uiShader.x = display.contentCenterX
     uiShader.y = cH
     sceneGroup:insert( uiShader )
+
+-- ----------------------------------------------------------------
+-- RIBBONS
+-- ----------------------------------------------------------------
 
     -- Create scrollable ribbon group (last one shows up on top, so we display legs, then body, the head)
 
@@ -726,43 +728,6 @@ function scene:create( event )
     _myG.ribbon[1].id = 1
     _myG.ribbon[1].activeBlock = 1
     sceneGroup:insert( _myG.ribbon[1] )
-
-    -- Image sheets for body parts
-
-    local headCount = 10
-    local headSheetInfo = require("heads-sheet")
-    local headSheet = graphics.newImageSheet( "images/heads.png", headSheetInfo:getSheet() )
-    local headFrames = { start=1, count=headCount }
-
-    local torsoCount = 6
-    local torsoSheetInfo = require("torso-sheet-1")
-    local torsoSheet = graphics.newImageSheet( "images/torso-1.png", torsoSheetInfo:getSheet() )
-    local torsoFrames =  { start=1, count=torsoCount }
-
-    local torso2Count = 4
-    local torso2SheetInfo = require("torso-sheet-2")
-    local torso2Sheet = graphics.newImageSheet( "images/torso-2.png", torso2SheetInfo:getSheet() )
-    local torso2Frames =  { start=1, count=torso2Count }
-
-    --[[
-    local legCount = 6
-    local legSheetInfo = require("legs-sheet-1")
-    local legSheet = graphics.newImageSheet( "images/legs-1.png", legSheetInfo:getSheet() )
-    local legFrames =  { start=1, count=legCount }
-
-    local leg2Count = 4
-    local leg2SheetInfo = require("legs-sheet-2")
-    local leg2Sheet = graphics.newImageSheet( "images/legs-2.png", leg2SheetInfo:getSheet() )
-    local leg2Frames =  { start=1, count=leg2Count }
-    ]]--
-
-    local legsSheetInfo = require("legs-sheet-1")
-    local legsSheet = graphics.newImageSheet( "images/legs-1.png", legsSheetInfo:getSheet() )
-    local legsFrames =  { start=1, count=7 }
-
-    local legsSheetInfo2 = require("legs-sheet-2")
-    local legsSheet2 = graphics.newImageSheet( "images/legs-2.png", legsSheetInfo2:getSheet() )
-    local legsFrames2 =  { start=1, count=4 }
 
     -- block groups inside scroll group
 
@@ -790,230 +755,484 @@ function scene:create( event )
     _myG.ribbon[3]:insert( blockGroupB[3] )
     blockGroupB[3].x = -blockGroupWidth
 
+-- ----------------------------------------------------------------
+-- HEADS
+-- ----------------------------------------------------------------
 
+    local headsSheetInfo = require("heads-sheet")
+    local headsSheet = graphics.newImageSheet( "images/heads.png", headsSheetInfo:getSheet() )
+    local headsFrames = { start=1, count=10 }
+
+    local headsArray
     local headsA = {}
-    for i=1, _myG.blockCount do
-        headsA[i] = display.newSprite( headSheet, headFrames )
-        headsA[i]:setFrame(i)
-        headsA[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth*0.5 
-        blockGroupA[1]:insert( headsA[i] )
-    end
-
     local headsB = {}
-    for i=1, _myG.blockCount do
-        --if ( i <= headCount ) then
-            -- use the first head sprite sheet
-            headsB[i] = display.newSprite( headSheet, headFrames )
-            headsB[i]:setFrame(i)
-            --[[
-        else
-            -- use the second head sprite sheet
-            headsB[i] = display.newSprite( head2Sheet, head2Frames )
-            headsB[i]:setFrame(i-headCount)
+    _myG.headsMatch = {}
+
+    -- Array to generate 1-10 digits for randomization
+        
+    local t1 = {}
+    for i = 1, _myG.blockCount do
+        t1[i] = i
+    end
+
+    function randomizeHeads()
+
+        -- Randomize array for use in shuffling the order of leg sprites as they are generated.
+        
+        for i = _myG.blockCount, 2, -1 do -- backwards
+            local r1 = math.random(i) -- select a random number between 1 and i
+            t1[i], t1[r1] = t1[r1], t1[i] -- swap the randomly selected item to position i
         end
-        ]]--
-        headsB[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth*0.5
-        blockGroupB[1]:insert( headsB[i] )
-    end
 
-    local torsoA = {}
-    for i=1, _myG.blockCount do
-        if ( i <= torsoCount ) then
-            torsoA[i] = display.newSprite( torsoSheet, torsoFrames )
-            torsoA[i]:setFrame(i)
-        else
-            torsoA[i] = display.newSprite( torso2Sheet, torso2Frames )
-            torsoA[i]:setFrame(i-torsoCount)
-        end
-        torsoA[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth*0.5
-        blockGroupA[2]:insert( torsoA[i] )
-    end
-
-    local torsoB = {}
-    for i=1, _myG.blockCount do
-        if ( i <= torsoCount ) then
-            torsoB[i] = display.newSprite( torsoSheet, torsoFrames )
-            torsoB[i]:setFrame(i)
-        else
-            torsoB[i] = display.newSprite( torso2Sheet, torso2Frames )
-            torsoB[i]:setFrame(i-torsoCount)
-        end
-        torsoB[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth*0.5
-        blockGroupB[2]:insert( torsoB[i] )
-    end
-
-    --[[
-    local legsA = {}
-    for i=1, _myG.blockCount do
-        if ( i <= legCount ) then
-            legsA[i] = display.newSprite( legSheet, legFrames )
-            legsA[i]:setFrame(i)
-        else
-            legsA[i] = display.newSprite( leg2Sheet, leg2Frames )
-            legsA[i]:setFrame(i-legCount)
-        end
-        legsA[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth*0.5
-        blockGroupA[3]:insert( legsA[i] )
-    end
-
-    local legsB = {}
-    for i=1, _myG.blockCount do
-        if ( i <= legCount ) then
-            legsB[i] = display.newSprite( legSheet, legFrames )
-            legsB[i]:setFrame(i)
-        else
-            legsB[i] = display.newSprite( leg2Sheet, leg2Frames )
-            legsB[i]:setFrame(i-legCount)
-        end
-        legsB[i].x = (( _myG.blockMargin + _myG.blockWidth ) * i) - _myG.blockWidth*0.5
-        blockGroupB[3]:insert( legsB[i] )
-    end
-    ]]--
-
-    local legsA = {}
-    local legsB = {}
-    local legCount = 10
-    local legsI
-    local blocksI
-
-    -- Create our sprites and populate our tables
-
-    local t = {}
-    for i = 1, legCount do
-        t[i] = i
-    end
-
-    for i = legCount, 2, -1 do -- backwards
-        local r = math.random(i) -- select a random number between 1 and i
-        t[i], t[r] = t[r], t[i] -- swap the randomly selected item to position i
-    end
-
-    for i=1, 2 do
+        -- Generate leg sprites.
         -- We need to run all this code twice to create duplicate groups for the purpose of allowing our ribbons to loop
-        if i == 1 then
-            legsI = legsA
-        elseif i == 2 then
-            legsI = legsB
+            
+        for i=1, 3 do
+            if i == 1 then
+                headsArray = headsA
+            elseif i == 2 then
+                headsArray = headsB
+            elseif i == 3 then
+                headsArray = _myG.headsMatch
+            end
+
+            -- total part count will vary based on difficulty level, so we determine the array number incrementally
+
+            -- head-cheshire
+            local tCount = 1
+            local tC = t1[tCount]
+            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
+            headsArray[tC]:setFrame(1)
+            if( i ~= 3 ) then
+                headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5           
+            end
+            
+            -- head-classic
+            tCount = tCount+1; tC = t1[tCount]
+            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
+            headsArray[tC]:setFrame(2)
+            if( i ~= 3 ) then
+                headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- head-fool
+            tCount = tCount+1; tC = t1[tCount]
+            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
+            headsArray[tC]:setFrame(3)
+            if( i ~= 3 ) then
+                headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- head-gentleman
+            tCount = tCount+1; tC = t1[tCount]
+            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
+            headsArray[tC]:setFrame(4)
+            if( i ~= 3 ) then
+                headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- head-goggles
+            tCount = tCount+1; tC = t1[tCount]
+            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
+            headsArray[tC]:setFrame(5)
+            if( i ~= 3 ) then
+                headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- head-grump
+            tCount = tCount+1; tC = t1[tCount]
+            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
+            headsArray[tC]:setFrame(6)
+            if( i ~= 3 ) then
+                headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- head-helmet
+            tCount = tCount+1; tC = t1[tCount]
+            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
+            headsArray[tC]:setFrame(7)
+            if( i ~= 3 ) then
+                headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- head-hood
+            tCount = tCount+1; tC = t1[tCount]
+            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
+            headsArray[tC]:setFrame(8)
+            if( i ~= 3 ) then
+                headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- head-skicap
+            tCount = tCount+1; tC = t1[tCount]
+            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
+            headsArray[tC]:setFrame(9)
+            if( i ~= 3 ) then
+                headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- head-tongue
+            tCount = tCount+1; tC = t1[tCount]
+            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
+            headsArray[tC]:setFrame(10)
+            if( i ~= 3 ) then
+                headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- include bonus parts based on difficulty level
+
+            --if ( _myG.difficulty ~= "easy" ) then
+                -- parts here
+            --end
+
+            -- if ( _myG.difficulty == "hard" ) then
+                --parts here
+            --end
+
         end
 
-        -- total leg count will vary based on other game data like skill level, so we determine the array number incrementally
-        -- if a leg is not included in a certain level, the incrementing will still allow the array to build out correctly
+        -- Add shuffled legs to block group
 
-        -- legs-bermuda
-        local tV = 1
-        local tN = t[tV]
+        for i=1, _myG.blockCount do
+            blockGroupA[1]:insert( headsA[i] )
+            blockGroupB[1]:insert( headsB[i] )
+        end
 
-        legsI[tN] = display.newSprite( legsSheet, legsFrames )
-        legsI[tN]:setFrame(1)
-        legsI[tN].x = (( _myG.blockMargin + _myG.blockWidth ) * tN ) - _myG.blockWidth*0.5           
+    end -- end randomize function
 
-        -- legs-buccaneer
-        tV = tV+1; tN = t[tV]
-        legsI[tN] = display.newSprite( legsSheet, legsFrames )
-        legsI[tN]:setFrame(2)
-        legsI[tN].x = (( _myG.blockMargin + _myG.blockWidth ) * tN ) - _myG.blockWidth*0.5
+-- ----------------------------------------------------------------
+-- TORSO
+-- ----------------------------------------------------------------
 
-        -- legs-dancer
-        tV = tV+1; tN = t[tV]
-        legsI[tN] = display.newSprite( legsSheet, legsFrames )
-        legsI[tN]:setFrame(3)
-        legsI[tN].x = (( _myG.blockMargin + _myG.blockWidth ) * tN ) - _myG.blockWidth*0.5
+    local torsoSheetInfo = require("torso-sheet-1")
+    local torsoSheet = graphics.newImageSheet( "images/torso-1.png", torsoSheetInfo:getSheet() )
+    local torsoFrames =  { start=1, count=6 }
 
-        -- legs-prisoner
-        tV = tV+1; tN = t[tV]
-        legsI[tN] = display.newSprite( legsSheet, legsFrames )
-        legsI[tN]:setFrame(4)
-        legsI[tN].x = (( _myG.blockMargin + _myG.blockWidth ) * tN ) - _myG.blockWidth*0.5
+    local torsoSheetInfo2 = require("torso-sheet-2")
+    local torsoSheet2 = graphics.newImageSheet( "images/torso-2.png", torsoSheetInfo2:getSheet() )
+    local torsoFrames2 =  { start=1, count=4 }
 
-        -- legs-wizard - original (blue)
-        local legsWizardBase = display.newSprite( legsSheet, legsFrames )
-        legsWizardBase:setFrame(6)
+    local torsoArray
+    local torsoA = {}
+    local torsoB = {}
+    _myG.torsoMatch = {}
 
-        local legsWizardColor = display.newSprite( legsSheet, legsFrames )
-        legsWizardColor:setFrame(5)
-
-        tV = tV+1; tN = t[tV]
-        legsI[tN] = display.newGroup()
-        legsI[tN]:insert( legsWizardColor )
-        legsI[tN]:insert( legsWizardBase )
-        legsI[tN].x = (( _myG.blockMargin + _myG.blockWidth ) * tN ) - _myG.blockWidth*0.5
-
-        -- legs-wizard - green
-        local legsWizardBase2 = display.newSprite( legsSheet, legsFrames )
-        legsWizardBase2:setFrame(6)
-
-        local legsWizardColor2 = display.newSprite( legsSheet, legsFrames )
-        legsWizardColor2:setFrame(5)
-        legsWizardColor2:setFillColor( 0, 1, 0, 1 ) -- green
-
-        tV = tV+1; tN = t[tV]
-        legsI[tN] = display.newGroup()
-        legsI[tN]:insert( legsWizardColor2 )
-        legsI[tN]:insert( legsWizardBase2 )
-        legsI[tN].x = (( _myG.blockMargin + _myG.blockWidth ) * tN ) - _myG.blockWidth*0.5
-
-        -- legs-yeehaw
-        tV = tV+1; tN = t[tV]
-        legsI[tN] = display.newSprite( legsSheet, legsFrames )
-        legsI[tN]:setFrame(7)
-        legsI[tN].x = (( _myG.blockMargin + _myG.blockWidth ) * tN ) - _myG.blockWidth*0.5
-
-        -- legs-bigfoot
-        tV = tV+1; tN = t[tV]
-        legsI[tN] = display.newSprite( legsSheet2, legsFrames2 )
-        legsI[tN]:setFrame(1)
-        legsI[tN].x = (( _myG.blockMargin + _myG.blockWidth ) * tN ) - _myG.blockWidth*0.5
-
-        -- legs-kilt
-        tV = tV+1; tN = t[tV]
-        legsI[tN] = display.newSprite( legsSheet2, legsFrames2 )
-        legsI[tN]:setFrame(2)
-        legsI[tN].x = (( _myG.blockMargin + _myG.blockWidth ) * tN ) - _myG.blockWidth*0.5
-
-        -- legs-knight
-        tV = tV+1; tN = t[tV]
-        legsI[tN] = display.newSprite( legsSheet2, legsFrames2 )
-        legsI[tN]:setFrame(3)
-        legsI[tN].x = (( _myG.blockMargin + _myG.blockWidth ) * tN ) - _myG.blockWidth*0.5
-
-        --[[
-        -- legs-traveler
-        tV = tV+1; tN = t[tV]
-        legsI[tN] = display.newSprite( legsSheet2, legsFrames2 )
-        legsI[tN]:setFrame(4)
-        legsI[tN].x = (( _myG.blockMargin + _myG.blockWidth ) * tN ) - _myG.blockWidth*0.5
-        ]]--
+    -- Array to generate 1-10 digits for randomization
+    
+    local t2 = {}
+    for i = 1, _myG.blockCount do
+        t2[i] = i
     end
 
-    -- Add shuffled legs to block group
+    function randomizeTorso()
 
-    for i=1, legCount do
-        blockGroupA[3]:insert( legsA[i] )
-        blockGroupB[3]:insert( legsB[i] )
+        -- Randomize array for use in shuffling the order of leg sprites as they are generated.
+        
+        for i = _myG.blockCount, 2, -1 do -- backwards
+            local r2 = math.random(i) -- select a random number between 1 and i
+            t2[i], t2[r2] = t2[r2], t2[i] -- swap the randomly selected item to position i
+        end
+
+        -- Generate leg sprites.
+        -- We need to run all this code twice to create duplicate groups for the purpose of allowing our ribbons to loop
+            
+        for i=1, 3 do
+            if i == 1 then
+                torsoArray = torsoA
+            elseif i == 2 then
+                torsoArray = torsoB
+            elseif i == 3 then
+                torsoArray = _myG.torsoMatch
+            end
+
+            -- total part count will vary based on difficulty level, so we determine the array number incrementally
+
+            -- torso-chef
+            local tCount = 1
+            local tC = t2[tCount]
+            torsoArray[tC] = display.newSprite( torsoSheet, torsoFrames )
+            torsoArray[tC]:setFrame(1)
+            if( i ~= 3 ) then
+                torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5           
+            end
+
+            -- torso-druid
+            tCount = tCount+1; tC = t2[tCount]
+            torsoArray[tC] = display.newSprite( torsoSheet, torsoFrames )
+            torsoArray[tC]:setFrame(2)
+            if( i ~= 3 ) then
+                torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- torso-hoodie
+            tCount = tCount+1; tC = t2[tCount]
+            torsoArray[tC] = display.newSprite( torsoSheet, torsoFrames )
+            torsoArray[tC]:setFrame(3)
+            if( i ~= 3 ) then
+                torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+           -- torso-loon
+            tCount = tCount+1; tC = t2[tCount]
+            torsoArray[tC] = display.newSprite( torsoSheet, torsoFrames )
+            torsoArray[tC]:setFrame(4)
+            if( i ~= 3 ) then
+                torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+           -- torso-suit
+            tCount = tCount+1; tC = t2[tCount]
+            torsoArray[tC] = display.newSprite( torsoSheet, torsoFrames )
+            torsoArray[tC]:setFrame(5)
+            if( i ~= 3 ) then
+                torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+           -- torso-traveler
+            tCount = tCount+1; tC = t2[tCount]
+            torsoArray[tC] = display.newSprite( torsoSheet, torsoFrames )
+            torsoArray[tC]:setFrame(6)
+            if( i ~= 3 ) then
+                torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+           -- torso-bomb
+            tCount = tCount+1; tC = t2[tCount]
+            torsoArray[tC] = display.newSprite( torsoSheet2, torsoFrames2 )
+            torsoArray[tC]:setFrame(1)
+            if( i ~= 3 ) then
+                torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+           -- torso-knight
+            tCount = tCount+1; tC = t2[tCount]
+            torsoArray[tC] = display.newSprite( torsoSheet2, torsoFrames2 )
+            torsoArray[tC]:setFrame(2)
+            if( i ~= 3 ) then
+                torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+           -- torso-napolean
+            tCount = tCount+1; tC = t2[tCount]
+            torsoArray[tC] = display.newSprite( torsoSheet2, torsoFrames2 )
+            torsoArray[tC]:setFrame(3)
+            if( i ~= 3 ) then
+                torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+           -- torso-sweater
+            tCount = tCount+1; tC = t2[tCount]
+            torsoArray[tC] = display.newSprite( torsoSheet2, torsoFrames2 )
+            torsoArray[tC]:setFrame(4)
+            if( i ~= 3 ) then
+                torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- include bonus parts based on difficulty level
+
+            --if ( _myG.difficulty ~= "easy" ) then
+                -- parts here
+            --end
+
+            -- if ( _myG.difficulty == "hard" ) then
+                --parts here
+            --end
+
+        end
+
+        -- Add shuffled legs to block group
+
+        for i=1, _myG.blockCount do
+            blockGroupA[2]:insert( torsoA[i] )
+            blockGroupB[2]:insert( torsoB[i] )
+        end
+
+    end -- end randomize function
+
+-- ----------------------------------------------------------------
+-- LEGS
+-- ----------------------------------------------------------------
+
+    local legsSheetInfo = require("legs-sheet-1")
+    local legsSheet = graphics.newImageSheet( "images/legs-1.png", legsSheetInfo:getSheet() )
+    local legsFrames =  { start=1, count=7 }
+
+    local legsSheetInfo2 = require("legs-sheet-2")
+    local legsSheet2 = graphics.newImageSheet( "images/legs-2.png", legsSheetInfo2:getSheet() )
+    local legsFrames2 =  { start=1, count=4 }
+
+    local legsArray
+    local legsA = {}
+    local legsB = {}
+    _myG.legsMatch = {}
+
+    -- Array to generate 1-10 digits for randomization
+    
+    local t3 = {}
+    for i = 1, _myG.blockCount do
+        t3[i] = i
     end
+
+    function randomizeLegs()
+
+        -- Randomize array for use in shuffling the order of leg sprites as they are generated.
+        
+        for i = _myG.blockCount, 2, -1 do -- backwards
+            local r3 = math.random(i) -- select a random number between 1 and i
+            t3[i], t3[r3] = t3[r3], t3[i] -- swap the randomly selected item to position i
+        end
+
+        -- Generate leg sprites.
+        -- We need to run all this code twice to create duplicate groups for the purpose of allowing our ribbons to loop
+            
+        for i=1, 3 do
+            if i == 1 then
+                legsArray = legsA
+            elseif i == 2 then
+                legsArray = legsB
+            elseif i == 3 then
+                legsArray = _myG.legsMatch
+            end
+
+            -- total part count will vary based on difficulty level, so we determine the array number incrementally
+
+            -- legs-bermuda
+            local tCount = 1
+            local tC = t3[tCount]
+            legsArray[tC] = display.newSprite( legsSheet, legsFrames )
+            legsArray[tC]:setFrame(1)
+            if( i ~= 3 ) then
+                legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5           
+            end
+
+            -- legs-buccaneer
+            tCount = tCount+1; tC = t3[tCount]
+            legsArray[tC] = display.newSprite( legsSheet, legsFrames )
+            legsArray[tC]:setFrame(2)
+            if( i ~= 3 ) then
+                legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- legs-dancer
+            tCount = tCount+1; tC = t3[tCount]
+            legsArray[tC] = display.newSprite( legsSheet, legsFrames )
+            legsArray[tC]:setFrame(3)
+            if( i ~= 3 ) then
+                legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- legs-prisoner
+            tCount = tCount+1; tC = t3[tCount]
+            legsArray[tC] = display.newSprite( legsSheet, legsFrames )
+            legsArray[tC]:setFrame(4)
+            if( i ~= 3 ) then
+                legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- legs-wizard - original (blue)
+            local legsWizardBase = display.newSprite( legsSheet, legsFrames )
+            legsWizardBase:setFrame(6)
+
+            local legsWizardColor = display.newSprite( legsSheet, legsFrames )
+            legsWizardColor:setFrame(5)
+
+            tCount = tCount+1; tC = t3[tCount]
+            legsArray[tC] = display.newGroup()
+            legsArray[tC]:insert( legsWizardColor )
+            legsArray[tC]:insert( legsWizardBase )
+            if( i ~= 3 ) then
+                legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- legs-yeehaw
+            tCount = tCount+1; tC = t3[tCount]
+            legsArray[tC] = display.newSprite( legsSheet, legsFrames )
+            legsArray[tC]:setFrame(7)
+            if( i ~= 3 ) then
+                legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- legs-bigfoot
+            tCount = tCount+1; tC = t3[tCount]
+            legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
+            legsArray[tC]:setFrame(1)
+            if( i ~= 3 ) then
+                legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- legs-kilt
+            tCount = tCount+1; tC = t3[tCount]
+            legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
+            legsArray[tC]:setFrame(2)
+            if( i ~= 3 ) then
+                legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- legs-knight
+            tCount = tCount+1; tC = t3[tCount]
+            legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
+            legsArray[tC]:setFrame(3)
+            if( i ~= 3 ) then
+                legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- legs-traveler
+            tCount = tCount+1; tC = t3[tCount]
+            legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
+            legsArray[tC]:setFrame(4)
+            if( i ~= 3 ) then
+                legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- include bonus parts based on difficulty level
+
+            if ( _myG.difficulty ~= "easy" ) then
+                
+                -- legs-wizard - green
+                local legsWizardBase2 = display.newSprite( legsSheet, legsFrames )
+                legsWizardBase2:setFrame(6)
+
+                local legsWizardColor2 = display.newSprite( legsSheet, legsFrames )
+                legsWizardColor2:setFrame(5)
+                legsWizardColor2:setFillColor( 0, 1, 0, 1 ) -- green
+
+                tCount = tCount+1; tC = t3[tCount]
+                legsArray[tC] = display.newGroup()
+                legsArray[tC]:insert( legsWizardColor2 )
+                legsArray[tC]:insert( legsWizardBase2 )
+                if( i ~= 3 ) then
+                    legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+            end
+
+            -- if ( _myG.difficulty == "hard" ) then
+                --parts here
+            --end
+
+        end
+
+        -- Add shuffled legs to block group
+
+        for i=1, _myG.blockCount do
+            blockGroupA[3]:insert( legsA[i] )
+            blockGroupB[3]:insert( legsB[i] )
+        end
+
+    end -- end randomize function
+
+-- ----------------------------------------------------------------
+-- SLIDER
+-- ----------------------------------------------------------------   
 
     -- slider setup for first load
 
     function _myG.loadSlider()
-        -- get random values for start position
-        local random1 = math.random( 1, _myG.blockCount )
-        local random2 = math.random( 1, _myG.blockCount )
-        local random3 = math.random( 2, _myG.blockCount )
-        -- set inital positions
-        transition.to( _myG.ribbon[1], { time=0, x=blockEnd[random1] + _myG.blockWidth/2 + _myG.blockMargin } )
-        transition.to( _myG.ribbon[2], { time=0, x=blockEnd[random2] + _myG.blockWidth/2 + _myG.blockMargin } )
-        transition.to( _myG.ribbon[3], { time=0, x=blockEnd[random3] + _myG.blockWidth/2 + _myG.blockMargin } )
-        --fade in
         transition.to( _myG.ribbon[1], { time=600, alpha=1 } )
         transition.to( _myG.ribbon[2], { time=600, alpha=1 } )
         transition.to( _myG.ribbon[3], { time=600, alpha=1 } )
-        -- set active block values based on post-animation start position
-        _myG.ribbon[1].activeBlock = random1
-        _myG.ribbon[2].activeBlock = random2
-        _myG.ribbon[3].activeBlock = random3
         timer.performWithDelay( 700, _myG.startGamePlay )
     end
-
 
     -- COLOR EXPERIMENTS
     
@@ -1028,10 +1247,7 @@ function scene:create( event )
     legsB[5]:setFillColor( 1, 0, 1, 1 )
     ]]--
 
-    --require( "body-builder" )
-
---end scene:create
-end 
+end --end scene:create
 
 -- "scene:show()"
 function scene:show( event )
@@ -1043,6 +1259,10 @@ function scene:show( event )
         _myG.ribbon[1].alpha=0
         _myG.ribbon[2].alpha=0
         _myG.ribbon[3].alpha=0
+
+        randomizeHeads()
+        randomizeTorso()
+        randomizeLegs()
         
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen

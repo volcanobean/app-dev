@@ -45,6 +45,8 @@ ads.init( adProvider, bannerAppID, adListener )
 
 -- Forward declarations
 
+_myG.difficulty = "easy"
+
 local blackMask 
 local tapGroup
 local playGoblinTheme

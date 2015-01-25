@@ -128,9 +128,6 @@ for i=1, 2 do
 
 end
 
-print( legsA[2] )
-print( legsB[2] )
-
 ---- TORSO
 
 local torsoSheetInfo = require("torso-sheet-1")
