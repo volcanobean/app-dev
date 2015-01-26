@@ -44,18 +44,28 @@ local notGobPlayed = "false"
 function scene:create( event )
     local sceneGroup = self.view
 
-    local gameStartTime = 0
-    local gameEndTime = 0
-    local gameTimeDif = 0
-    local totalTime = 0
-    local totalPeeks = 0
-
     local startX
     local endX
     local startY
     local endY
     local startTime
     local endTime
+    local totalTime = 0
+
+    local gameStartTime = 0
+    local gameEndTime = 0
+    local gameTimeDif = 0
+    local totalPeeks = 0
+    local peeksPar
+    local timePar
+
+    if( _myG.difficulty == "medium" ) then
+        peeksPar = 2
+        timePar = 2400
+    elseif( _myG.difficulty == "hard" ) then
+        peeksPar = 1
+        timePar = 1900
+    end
 
     -- Create table to hold data for goblin match
 
@@ -767,12 +777,13 @@ function scene:create( event )
             if secs < 60 then
                 mySeconds = secs
             end
+            if secs < 10 then
+                mySeconds = "0"..mySeconds
+            end
             myTime = "0:"..mySeconds
         end
-        --return myTime
-        --totalTime = myTime
         timeNumber.text = " " .. myTime
-        print ( "myTime: ", totalTime )
+        print ( "myTime: ", myTime )
     end
 
     local function getGameStats()
@@ -782,6 +793,14 @@ function scene:create( event )
         print( "time: ", gameTimeDif .. " seconds" )
         secsToMins( gameTimeDif )
         peeksNumber.text = " " .. totalPeeks
+        if( _myG.difficulty ~= "easy" ) then
+            if (totalPeeks > peeksPar ) then
+                peeksNumber:setFillColor( 150/255, 50/255, 0, 1 )
+            end
+            if (gameTimeDif > timePar ) then
+                timeNumber:setFillColor( 150/255, 50/255, 0, 1 )
+            end
+        end
         print( "peeks: " .. totalPeeks )
     end
 
@@ -880,11 +899,23 @@ function scene:create( event )
             gearForward()
             compareGoblins()
             if ( _myG.introComplete == "false" ) then
-                bannerStayTimer = timer.performWithDelay( 6000, raiseBanner )
+                if( _myG.difficulty == "easy" ) then
+                    bannerStayTimer = timer.performWithDelay( 6000, raiseBanner )
+                elseif( _myG.difficulty == "medium" ) then
+                    bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
+                elseif( _myG.difficulty == "hard" ) then
+                    bannerStayTimer = timer.performWithDelay( 2000, raiseBanner )
+                end
             else
                 local peekVar = totalPeeks
                 totalPeeks = peekVar+1
-                bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
+                if( _myG.difficulty == "easy" ) then
+                    bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
+                elseif( _myG.difficulty == "medium" ) then
+                    bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
+                elseif( _myG.difficulty == "hard" ) then
+                    bannerStayTimer = timer.performWithDelay( 2500, raiseBanner )
+                end
             end
         end
         return true
