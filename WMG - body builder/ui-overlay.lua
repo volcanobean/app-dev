@@ -28,6 +28,7 @@ local replaySign
 local replayYesBtn
 local replayNoBtn
 local bannerGroup
+local replayShade2
 
 local bannerUpY
 local bannerDownY
@@ -573,7 +574,7 @@ function scene:create( event )
     replayShader:setFillColor( 0, 0, 0, 1 ) 
     sceneGroup:insert( replayShader )
 
-    local replayShade2 = display.newImageRect( sceneGroup, "images/replay-shader.png", cW, 510*mW )
+    replayShade2 = display.newImageRect( sceneGroup, "images/replay-shader.png", cW, 510*mW )
     replayShade2.x = cX
     replayShade2.y = cY+130*mW
 
@@ -697,6 +698,7 @@ function scene:create( event )
         transition.to( replaySign, { time=350, y=50*mW, yScale=1, transition=easing.outSine })
         transition.to( replaySign, { delay=350, time=200, y=0, transition=easing.outSine })
         transition.to( replayShader, { time=300, alpha=0.5 } )
+        transition.to( replayShade2, { time=600, alpha=1 } )
         timer.performWithDelay( 200, replayBtnsOpen )
     end
 
@@ -986,15 +988,14 @@ function scene:show( event )
         transition.to( uiShader2, { time=0, alpha=0 })
 
         transition.to( replayShader, { time=0, alpha=0 })
+        transition.to( replayShade2, { time=0, alpha=0 } )
 
         -- set inital banner values
         transition.to( bannerGroup, { time=0, y=bannerUpY, yScale=0.5 })
 
         -- set inital sign position
-        --[[
         transition.to( replaySign, { time=0, y=-300, yScale=0.5 })
         transition.to( replaySign, { time=1, alpha=0 }) 
-        ]]--
         transition.to( replayYesBtn, { time=0, y=cY-40*mW, yScale=0.25, alpha=0 })
         transition.to( replayNoBtn, { time=0, y=cY-40*mW, yScale=0.25, alpha=0 })
         
