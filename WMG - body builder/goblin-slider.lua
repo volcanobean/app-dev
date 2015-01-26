@@ -1,12 +1,9 @@
 ---------------------------------------------------------------------------------
---
 -- goblin-slider.lua
---
 ---------------------------------------------------------------------------------
 
 local composer = require( "composer" )
 local scene = composer.newScene()
-
 local _myG = composer.myGlobals
 
 local cW = display.contentWidth
@@ -21,9 +18,9 @@ local mW = 0.0013022*cW
 if( _myG.difficulty == "easy" ) then
     _myG.blockCount = 10
 elseif( _myG.difficulty == "medium" ) then
-    _myG.blockCount = 20
+    _myG.blockCount = 10
 elseif( _myG.difficulty == "hard" ) then
-    _myG.blockCount = 30
+    _myG.blockCount = 10
 end
 
 _myG.blockWidth = 512*mW
@@ -41,12 +38,9 @@ local randomizeHeads
 local randomizeTorso
 local randomizeLegs
 
--- -----------------------------------------------------------------------------------------------------------------
--- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
--- -----------------------------------------------------------------------------------------------------------------
-
--- "scene:create()"
--- Initialize the scene here.
+---------------------------------------------------------------------------------
+-- SCENE:CREATE
+---------------------------------------------------------------------------------
 
 -- debug
 
@@ -69,7 +63,7 @@ function scene:create( event )
     local blockRegion = "center"
     local activeRibbon = 1
     local activeBlockSnap = ribbonX
-    local activeBlockText = display.newText( "ARibbon: " .. activeRibbon .. ", ABlock: 1, Region: " .. blockRegion, display.contentCenterX, 50, native.systemFont, 30 )
+    --local activeBlockText = display.newText( "ARibbon: " .. activeRibbon .. ", ABlock: 1, Region: " .. blockRegion, display.contentCenterX, 50, native.systemFont, 30 )
     -- sceneGroup:insert( activeBlockText )
 
     -- duplicate image blocks for the purpose of x pos swapping to simulate loop
@@ -159,7 +153,7 @@ function scene:create( event )
             end
             blockRegion = "right"
             -- debug
-            activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+            --activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
         
         -- if we're to the left of the main blocks (positive x pos)
         elseif( currentX > (ribbonStartX + _myG.blockWidth*0.5)) then
@@ -176,7 +170,7 @@ function scene:create( event )
             end
             blockRegion = "left"
             -- debug
-            activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+            --activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
 
         -- if x pos is in the main block area
         else
@@ -193,7 +187,7 @@ function scene:create( event )
             end
             blockRegion = "center"
             -- debug
-            activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+            --activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
         end
         --print ( blockRegion )
     end
@@ -1186,6 +1180,7 @@ function scene:create( event )
 
             -- include bonus parts based on difficulty level
 
+            --[[
             if ( _myG.difficulty ~= "easy" ) then
                 
                 -- legs-wizard - green
@@ -1205,6 +1200,7 @@ function scene:create( event )
                 end
 
             end
+            ]]--
 
             -- if ( _myG.difficulty == "hard" ) then
                 --parts here
@@ -1217,7 +1213,7 @@ function scene:create( event )
         for i=1, _myG.blockCount do
             blockGroupA[3]:insert( legsA[i] )
             blockGroupB[3]:insert( legsB[i] )
-        end
+        end        
 
     end -- end randomize function
 
@@ -1249,7 +1245,10 @@ function scene:create( event )
 
 end --end scene:create
 
--- "scene:show()"
+---------------------------------------------------------------------------------
+-- SCENE:SHOW
+---------------------------------------------------------------------------------
+
 function scene:show( event )
     local sceneGroup = self.view
     if ( event.phase == "will" ) then
@@ -1263,7 +1262,7 @@ function scene:show( event )
         randomizeHeads()
         randomizeTorso()
         randomizeLegs()
-        
+
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen
         -- Load Goblin banner and UI 
@@ -1271,7 +1270,10 @@ function scene:show( event )
     end
 end
 
--- "scene:hide()"
+---------------------------------------------------------------------------------
+-- SCENE:HIDE
+---------------------------------------------------------------------------------
+
 function scene:hide( event )
     local sceneGroup = self.view
     if ( event.phase == "will" ) then
@@ -1283,7 +1285,10 @@ function scene:hide( event )
     end
 end
 
--- "scene:destroy()"
+---------------------------------------------------------------------------------
+-- SCENE:DESTROY
+---------------------------------------------------------------------------------
+
 function scene:destroy( event )
     local sceneGroup = self.view
     -- Called prior to the removal of scene's view ("sceneGroup").
@@ -1291,10 +1296,10 @@ function scene:destroy( event )
     -- Example: remove display objects, save state, etc.
 end
 
-
--- -------------------------------------------------------------------------------
-
+---------------------------------------------------------------------------------
 -- Listener setup
+---------------------------------------------------------------------------------
+
 scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )

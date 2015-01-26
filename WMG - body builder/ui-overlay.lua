@@ -1,12 +1,9 @@
 ---------------------------------------------------------------------------------
---
 -- gameplay.lua
---
 ---------------------------------------------------------------------------------
 
 local composer = require( "composer" )
 local scene = composer.newScene()
-
 local _myG = composer.myGlobals
 
 local cW = display.contentWidth
@@ -16,14 +13,6 @@ local cY = display.contentCenterY
 local mW = 0.0013022*cW
 local screenRatio = cW/cH
 print ("screenRatio " .. screenRatio)
-
--- -----------------------------------------------------------------------------------------------------------------
--- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
--- -----------------------------------------------------------------------------------------------------------------
-
--- local forward references should go here
--- any reference created in scene:create will not be available in scene:hide, show, etc
--- unless it is first defined as a forward reference here
 
 local bannerStayTimer
 local crankTimer
@@ -47,14 +36,18 @@ local getMatchParts
 
 local notGobPlayed = "false"
 
--- -------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+-- SCENE:CREATE - Initialize the scene here.
+---------------------------------------------------------------------------------
 
--- "scene:create()"
--- Initialize the scene here.
-
--- "scene:create()"
 function scene:create( event )
     local sceneGroup = self.view
+
+    local gameStartTime = 0
+    local gameEndTime = 0
+    local gameTimeDif = 0
+    local totalTime = 0
+    local totalPeeks = 0
 
     local startX
     local endX
@@ -94,7 +87,7 @@ function scene:create( event )
 
     goblinText.isVisible = false
     activeText.isVisible = false
-    --matchBlocksText.isVisible = false
+    matchBlocksText.isVisible = false
     _myG.activeRibbonsText.isVisible = false
 
     -- UI on/off functions
@@ -580,6 +573,10 @@ function scene:create( event )
     replayShader:setFillColor( 0, 0, 0, 1 ) 
     sceneGroup:insert( replayShader )
 
+    local replayShade2 = display.newImageRect( sceneGroup, "images/replay-shader.png", cW, 510*mW )
+    replayShade2.x = cX
+    replayShade2.y = cY+130*mW
+
     local replaySheetInfo = require("replay-sheet")
     local replaySheet = graphics.newImageSheet( "images/replay-sheet.png", replaySheetInfo:getSheet() )
     local replayFrames  = { start=1, count=3 }
@@ -623,10 +620,37 @@ function scene:create( event )
     ropeR.x = 512*mW
     ropeR.y = cY-229*mW
 
+    local replayText = display.newText( "play again?", display.contentCenterX+15*mW, cY-180*mW, "Mathlete-Skinny", 120*mW )
+    replayText:setFillColor( 74/255, 54/255, 22/255, 1)
+
+    local statsTextY = cY-80*mW
+    local statsTextSize = 70*mW
+
+    local peeksLabel = display.newText( "peeks:", display.contentCenterX-55*mW, statsTextY, "Mathlete-Skinny", statsTextSize )
+    peeksLabel:setFillColor( 74/255, 54/255, 22/255, 1)
+    peeksLabel.anchorX = 1
+
+    local timeLabel = display.newText( "time:", display.contentCenterX+95*mW, statsTextY, "Mathlete-Skinny", statsTextSize )
+    timeLabel:setFillColor( 74/255, 54/255, 22/255, 1)
+    timeLabel.anchorX = 1
+
+    local peeksNumber = display.newText( " 0", display.contentCenterX-65*mW, statsTextY, "Mathlete-Skinny", statsTextSize )
+    peeksNumber.anchorX = 0
+    peeksNumber:setFillColor( 37/255, 108/255, 0, 1)
+
+    local timeNumber = display.newText( " 0:00", display.contentCenterX+85*mW, statsTextY, "Mathlete-Skinny", statsTextSize )
+    timeNumber.anchorX = 0
+    timeNumber:setFillColor( 37/255, 108/255, 0, 1)
+
     -- sign group
 
     replaySign = display.newGroup()
     replaySign:insert( replayPaper )
+    replaySign:insert( replayText )
+    replaySign:insert( peeksLabel )
+    replaySign:insert( timeLabel )
+    replaySign:insert( peeksNumber )
+    replaySign:insert( timeNumber )
     replaySign:insert( ropeL )
     replaySign:insert( ropeR )
 
@@ -634,6 +658,16 @@ function scene:create( event )
     sceneGroup:insert( replayYesBtn )
     sceneGroup:insert( replayNoBtn )
     sceneGroup:insert( replaySign )
+
+    -- change sign for Easy level
+    
+    if( _myG.difficulty == "easy" ) then
+        replayText.y = cY-145*mW
+        peeksLabel.isVisible = false
+        timeLabel.isVisible = false
+        peeksNumber.isVisible = false
+        timeNumber.isVisible = false
+    end
 
     -- animate replay sign
 
@@ -715,6 +749,40 @@ function scene:create( event )
         sceneGroup:insert( adSpace ) 
     end
 
+    local function secsToMins( secs )
+        local myTime 
+        local myMinutes
+        local mySeconds
+
+        if secs > 59 then
+            myMinutes = math.floor(secs/60)
+            mySeconds = secs-(math.floor(secs/60)*60)
+            if mySeconds < 10 then
+                mySeconds = "0"..mySeconds
+            end
+            myTime = myMinutes..":"..mySeconds
+        else
+            if secs < 60 then
+                mySeconds = secs
+            end
+            myTime = "0:"..mySeconds
+        end
+        --return myTime
+        --totalTime = myTime
+        timeNumber.text = " " .. myTime
+        print ( "myTime: ", totalTime )
+    end
+
+    local function getGameStats()
+        gameEndTime = system.getTimer()
+        print( "end: ", gameEndTime )
+        gameTimeDif = math.floor((gameEndTime - gameStartTime)*0.001)
+        print( "time: ", gameTimeDif .. " seconds" )
+        secsToMins( gameTimeDif )
+        peeksNumber.text = " " .. totalPeeks
+        print( "peeks: " .. totalPeeks )
+    end
+
     -- Sign animation and match checking
 
     local function signCompare( event )
@@ -722,6 +790,7 @@ function scene:create( event )
             uiActiveFalse()
             if _myG.headsMatch.activeBlock == _myG.ribbon[1].activeBlock and _myG.torsoMatch.activeBlock == _myG.ribbon[2].activeBlock and _myG.legsMatch.activeBlock == _myG.ribbon[3].activeBlock then
                 -- if we have a match, don't lower the banner. Play victory animation.
+                getGameStats()
                 signSpinToCheck()
                 timer.performWithDelay( 700, audioThatsMyGoblin )
                 -- you win!
@@ -754,6 +823,7 @@ function scene:create( event )
             -- else do our comparison
             if _myG.headsMatch.activeBlock == _myG.ribbon[1].activeBlock and _myG.torsoMatch.activeBlock == _myG.ribbon[2].activeBlock and _myG.legsMatch.activeBlock == _myG.ribbon[3].activeBlock then
                 -- if we have a match, don't lower the banner. Play victory animation.
+                getGameStats()
                 timer.performWithDelay( 400, signSpinToCheck )
                 timer.performWithDelay( 1100, audioThatsMyGoblin )
                 -- you win!
@@ -810,6 +880,8 @@ function scene:create( event )
             if ( _myG.introComplete == "false" ) then
                 bannerStayTimer = timer.performWithDelay( 6000, raiseBanner )
             else
+                local peekVar = totalPeeks
+                totalPeeks = peekVar+1
                 bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
             end
         end
@@ -880,6 +952,9 @@ function scene:create( event )
         _myG.uiActive = "true"
         settingsActive = "true"
         _myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
+        -- capture current time for game start
+        gameStartTime = system.getTimer()
+        print( "start: ", gameStartTime)
     end
 
     -- event listeners
@@ -890,10 +965,14 @@ function scene:create( event )
     gearHandle:addEventListener( "touch", handleDrag )
     shader:addEventListener( "tap", raiseBannerNow )
 
+
 --end scene:create
 end 
 
--- "scene:show()"
+---------------------------------------------------------------------------------
+-- SCENE:SHOW
+---------------------------------------------------------------------------------
+
 function scene:show( event )
     local sceneGroup = self.view
 
@@ -912,11 +991,13 @@ function scene:show( event )
         transition.to( bannerGroup, { time=0, y=bannerUpY, yScale=0.5 })
 
         -- set inital sign position
+        --[[
         transition.to( replaySign, { time=0, y=-300, yScale=0.5 })
         transition.to( replaySign, { time=1, alpha=0 }) 
+        ]]--
         transition.to( replayYesBtn, { time=0, y=cY-40*mW, yScale=0.25, alpha=0 })
         transition.to( replayNoBtn, { time=0, y=cY-40*mW, yScale=0.25, alpha=0 })
-
+        
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
 
@@ -928,8 +1009,10 @@ function scene:show( event )
     end
 end
 
+---------------------------------------------------------------------------------
+-- SCENE:HIDE
+---------------------------------------------------------------------------------
 
--- "scene:hide()"
 function scene:hide( event )
     local sceneGroup = self.view
 
@@ -946,8 +1029,10 @@ function scene:hide( event )
     end
 end
 
+---------------------------------------------------------------------------------
+-- SCENE:DESTROY
+---------------------------------------------------------------------------------
 
--- "scene:destroy()"
 function scene:destroy( event )
     local sceneGroup = self.view
     -- Called prior to the removal of scene's view ("sceneGroup").
@@ -956,9 +1041,10 @@ function scene:destroy( event )
 end
 
 
--- -------------------------------------------------------------------------------
-
+---------------------------------------------------------------------------------
 -- Listener setup
+---------------------------------------------------------------------------------
+
 scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )

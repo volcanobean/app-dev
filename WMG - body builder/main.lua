@@ -1,8 +1,6 @@
 --
 -- Abstract: Where's My Goblin?
---
--- Version: 1.0
---
+-- Version: 1.1
 -- Copyright (C) 2014-2015 Volcano Bean, LLC. All Rights Reserved.
 ------------------------------------------------------------
 
