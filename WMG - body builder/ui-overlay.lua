@@ -79,6 +79,7 @@ function scene:create( event )
 
     _myG.introComplete = "false"
     local bannerState = "up"
+    local handleState = "up"
     local signState = "goblin"
     local arrowState = "down"
     local settingsActive = "true"
@@ -466,21 +467,36 @@ function scene:create( event )
 
     -- animate banner
 
-    local function bannerPlayDown()
+    local function bannerStateDown()
         bannerState = "down"
-        print( bannerState )
-        playBannerFX()
-        transition.to( bannerGroup, { time=350, y=bannerDownY+bannerStretchY, yScale=1, transition=easing.outSine })
-        transition.to( bannerGroup, { delay=350, time=200, y=bannerDownY, transition=easing.outSine })
-        transition.to( shader, { time=300, alpha=0.5 } )
+        print( "bannerState down")
+    end
+
+    local function bannerStateUp()
+        bannerState = "up"
+        print( "bannerState up")
+    end
+
+    local function bannerPlayDown()
+        if ( bannerState == "up" ) then
+            print( bannerState )
+            --bannerStateDown()
+            playBannerFX()
+            transition.to( bannerGroup, { time=350, y=bannerDownY+bannerStretchY, yScale=1, transition=easing.outSine })
+            transition.to( bannerGroup, { delay=350, time=200, y=bannerDownY, transition=easing.outSine })
+            transition.to( shader, { time=300, alpha=0.5 } )
+            timer.performWithDelay( 300, bannerStateDown )
+        end
     end
 
     local function bannerPlayUp()
-        bannerState = "up"
-        print( bannerState )
-        playBannerFX()
-        transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
-        transition.to( shader, { time=300, alpha=0 } )
+        if ( bannerState == "down" ) then
+            print( bannerState )
+            playBannerFX()
+            transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
+            transition.to( shader, { time=300, alpha=0 } )
+            timer.performWithDelay( 400, bannerStateUp )
+        end
     end
 
     -- gear sprite
@@ -501,13 +517,25 @@ function scene:create( event )
     gearHandle.anchorY = 1
     sceneGroup:insert( gearHandle )
 
+    local function handleStateDown()
+        handleState = "down"
+        print( "handleState down")
+    end
+
+    local function handleStateUp()
+        handleState = "up"
+        print( "handleState up")
+    end
+
     local function handlePlay( seqVar )
         if seqVar == "down" then
             transition.to( gearHandle, { time=700, rotation=100, transition=easing.outSine } )
+            timer.performWithDelay( 700, handleStateDown )
             playLeverFX()
         elseif seqVar == "up" then
             transition.to( gearHandle, { time=400, rotation=0, transition=easing.outSine } )
             playLeverShortFX()
+            timer.performWithDelay( 500, handleStateUp )
         end
     end
 
@@ -864,27 +892,31 @@ function scene:create( event )
     -- animation functions
 
     local function raiseBanner()
-        print ( "raiseBanner" )
-        handlePlay( "up" )
-        gearBackward()
-        bannerPlayUp()
-        print( "raiseBanner uiActive: " .. _myG.uiActive )
-        if ( _myG.introComplete == "false" ) then
-            _myG.loadSlider()
-        elseif ( signState ~= "check" ) then
-            timer.performWithDelay( 500, uiActiveTrue )
+        if( bannerState == "down" ) then
+            print ( "raiseBanner" )
+            handlePlay( "up" )
+            gearBackward()
+            bannerPlayUp()
+            print( "raiseBanner uiActive: " .. _myG.uiActive )
+            if ( _myG.introComplete == "false" ) then
+                _myG.loadSlider()
+            elseif ( signState ~= "check" ) then
+                timer.performWithDelay( 500, uiActiveTrue )
+            end
         end
     end
 
     local function raiseBannerNow( event )
-        print( "raiseBannerNow" )
-        timer.cancel( bannerStayTimer )
-        raiseBanner()
-        if (signState == "x") then
-            timer.cancel( signTimer )
-            signSpinFromX()
+        if( bannerState == "down" ) then
+            print( "raiseBannerNow" )
+            timer.cancel( bannerStayTimer )
+            raiseBanner()
+            if (signState == "x") then
+                timer.cancel( signTimer )
+                signSpinFromX()
+            end
+            print( "raiseBannerNow uiActive: " .. _myG.uiActive )
         end
-        print( "raiseBannerNow uiActive: " .. _myG.uiActive )
         return true
     end
 
@@ -921,60 +953,38 @@ function scene:create( event )
         return true
     end
 
-    local function handleSwipe( event )
-        if ( event.phase == "began" ) then
-            display.getCurrentStage():setFocus( event.target )
-            event.target.isFocus = true
-            startX = event.x
-            startTime = event.time
-        elseif ( event.target.isFocus ) then
-            if( event.phase == "moved") then
-                endX = event.x
-            elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
-                endX = event.x
-                endTime = event.time
-                display.getCurrentStage():setFocus( nil )
-                event.target.isFocus = false
-                local totalTime = endTime - startTime
-                if ( totalTime < 200 ) and ( startX ~= endX ) then
-                    turnCrank()
-                end
-            end
-        end
-        return true
-    end
-
-    gearBlock:addEventListener( "touch", handleSwipe )
-
     local function handleDrag( event )
-        if ( event.phase == "began" ) then
-            display.getCurrentStage():setFocus( event.target )
-            event.target.isFocus = true
-            startX = event.x
-            startTime = event.time
-            endX = event.x
-        elseif ( event.target.isFocus ) then
-            if( event.phase == "moved") then
+        if ( handleState == "up" ) then
+            if ( event.phase == "began" ) then
+                display.getCurrentStage():setFocus( gearHandle )
+                gearHandle.isFocus = true
+                startX = event.x
+                startTime = event.time
                 endX = event.x
-                local difX = endX - startX
-                if( event.target.rotation > -1 and event.target.rotation < 101 ) then
-                    event.target.rotation = difX*0.25
-                    if( event.target.rotation > 29) then
+            elseif ( gearHandle.isFocus ) then
+                if( event.phase == "moved") then
+                    endX = event.x
+                    local difX = endX - startX
+                    if( gearHandle.rotation > -1 and gearHandle.rotation < 101 ) then
+                        gearHandle.rotation = difX*0.25
+                        if( gearHandle.rotation > 29) then
+                            turnCrank()
+                        end
+                    end 
+                elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
+                    endX = event.x
+                    endTime = event.time
+                    local totalTime = endTime - startTime
+                    if ( totalTime < 400 ) and ( startX == endX ) then
+                        -- this is a tap
                         turnCrank()
+                    elseif( gearHandle.rotation < 30 )then
+                        transition.to( gearHandle, { time=200, rotation=0, transition=easing.outSine } )
+                        timer.performWithDelay( 200, handleStateUp )
                     end
-                end 
-            elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
-                endX = event.x
-                endTime = event.time
-                local totalTime = endTime - startTime
-                if ( totalTime < 400 ) and ( startX == endX ) then
-                    -- this is a tap
-                    turnCrank()
-                elseif( event.target.rotation < 30 )then
-                    transition.to( gearHandle, { time=200, rotation=0, transition=easing.outSine } )
+                    display.getCurrentStage():setFocus( nil )
+                    gearHandle.isFocus = false
                 end
-                display.getCurrentStage():setFocus( nil )
-                event.target.isFocus = false
             end
         end
         return true
@@ -984,7 +994,7 @@ function scene:create( event )
         _myG.introComplete = "true"
         _myG.uiActive = "true"
         settingsActive = "true"
-        _myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
+        --_myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
         -- capture current time for game start
         gameStartTime = system.getTimer()
         print( "start: ", gameStartTime)
@@ -996,6 +1006,7 @@ function scene:create( event )
     gearSprite:addEventListener( "tap", turnCrank )
     --gearHandle:addEventListener( "tap", turnCrank )
     gearHandle:addEventListener( "touch", handleDrag )
+    gearBlock:addEventListener( "touch", handleDrag )
     shader:addEventListener( "tap", raiseBannerNow )
 
 
