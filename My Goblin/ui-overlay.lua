@@ -975,9 +975,10 @@ function scene:create( event )
                     endX = event.x
                     endTime = event.time
                     local totalTime = endTime - startTime
-                    if ( totalTime < 400 ) and ( startX == endX ) then
+                    if ( totalTime < 400 ) and ( startX < endX+10 and startX > endX-10 ) then
                         -- this is a tap
                         turnCrank()
+                        print("tapped on handle")
                     elseif( gearHandle.rotation < 30 )then
                         transition.to( gearHandle, { time=200, rotation=0, transition=easing.outSine } )
                         timer.performWithDelay( 200, handleStateUp )
