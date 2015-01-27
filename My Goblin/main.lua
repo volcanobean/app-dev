@@ -1,8 +1,6 @@
 --
 -- Abstract: Where's My Goblin?
---
--- Version: 1.0
---
+-- Version: 1.1
 -- Copyright (C) 2014-2015 Volcano Bean, LLC. All Rights Reserved.
 ------------------------------------------------------------
 
@@ -30,5 +28,5 @@ local _myG = composer.myGlobals
 
 -- Now that our variables are set, let's start the game.
 
---composer.gotoScene( "logos" )
-composer.gotoScene( "start-screen" )
+composer.gotoScene( "logos" )
+--composer.gotoScene( "start-screen" )

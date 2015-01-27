@@ -45,6 +45,8 @@ ads.init( adProvider, bannerAppID, adListener )
 
 -- Forward declarations
 
+_myG.difficulty = "easy"
+
 local blackMask 
 local tapGroup
 local playGoblinTheme
@@ -81,13 +83,6 @@ function scene:create( event )
         return true
     end
 
-    -- load 'secret button' first to hide it behind background image
-
-    local startHitArea =  display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight )
-    startHitArea:setFillColor( 0, 1, 1, 0.25 )
-    startHitArea:addEventListener( "tap", startGame )
-    sceneGroup:insert( startHitArea )
-
     _myG.background = display.newImageRect( "images/forest-bg.jpg", display.contentWidth, 1366*mW)
     _myG.background.x = display.contentCenterX
     _myG.background.y = display.contentCenterY
@@ -106,18 +101,38 @@ function scene:create( event )
     sceneGroup:insert( titleText2b )
     sceneGroup:insert( titleText2 )
 
-    local startBtn = display.newText( "tap to start", display.contentCenterX, display.contentCenterY+(200*mW), "Mathlete-SkinnySlant", 80*mW )
-    startBtn:setFillColor( 0.8, 0.97, 0.63, 1 )
-    local startBtn2 = display.newText( "tap to start", display.contentCenterX+3, display.contentCenterY+(203*mW), "Mathlete-SkinnySlant", 80*mW )
-    startBtn2:setFillColor( 0, 0, 0, 0.8 )
-    startBtn:addEventListener( "tap", startGame )
-
-    tapGroup = display.newGroup()
-    tapGroup:insert( startBtn2 )
-    tapGroup:insert( startBtn )
-
-    sceneGroup:insert( tapGroup )
+    local easyBtn = display.newText( "easy", display.contentCenterX, display.contentCenterY+(165*mW), "Mathlete-SkinnySlant", 80*mW )
+    local medBtn = display.newText( "medium", display.contentCenterX, display.contentCenterY+(255*mW), "Mathlete-SkinnySlant", 80*mW )
+    local hardBtn = display.newText( "hard", display.contentCenterX, display.contentCenterY+(345*mW), "Mathlete-SkinnySlant", 80*mW )
     
+    local function setToEasy( event )
+        _myG.difficulty = "easy"
+        print( _myG.difficulty )
+        startGame()
+        return true
+    end
+
+    local function setToMed( event )
+        _myG.difficulty = "medium"
+        print( _myG.difficulty )
+        startGame()
+        return true
+    end
+
+    local function setToHard( event )
+        _myG.difficulty = "hard"
+        print( _myG.difficulty )
+        startGame()
+        return true
+    end
+
+    easyBtn:addEventListener( "tap", setToEasy )
+    medBtn:addEventListener( "tap", setToMed )
+    hardBtn:addEventListener( "tap", setToHard )
+
+    sceneGroup:insert( easyBtn )
+    sceneGroup:insert( medBtn )
+    sceneGroup:insert( hardBtn )
 
     -- Settings sprites
     

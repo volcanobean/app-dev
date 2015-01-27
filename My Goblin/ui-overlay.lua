@@ -1,12 +1,9 @@
 ---------------------------------------------------------------------------------
---
 -- gameplay.lua
---
 ---------------------------------------------------------------------------------
 
 local composer = require( "composer" )
 local scene = composer.newScene()
-
 local _myG = composer.myGlobals
 
 local cW = display.contentWidth
@@ -16,14 +13,6 @@ local cY = display.contentCenterY
 local mW = 0.0013022*cW
 local screenRatio = cW/cH
 print ("screenRatio " .. screenRatio)
-
--- -----------------------------------------------------------------------------------------------------------------
--- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
--- -----------------------------------------------------------------------------------------------------------------
-
--- local forward references should go here
--- any reference created in scene:create will not be available in scene:hide, show, etc
--- unless it is first defined as a forward reference here
 
 local bannerStayTimer
 local crankTimer
@@ -39,19 +28,19 @@ local replaySign
 local replayYesBtn
 local replayNoBtn
 local bannerGroup
+local replayShade2
 
 local bannerUpY
 local bannerDownY
 local bannerStretchY
+local getMatchParts
 
 local notGobPlayed = "false"
 
--- -------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+-- SCENE:CREATE - Initialize the scene here.
+---------------------------------------------------------------------------------
 
--- "scene:create()"
--- Initialize the scene here.
-
--- "scene:create()"
 function scene:create( event )
     local sceneGroup = self.view
 
@@ -61,6 +50,22 @@ function scene:create( event )
     local endY
     local startTime
     local endTime
+    local totalTime = 0
+
+    local gameStartTime = 0
+    local gameEndTime = 0
+    local gameTimeDif = 0
+    local totalPeeks = 0
+    local peeksPar
+    local timePar
+
+    if( _myG.difficulty == "medium" ) then
+        peeksPar = 2
+        timePar = 2400
+    elseif( _myG.difficulty == "hard" ) then
+        peeksPar = 1
+        timePar = 1900
+    end
 
     -- Create table to hold data for goblin match
 
@@ -68,9 +73,13 @@ function scene:create( event )
     matchBlocks[1] = 1
     matchBlocks[2] = 1
     matchBlocks[3] = 1
+    _myG.headsMatch.activeBlock = 1
+    _myG.torsoMatch.activeBlock = 1
+    _myG.legsMatch.activeBlock = 1
 
     _myG.introComplete = "false"
     local bannerState = "up"
+    local handleState = "up"
     local signState = "goblin"
     local arrowState = "down"
     local settingsActive = "true"
@@ -80,7 +89,7 @@ function scene:create( event )
     local goblinText = display.newText( "", display.contentCenterX, 985, native.systemFont, 30 )  
     local activeText = display.newText( "UI Active: " .. _myG.uiActive, display.contentCenterX, 950, native.systemFont, 30 ) 
 
-    local matchBlocksText = display.newText( "Match these: " .. matchBlocks[1] .. ", " .. matchBlocks[2] .. ", " .. matchBlocks[3], display.contentCenterX, 20, native.systemFont, 30 )
+    local matchBlocksText = display.newText( "Match these: " .. _myG.headsMatch.activeBlock .. ", " .. _myG.torsoMatch.activeBlock .. ", " .. _myG.legsMatch.activeBlock, display.contentCenterX, 20, native.systemFont, 30 )
     _myG.activeRibbonsText = display.newText( "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock, display.contentCenterX, 60, native.systemFont, 30 )
 
     sceneGroup:insert( goblinText )
@@ -310,6 +319,7 @@ function scene:create( event )
 
     local function clickHome( event )
         if( settingsActive == "true" ) then
+            composer.removeScene( "goblin-slider" )
             composer.gotoScene( "start-screen" )
         end
         return true
@@ -336,34 +346,6 @@ function scene:create( event )
         end
         return true
     end
-
-    --[[
-    local function swipeArrow( event )
-        if ( event.phase == "began" ) then
-            display.getCurrentStage():setFocus( event.target )
-            event.target.isFocus = true
-            startY = event.y
-            startTime = event.time
-        elseif ( event.target.isFocus ) then
-            if( event.phase == "moved") then
-                endY = event.y
-            elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
-                endY = event.y
-                endTime = event.time
-                display.getCurrentStage():setFocus( nil )
-                event.target.isFocus = false
-                local totalTime = endTime - startTime
-                if( startY== endY ) then
-                    -- this is a tap
-                    clickArrow()
-                elseif ( totalTime < 200 ) and ( startY ~= endY ) then
-                    clickArrow()
-                end
-            end
-        end
-        return true
-    end
-    ]]--
 
     arrowBtn:addEventListener( "touch", clickArrow )
     homeBtn:addEventListener( "tap", clickHome )
@@ -398,98 +380,52 @@ function scene:create( event )
 
     -- Add goblin match pieces to banner
 
-    local headMatch
-    local headMatchSheetInfo
-    local headMatchSheet
-    local headMatchFrames
+    local matchGroup = display.newGroup()
 
-    local torsoMatch
-    local torsoMatchSheetInfo
-    local torsoMatchSheet
-    local torsoMatchFrames
+    function getMatchParts()
 
-    local legMatch
-    local legMatchSheetInfo
-    local legMatchSheet
-    local legMatchFrames
-
-    local function getMatchParts()
-        -- Generate head
-        local matchNumber = math.random( _myG.blockCount )
-        matchBlocks[1] = matchNumber
-        --if ( matchNumber <= 10 ) then
-            -- if random number is within range of first sheet...
-            headMatchSheetInfo = require("heads-sheet")
-            headMatchSheet = graphics.newImageSheet( "images/heads.png", headMatchSheetInfo:getSheet() )
-            headMatchFrames = { start=1, count=10 }
-            headMatch = display.newSprite( headMatchSheet, headMatchFrames )
-            headMatch:setFrame( matchNumber )
-        --[[
-        else
-            -- else use the second sheet tp pick up where we left off
-            headMatchSheetInfo = require("heads-sheet-2")
-            headMatchSheet = graphics.newImageSheet( "images/heads-2.png", headMatchSheetInfo:getSheet() )
-            headMatchFrames = { start=1, count=1 }
-            headMatch = display.newSprite( headMatchSheet, headMatchFrames )
-            headMatch:setFrame( matchNumber-9 )
+        -- LEGS
+        local r1 = math.random( _myG.blockCount )
+        _myG.legsMatch.activeBlock = r1
+        for i=1, _myG.blockCount do
+            _myG.legsMatch[i].isVisible = false
         end
-        ]]--
+        _myG.legsMatch[r1].isVisible = true
+        matchGroup:insert( _myG.legsMatch[r1] )
 
-        -- Generate torso
-        matchNumber = math.random( _myG.blockCount )
-        matchBlocks[2] = matchNumber
-        if ( matchNumber <= 6 ) then
-            -- if random number is within range of first sheet...
-            torsoMatchSheetInfo = require("torso-sheet-1")
-            torsoMatchSheet = graphics.newImageSheet( "images/torso-1.png", torsoMatchSheetInfo:getSheet() )
-            torsoMatchFrames = { start=1, count=6 }
-            torsoMatch = display.newSprite( torsoMatchSheet, torsoMatchFrames )
-            torsoMatch:setFrame( matchNumber )
-        else
-            -- else use the second sheet tp pick up where we left off
-            torsoMatchSheetInfo = require("torso-sheet-2")
-            torsoMatchSheet = graphics.newImageSheet( "images/torso-2.png", torsoMatchSheetInfo:getSheet() )
-            torsoMatchFrames = { start=1, count=4 }
-            torsoMatch = display.newSprite( torsoMatchSheet, torsoMatchFrames )
-            torsoMatch:setFrame( matchNumber-6 )
+        -- TORSO
+        local r2 = math.random( _myG.blockCount )
+        _myG.torsoMatch.activeBlock = r2
+        for i=1, _myG.blockCount do
+            _myG.torsoMatch[i].isVisible = false
         end
+        _myG.torsoMatch[r2].isVisible = true
+        matchGroup:insert( _myG.torsoMatch[r2] )
 
-        -- Generate legs
-        matchNumber = math.random( _myG.blockCount )
-        matchBlocks[3] = matchNumber
-        if ( matchNumber <= 6 ) then
-            -- if random number is within range of first sheet...
-            legMatchSheetInfo = require("legs-sheet-1")
-            legMatchSheet = graphics.newImageSheet( "images/legs-1.png", legMatchSheetInfo:getSheet() )
-            legMatchFrames = { start=1, count=6 }
-            legMatch = display.newSprite( legMatchSheet, legMatchFrames )
-            legMatch:setFrame( matchNumber )
-        else
-            -- else use the second sheet tp pick up where we left off
-            legMatchSheetInfo = require("legs-sheet-2")
-            legMatchSheet = graphics.newImageSheet( "images/legs-2.png", legMatchSheetInfo:getSheet() )
-            legMatchFrames = { start=1, count=4 }
-            legMatch = display.newSprite( legMatchSheet, legMatchFrames )
-            legMatch:setFrame( matchNumber-6 )
+        -- HEAD
+        local r3 = math.random( _myG.blockCount )
+        _myG.headsMatch.activeBlock = r3
+        for i=1, _myG.blockCount do
+            _myG.headsMatch[i].isVisible = false
         end
+        _myG.headsMatch[r3].isVisible = true
+        matchGroup:insert( _myG.headsMatch[r3] )
+
+        -- assign Y values now that objects have been created
+
+        _myG.headsMatch[r3].y = 385*mW
+        _myG.torsoMatch[r2].y = 675*mW
+        _myG.legsMatch[r1].y = 850*mW
+
+        -- debug
+        matchBlocksText.text = "Match these: " .. _myG.headsMatch.activeBlock .. ", " .. _myG.torsoMatch.activeBlock .. ", " .. _myG.legsMatch.activeBlock
     end
 
     -- generate intial values
 
-    getMatchParts()
-
-    -- assign Y values now that objects have been created
-
-    headMatch.y = 385*mW
-    torsoMatch.y = 675*mW
-    legMatch.y = 850*mW
+    --getMatchParts()
 
     local mScale = 0.83 
-
-    local matchGroup = display.newGroup()
-    matchGroup:insert( legMatch )
-    matchGroup:insert( torsoMatch )
-    matchGroup:insert( headMatch )
     matchGroup:scale( mScale, mScale )
 
     bannerGroup = display.newGroup()
@@ -531,21 +467,36 @@ function scene:create( event )
 
     -- animate banner
 
-    local function bannerPlayDown()
+    local function bannerStateDown()
         bannerState = "down"
-        print( bannerState )
-        playBannerFX()
-        transition.to( bannerGroup, { time=350, y=bannerDownY+bannerStretchY, yScale=1, transition=easing.outSine })
-        transition.to( bannerGroup, { delay=350, time=200, y=bannerDownY, transition=easing.outSine })
-        transition.to( shader, { time=300, alpha=0.5 } )
+        print( "bannerState down")
+    end
+
+    local function bannerStateUp()
+        bannerState = "up"
+        print( "bannerState up")
+    end
+
+    local function bannerPlayDown()
+        if ( bannerState == "up" ) then
+            print( bannerState )
+            --bannerStateDown()
+            playBannerFX()
+            transition.to( bannerGroup, { time=350, y=bannerDownY+bannerStretchY, yScale=1, transition=easing.outSine })
+            transition.to( bannerGroup, { delay=350, time=200, y=bannerDownY, transition=easing.outSine })
+            transition.to( shader, { time=300, alpha=0.5 } )
+            timer.performWithDelay( 300, bannerStateDown )
+        end
     end
 
     local function bannerPlayUp()
-        bannerState = "up"
-        print( bannerState )
-        playBannerFX()
-        transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
-        transition.to( shader, { time=300, alpha=0 } )
+        if ( bannerState == "down" ) then
+            print( bannerState )
+            playBannerFX()
+            transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
+            transition.to( shader, { time=300, alpha=0 } )
+            timer.performWithDelay( 400, bannerStateUp )
+        end
     end
 
     -- gear sprite
@@ -566,13 +517,25 @@ function scene:create( event )
     gearHandle.anchorY = 1
     sceneGroup:insert( gearHandle )
 
+    local function handleStateDown()
+        handleState = "down"
+        print( "handleState down")
+    end
+
+    local function handleStateUp()
+        handleState = "up"
+        print( "handleState up")
+    end
+
     local function handlePlay( seqVar )
         if seqVar == "down" then
             transition.to( gearHandle, { time=700, rotation=100, transition=easing.outSine } )
+            timer.performWithDelay( 700, handleStateDown )
             playLeverFX()
         elseif seqVar == "up" then
             transition.to( gearHandle, { time=400, rotation=0, transition=easing.outSine } )
             playLeverShortFX()
+            timer.performWithDelay( 500, handleStateUp )
         end
     end
 
@@ -649,6 +612,10 @@ function scene:create( event )
     replayShader:setFillColor( 0, 0, 0, 1 ) 
     sceneGroup:insert( replayShader )
 
+    replayShade2 = display.newImageRect( sceneGroup, "images/replay-shader.png", cW, 510*mW )
+    replayShade2.x = cX
+    replayShade2.y = cY+130*mW
+
     local replaySheetInfo = require("replay-sheet")
     local replaySheet = graphics.newImageSheet( "images/replay-sheet.png", replaySheetInfo:getSheet() )
     local replayFrames  = { start=1, count=3 }
@@ -692,10 +659,37 @@ function scene:create( event )
     ropeR.x = 512*mW
     ropeR.y = cY-229*mW
 
+    local replayText = display.newText( "play again?", display.contentCenterX+15*mW, cY-180*mW, "Mathlete-Skinny", 120*mW )
+    replayText:setFillColor( 74/255, 54/255, 22/255, 1)
+
+    local statsTextY = cY-80*mW
+    local statsTextSize = 70*mW
+
+    local peeksLabel = display.newText( "peeks:", display.contentCenterX-55*mW, statsTextY, "Mathlete-Skinny", statsTextSize )
+    peeksLabel:setFillColor( 74/255, 54/255, 22/255, 1)
+    peeksLabel.anchorX = 1
+
+    local timeLabel = display.newText( "time:", display.contentCenterX+95*mW, statsTextY, "Mathlete-Skinny", statsTextSize )
+    timeLabel:setFillColor( 74/255, 54/255, 22/255, 1)
+    timeLabel.anchorX = 1
+
+    local peeksNumber = display.newText( " 0", display.contentCenterX-65*mW, statsTextY, "Mathlete-Skinny", statsTextSize )
+    peeksNumber.anchorX = 0
+    peeksNumber:setFillColor( 37/255, 108/255, 0, 1)
+
+    local timeNumber = display.newText( " 0:00", display.contentCenterX+85*mW, statsTextY, "Mathlete-Skinny", statsTextSize )
+    timeNumber.anchorX = 0
+    timeNumber:setFillColor( 37/255, 108/255, 0, 1)
+
     -- sign group
 
     replaySign = display.newGroup()
     replaySign:insert( replayPaper )
+    replaySign:insert( replayText )
+    replaySign:insert( peeksLabel )
+    replaySign:insert( timeLabel )
+    replaySign:insert( peeksNumber )
+    replaySign:insert( timeNumber )
     replaySign:insert( ropeL )
     replaySign:insert( ropeR )
 
@@ -703,6 +697,16 @@ function scene:create( event )
     sceneGroup:insert( replayYesBtn )
     sceneGroup:insert( replayNoBtn )
     sceneGroup:insert( replaySign )
+
+    -- change sign for Easy level
+    
+    if( _myG.difficulty == "easy" ) then
+        replayText.y = cY-145*mW
+        peeksLabel.isVisible = false
+        timeLabel.isVisible = false
+        peeksNumber.isVisible = false
+        timeNumber.isVisible = false
+    end
 
     -- animate replay sign
 
@@ -732,6 +736,7 @@ function scene:create( event )
         transition.to( replaySign, { time=350, y=50*mW, yScale=1, transition=easing.outSine })
         transition.to( replaySign, { delay=350, time=200, y=0, transition=easing.outSine })
         transition.to( replayShader, { time=300, alpha=0.5 } )
+        transition.to( replayShade2, { time=600, alpha=1 } )
         timer.performWithDelay( 200, replayBtnsOpen )
     end
 
@@ -784,13 +789,57 @@ function scene:create( event )
         sceneGroup:insert( adSpace ) 
     end
 
+    local function secsToMins( secs )
+        local myTime 
+        local myMinutes
+        local mySeconds
+
+        if secs > 59 then
+            myMinutes = math.floor(secs/60)
+            mySeconds = secs-(math.floor(secs/60)*60)
+            if mySeconds < 10 then
+                mySeconds = "0"..mySeconds
+            end
+            myTime = myMinutes..":"..mySeconds
+        else
+            if secs < 60 then
+                mySeconds = secs
+            end
+            if secs < 10 then
+                mySeconds = "0"..mySeconds
+            end
+            myTime = "0:"..mySeconds
+        end
+        timeNumber.text = " " .. myTime
+        print ( "myTime: ", myTime )
+    end
+
+    local function getGameStats()
+        gameEndTime = system.getTimer()
+        print( "end: ", gameEndTime )
+        gameTimeDif = math.floor((gameEndTime - gameStartTime)*0.001)
+        print( "time: ", gameTimeDif .. " seconds" )
+        secsToMins( gameTimeDif )
+        peeksNumber.text = " " .. totalPeeks
+        if( _myG.difficulty ~= "easy" ) then
+            if (totalPeeks > peeksPar ) then
+                peeksNumber:setFillColor( 150/255, 50/255, 0, 1 )
+            end
+            if (gameTimeDif > timePar ) then
+                timeNumber:setFillColor( 150/255, 50/255, 0, 1 )
+            end
+        end
+        print( "peeks: " .. totalPeeks )
+    end
+
     -- Sign animation and match checking
 
     local function signCompare( event )
         if ( _myG.uiActive == "true" ) and ( _myG.introComplete == "true" ) then
             uiActiveFalse()
-            if matchBlocks[1] == _myG.ribbon[1].activeBlock and matchBlocks[2] == _myG.ribbon[2].activeBlock and matchBlocks[3] == _myG.ribbon[3].activeBlock then
+            if _myG.headsMatch.activeBlock == _myG.ribbon[1].activeBlock and _myG.torsoMatch.activeBlock == _myG.ribbon[2].activeBlock and _myG.legsMatch.activeBlock == _myG.ribbon[3].activeBlock then
                 -- if we have a match, don't lower the banner. Play victory animation.
+                getGameStats()
                 signSpinToCheck()
                 timer.performWithDelay( 700, audioThatsMyGoblin )
                 -- you win!
@@ -821,8 +870,9 @@ function scene:create( event )
                 signIsUp = true
             end
             -- else do our comparison
-            if matchBlocks[1] == _myG.ribbon[1].activeBlock and matchBlocks[2] == _myG.ribbon[2].activeBlock and matchBlocks[3] == _myG.ribbon[3].activeBlock then
+            if _myG.headsMatch.activeBlock == _myG.ribbon[1].activeBlock and _myG.torsoMatch.activeBlock == _myG.ribbon[2].activeBlock and _myG.legsMatch.activeBlock == _myG.ribbon[3].activeBlock then
                 -- if we have a match, don't lower the banner. Play victory animation.
+                getGameStats()
                 timer.performWithDelay( 400, signSpinToCheck )
                 timer.performWithDelay( 1100, audioThatsMyGoblin )
                 -- you win!
@@ -842,27 +892,31 @@ function scene:create( event )
     -- animation functions
 
     local function raiseBanner()
-        print ( "raiseBanner" )
-        handlePlay( "up" )
-        gearBackward()
-        bannerPlayUp()
-        print( "raiseBanner uiActive: " .. _myG.uiActive )
-        if ( _myG.introComplete == "false" ) then
-            _myG.loadSlider()
-        elseif ( signState ~= "check" ) then
-            timer.performWithDelay( 500, uiActiveTrue )
+        if( bannerState == "down" ) then
+            print ( "raiseBanner" )
+            handlePlay( "up" )
+            gearBackward()
+            bannerPlayUp()
+            print( "raiseBanner uiActive: " .. _myG.uiActive )
+            if ( _myG.introComplete == "false" ) then
+                _myG.loadSlider()
+            elseif ( signState ~= "check" ) then
+                timer.performWithDelay( 500, uiActiveTrue )
+            end
         end
     end
 
     local function raiseBannerNow( event )
-        print( "raiseBannerNow" )
-        timer.cancel( bannerStayTimer )
-        raiseBanner()
-        if (signState == "x") then
-            timer.cancel( signTimer )
-            signSpinFromX()
+        if( bannerState == "down" ) then
+            print( "raiseBannerNow" )
+            timer.cancel( bannerStayTimer )
+            raiseBanner()
+            if (signState == "x") then
+                timer.cancel( signTimer )
+                signSpinFromX()
+            end
+            print( "raiseBannerNow uiActive: " .. _myG.uiActive )
         end
-        print( "raiseBannerNow uiActive: " .. _myG.uiActive )
         return true
     end
 
@@ -877,68 +931,60 @@ function scene:create( event )
             gearForward()
             compareGoblins()
             if ( _myG.introComplete == "false" ) then
-                bannerStayTimer = timer.performWithDelay( 6000, raiseBanner )
+                if( _myG.difficulty == "easy" ) then
+                    bannerStayTimer = timer.performWithDelay( 6000, raiseBanner )
+                elseif( _myG.difficulty == "medium" ) then
+                    bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
+                elseif( _myG.difficulty == "hard" ) then
+                    bannerStayTimer = timer.performWithDelay( 2000, raiseBanner )
+                end
             else
-                bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
-            end
-        end
-        return true
-    end
-
-    local function handleSwipe( event )
-        if ( event.phase == "began" ) then
-            display.getCurrentStage():setFocus( event.target )
-            event.target.isFocus = true
-            startX = event.x
-            startTime = event.time
-        elseif ( event.target.isFocus ) then
-            if( event.phase == "moved") then
-                endX = event.x
-            elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
-                endX = event.x
-                endTime = event.time
-                display.getCurrentStage():setFocus( nil )
-                event.target.isFocus = false
-                local totalTime = endTime - startTime
-                if ( totalTime < 200 ) and ( startX ~= endX ) then
-                    turnCrank()
+                local peekVar = totalPeeks
+                totalPeeks = peekVar+1
+                if( _myG.difficulty == "easy" ) then
+                    bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
+                elseif( _myG.difficulty == "medium" ) then
+                    bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
+                elseif( _myG.difficulty == "hard" ) then
+                    bannerStayTimer = timer.performWithDelay( 2500, raiseBanner )
                 end
             end
         end
         return true
     end
-
-    gearBlock:addEventListener( "touch", handleSwipe )
 
     local function handleDrag( event )
-        if ( event.phase == "began" ) then
-            display.getCurrentStage():setFocus( event.target )
-            event.target.isFocus = true
-            startX = event.x
-            startTime = event.time
-            endX = event.x
-        elseif ( event.target.isFocus ) then
-            if( event.phase == "moved") then
+        if ( handleState == "up" ) then
+            if ( event.phase == "began" ) then
+                display.getCurrentStage():setFocus( gearHandle )
+                gearHandle.isFocus = true
+                startX = event.x
+                startTime = event.time
                 endX = event.x
-                local difX = endX - startX
-                if( event.target.rotation > -1 and event.target.rotation < 101 ) then
-                    event.target.rotation = difX*0.25
-                    if( event.target.rotation > 29) then
+            elseif ( gearHandle.isFocus ) then
+                if( event.phase == "moved") then
+                    endX = event.x
+                    local difX = endX - startX
+                    if( gearHandle.rotation > -1 and gearHandle.rotation < 101 ) then
+                        gearHandle.rotation = difX*0.25
+                        if( gearHandle.rotation > 29) then
+                            turnCrank()
+                        end
+                    end 
+                elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
+                    endX = event.x
+                    endTime = event.time
+                    local totalTime = endTime - startTime
+                    if ( totalTime < 400 ) and ( startX == endX ) then
+                        -- this is a tap
                         turnCrank()
+                    elseif( gearHandle.rotation < 30 )then
+                        transition.to( gearHandle, { time=200, rotation=0, transition=easing.outSine } )
+                        timer.performWithDelay( 200, handleStateUp )
                     end
-                end 
-            elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
-                endX = event.x
-                endTime = event.time
-                local totalTime = endTime - startTime
-                if ( totalTime < 400 ) and ( startX == endX ) then
-                    -- this is a tap
-                    turnCrank()
-                elseif( event.target.rotation < 30 )then
-                    transition.to( gearHandle, { time=200, rotation=0, transition=easing.outSine } )
+                    display.getCurrentStage():setFocus( nil )
+                    gearHandle.isFocus = false
                 end
-                display.getCurrentStage():setFocus( nil )
-                event.target.isFocus = false
             end
         end
         return true
@@ -948,7 +994,10 @@ function scene:create( event )
         _myG.introComplete = "true"
         _myG.uiActive = "true"
         settingsActive = "true"
-        _myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
+        --_myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
+        -- capture current time for game start
+        gameStartTime = system.getTimer()
+        print( "start: ", gameStartTime)
     end
 
     -- event listeners
@@ -957,22 +1006,31 @@ function scene:create( event )
     gearSprite:addEventListener( "tap", turnCrank )
     --gearHandle:addEventListener( "tap", turnCrank )
     gearHandle:addEventListener( "touch", handleDrag )
+    gearBlock:addEventListener( "touch", handleDrag )
     shader:addEventListener( "tap", raiseBannerNow )
+
 
 --end scene:create
 end 
 
--- "scene:show()"
+---------------------------------------------------------------------------------
+-- SCENE:SHOW
+---------------------------------------------------------------------------------
+
 function scene:show( event )
     local sceneGroup = self.view
 
     if ( event.phase == "will" ) then
         -- Called when the scene is still off screen (but is about to come on screen).
+
+        getMatchParts()
+
         signIsUp = "false"
         transition.to( signSprite, { time=0, y=cH+100*mW })
         transition.to( uiShader2, { time=0, alpha=0 })
 
         transition.to( replayShader, { time=0, alpha=0 })
+        transition.to( replayShade2, { time=0, alpha=0 } )
 
         -- set inital banner values
         transition.to( bannerGroup, { time=0, y=bannerUpY, yScale=0.5 })
@@ -982,7 +1040,7 @@ function scene:show( event )
         transition.to( replaySign, { time=1, alpha=0 }) 
         transition.to( replayYesBtn, { time=0, y=cY-40*mW, yScale=0.25, alpha=0 })
         transition.to( replayNoBtn, { time=0, y=cY-40*mW, yScale=0.25, alpha=0 })
-
+        
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
 
@@ -994,8 +1052,10 @@ function scene:show( event )
     end
 end
 
+---------------------------------------------------------------------------------
+-- SCENE:HIDE
+---------------------------------------------------------------------------------
 
--- "scene:hide()"
 function scene:hide( event )
     local sceneGroup = self.view
 
@@ -1012,8 +1072,10 @@ function scene:hide( event )
     end
 end
 
+---------------------------------------------------------------------------------
+-- SCENE:DESTROY
+---------------------------------------------------------------------------------
 
--- "scene:destroy()"
 function scene:destroy( event )
     local sceneGroup = self.view
     -- Called prior to the removal of scene's view ("sceneGroup").
@@ -1022,9 +1084,10 @@ function scene:destroy( event )
 end
 
 
--- -------------------------------------------------------------------------------
-
+---------------------------------------------------------------------------------
 -- Listener setup
+---------------------------------------------------------------------------------
+
 scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )

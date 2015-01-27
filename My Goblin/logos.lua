@@ -1,13 +1,10 @@
 ---------------------------------------------------------------------------------
---
 -- start-screen.lua
---
 ---------------------------------------------------------------------------------
 
 print ("start of logos")
 local composer = require( "composer" )
 local scene = composer.newScene()
-
 local _myG = composer.myGlobals
 
 local cW = display.contentWidth
@@ -50,12 +47,10 @@ local vbText
 local vbFire
 local vbSprout
 
--- -----------------------------------------------------------------------------------------------------------------
--- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
--- -----------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+-- SCENE:CREATE
+---------------------------------------------------------------------------------
 
--- "scene:create()"
--- Initialize the scene here.
 function scene:create( event )
     local sceneGroup = self.view
 
@@ -227,7 +222,10 @@ function scene:create( event )
 
 end
 
--- "scene:show()"
+---------------------------------------------------------------------------------
+-- SCENE:SHOW
+---------------------------------------------------------------------------------
+
 function scene:show( event )
     local sceneGroup = self.view
 
@@ -342,7 +340,10 @@ function scene:show( event )
 end
 
 
--- "scene:hide()"
+---------------------------------------------------------------------------------
+-- SCENE:HIDE
+---------------------------------------------------------------------------------
+
 function scene:hide( event )
     local sceneGroup = self.view
 
@@ -356,7 +357,10 @@ function scene:hide( event )
 end
 
 
--- "scene:destroy()"
+---------------------------------------------------------------------------------
+-- SCENE:DESTROY
+---------------------------------------------------------------------------------
+
 function scene:destroy( event )
     local sceneGroup = self.view
     -- Called prior to the removal of scene's view ("sceneGroup").
@@ -364,10 +368,10 @@ function scene:destroy( event )
     -- Example: remove display objects, save state, etc.
 end
 
-
--- -------------------------------------------------------------------------------
-
+---------------------------------------------------------------------------------
 -- Listener setup
+---------------------------------------------------------------------------------
+
 scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )

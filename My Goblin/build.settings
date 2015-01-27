@@ -17,7 +17,8 @@ settings =
     
     excludeFiles =
     {
-        -- Include only the necessary icon files on each platform
+        -- Include only the necessary files on each platform
+        all = { "Profiler.lua" },
         iphone = { "Icon-*dpi.png", },
         android = { "Icon.png", "Icon-Small-*.png", "Icon*@2x.png", },
     },
@@ -127,7 +128,7 @@ settings =
     {
         -- Version Code must be set to a higher value when submitting an updated app to market.
         -- 10 = 1.0, 11 = 1.1, 12 = 1.2, etc
-        versionCode = "10",
+        versionCode = "11",
         
         -- Raise the max heap size on a device from 32 MB to 256 MB to allow Corona app to load 2048×2048 images.
         largeHeap = true,
