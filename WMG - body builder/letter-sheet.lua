@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:d43988ec2958b0eaf2547c2e7ba04dec:c949275da3fffa1b5f2b87c427b58910:8896903440eaed2e047bd863648d6120$
+-- $TexturePacker:SmartUpdate:3a649e1fe559020a2bafdd2c69e09b0f:c949275da3fffa1b5f2b87c427b58910:ffa06696ec1c986cfe9dc1389458baf1$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -16,6 +16,7 @@ local SheetInfo = {}
 SheetInfo.sheet =
 {
     frames = {
+    
         {
             -- letter-c
             x=2*mW,
@@ -31,9 +32,9 @@ SheetInfo.sheet =
         {
             -- letter-g
             x=86*mW,
-            y=89*mW, --90
+            y=90*mW,
             width=82*mW,
-            height=89*mW, --86
+            height=86*mW,
 
             sourceX = 0,
             sourceY = 0,
@@ -67,9 +68,9 @@ SheetInfo.sheet =
         {
             -- letter-o
             x=2*mW,
-            y=1*mW, --2
+            y=2*mW,
             width=85*mW,
-            height=89*mW, --86
+            height=86*mW,
 
             sourceX = 0,
             sourceY = 0,
@@ -91,9 +92,9 @@ SheetInfo.sheet =
         {
             -- letter-u
             x=89*mW,
-            y=1*mW, --2
+            y=2*mW,
             width=78*mW,
-            height=87*mW, --84
+            height=84*mW,
 
             sourceX = 0,
             sourceY = 2*mW,
