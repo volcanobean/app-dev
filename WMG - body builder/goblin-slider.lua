@@ -58,7 +58,6 @@ function scene:create( event )
 
     local ribbonX = (display.contentWidth - _myG.blockWidth)*0.5 - _myG.blockMargin
     local ribbonStartX = ribbonX -- store starting X value for future reference
-    --local ribbonXText = display.newText( "X: " .. ribbonX, display.contentCenterX, 50, native.systemFont, 30 )
 
     local blockRegion = "center"
     local activeRibbon = 1
@@ -83,6 +82,9 @@ function scene:create( event )
     local blockEnd = {}
     local blockEndRight = {}
     local blockEndLeft = {}
+
+    local blockTouch
+    local blockRelease
 
     -- Create swipe variables
 
@@ -189,7 +191,7 @@ function scene:create( event )
             -- debug
             --activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
         end
-        --print ( blockRegion )
+        --print ( _myG.ribbon[activeRibbon].activeBlock )
     end
 
     -- Shift position of scond group to right or left side of main group depending on X pos
@@ -264,23 +266,18 @@ function scene:create( event )
                 endX = event.x
 
                 -- Check for active block, this is to make sure a new tap doesn't use the old active block information
+                groupSwap( activeRibbon )
                 getActiveBlock( _myG.ribbon[activeRibbon].x, activeRibbon )
+                blockTouch = _myG.ribbon[activeRibbon].activeBlock
+                print( "blockTouch: " ..blockTouch)
+
             end
 
         -- ON MOVE:
         elseif ( event.target.isFocus ) then
             if ( event.phase == "moved" ) then
-                -- START DRAG:
-                _myG.ribbon[activeRibbon].x = event.x - event.target.offset
-                -- debug
-                --ribbonXText.text = "X: " .. _myG.ribbon[activeRibbon].x
-                -- track x and y movement, store as last positions touched
                 endX = event.x
                 local difX = endX - startX
-                -- Swap groups as needed
-                groupSwap( activeRibbon )
-                 -- Check for active block
-                getActiveBlock( _myG.ribbon[activeRibbon].x, activeRibbon )
                 
             -- ON RELEASE: 
             elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
@@ -293,42 +290,16 @@ function scene:create( event )
 
                 -- if not in the middle of a previous swipe/drag
                 if ( _myG.uiActive == "true" )  and ( moveAllowed == "true" ) then
-                    -- if a swip command has been triggered
 
-                    -- SWIPE LEFT:
-                    if ( totalTime < 200 ) and ( endX < startX ) then
-                        -- if at end of center block region
-                        if ( _myG.ribbon[activeRibbon].activeBlock == _myG.blockCount ) then
-                            -- transition to first block in right region, then shift to center
-                            blockRegion = "right"
-                            activeBlockSnap = blockSnapRight[1]
-                            transition.to( _myG.ribbon[activeRibbon], { time=300, transition=easing.outSine, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
-                            -- note: shift to center will get the active block on completion
-                            -- play sound fx
-                            playSwipeFX()
-                            
-                            -- debug
-                            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
-                       -- else, if we're not at the end but still in the center region
-                       elseif ( blockRegion == "center" ) then
-                            nextBlockSnap = _myG.ribbon[activeRibbon].activeBlock + 1
-                            transition.to( _myG.ribbon[activeRibbon], { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
-                            -- play sound fx
-                            playSwipeFX()
-                            -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
-                            _myG.ribbon[activeRibbon].activeBlock = nextBlockSnap
-                            -- debug
-                            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
-                        -- else if we are not in the center region (because of a very fast/long swipe going into the right region before code trigger)
-                        else
-                            -- don't do the full swipe animation, just shift to the next block
-                            -- play sound fx
-                            playSwipeFX()
-                            transition.to( _myG.ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
-                        end
+                    nextBlockSnap = blockTouch + 1
+                    --getActiveBlock( _myG.ribbon[activeRibbon].x, activeRibbon )
+                    blockRelease = _myG.ribbon[activeRibbon].activeBlock
+                    print( "blockRelease: " ..blockRelease)
 
-                    -- SWIPE RIGHT:
-                    elseif ( totalTime < 200 ) and ( endX > startX ) then
+                    -- TAP or SWIPE RIGHT:
+                    if ( totalTime < 400 and startX == endX ) or ( totalTime < 200 and endX > startX ) then
+                        print("swipe right")
+                        nextBlockSnap = blockTouch - 1
                         -- if at start of center block region
                         if( _myG.ribbon[activeRibbon].activeBlock == 1) then
                             -- transition to last block in left region, then shift to center
@@ -341,7 +312,6 @@ function scene:create( event )
                             -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                          -- else, if we're not at the end but still in the center region
                        elseif ( blockRegion == "center" ) then
-                            nextBlockSnap = _myG.ribbon[activeRibbon].activeBlock - 1
                             transition.to( _myG.ribbon[activeRibbon], { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
                             -- play sound fx
                             playSwipeFX()
@@ -349,25 +319,32 @@ function scene:create( event )
                             _myG.ribbon[activeRibbon].activeBlock = nextBlockSnap
                             -- debug
                             -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
-                        -- else if we are not in the center region (because of a very fast/long swipe going into the right region before code trigger)
-                        else
-                            -- don't do the full swipe animation, just shift to the next block
-                            transition.to( _myG.ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
-                            -- play sound fx
-                            playSwipeFX()
                         end
 
-                    -- DRAG:
-                    else
-                        -- if the ribbon has been dragged out of the center region into the left or the right regions
-                        if( blockRegion ~= "center" ) then
-                            -- shift back to center
-                            transition.to( _myG.ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
-                        -- else if we're still in the center
-                        else
-                            -- just snap to nearest block
-                            --print ("abs: " .. activeBlockSnap)
-                            transition.to( _myG.ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=moveEnd } )
+                    -- SWIPE LEFT:
+                    elseif ( totalTime < 200 ) and ( endX < startX ) then
+                    print("swipe left")
+                        -- if at end of center block region
+                        if ( _myG.ribbon[activeRibbon].activeBlock == _myG.blockCount ) then
+                            -- transition to first block in right region, then shift to center
+                            blockRegion = "right"
+                            activeBlockSnap = blockSnapRight[1]
+                            transition.to( _myG.ribbon[activeRibbon], { time=300, transition=easing.outSine, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
+                            -- note: shift to center will get the active block on completion
+                            -- play sound fx
+                            playSwipeFX()
+                            
+                            -- debug
+                            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+                        -- else, if we're not at the end but still in the center region
+                        elseif ( blockRegion == "center" ) then
+                            transition.to( _myG.ribbon[activeRibbon], { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
+                            -- play sound fx
+                            playSwipeFX()
+                            -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
+                            _myG.ribbon[activeRibbon].activeBlock = nextBlockSnap
+                            -- debug
+                            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                         end
                     end
                 end
@@ -890,7 +867,10 @@ function scene:create( event )
         for i=1, _myG.blockCount do
             blockGroupA[1]:insert( headsA[i] )
             blockGroupB[1]:insert( headsB[i] )
+            sceneGroup:insert( _myG.headsMatch[i] )
         end
+
+
 
     end -- end randomize function
 
@@ -1039,6 +1019,7 @@ function scene:create( event )
         for i=1, _myG.blockCount do
             blockGroupA[2]:insert( torsoA[i] )
             blockGroupB[2]:insert( torsoB[i] )
+            sceneGroup:insert( _myG.torsoMatch[i] )
         end
 
     end -- end randomize function
@@ -1213,6 +1194,7 @@ function scene:create( event )
         for i=1, _myG.blockCount do
             blockGroupA[3]:insert( legsA[i] )
             blockGroupB[3]:insert( legsB[i] )
+            sceneGroup:insert( _myG.legsMatch[i] )
         end        
 
     end -- end randomize function
@@ -1265,8 +1247,16 @@ function scene:show( event )
 
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen
+
         -- Load Goblin banner and UI 
         composer.showOverlay( "ui-overlay", { effect="fade" }  )
+
+        -- activeBlock always starts at 1
+
+        _myG.ribbon[1].activeBlock = 1
+        _myG.ribbon[2].activeBlock = 1
+        _myG.ribbon[3].activeBlock = 1
+
     end
 end
 
