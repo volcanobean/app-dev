@@ -38,6 +38,8 @@ local randomizeHeads
 local randomizeTorso
 local randomizeLegs
 
+local matchGroup = display.newGroup()
+
 ---------------------------------------------------------------------------------
 -- SCENE:CREATE
 ---------------------------------------------------------------------------------
@@ -96,6 +98,8 @@ function scene:create( event )
     local nextBlockSnap = 0
 
     local moveAllowed = "true"
+    local arrowState = "down"
+    local settingsActive = "true"
 
     -- on first load, UI is not active until after intro animations complete
 
@@ -364,7 +368,7 @@ function scene:create( event )
 
     -- Create hit areas to control ribbon scroll
 
-    local hitRibbonWidth = 500*mW
+    local hitRibbonWidth = 325*mW
 
     local hitRibbon1 = display.newRect( display.contentCenterX, display.contentCenterY-(272*mW), hitRibbonWidth, 215*mW ) --260,215
     hitRibbon1:setFillColor( 0, 1, 1, 0.25 )
@@ -667,11 +671,13 @@ function scene:create( event )
     --bushLeft.isVisible = false
     --bushRight.isVisible = false
 
+    --[[
     local uiShader = display.newImageRect( "images/ui-shader.png", display.contentWidth, 403*mW )
     uiShader.anchorY = 1
     uiShader.x = display.contentCenterX
     uiShader.y = cH
     sceneGroup:insert( uiShader )
+    ]]--
 
 -- ----------------------------------------------------------------
 -- RIBBONS
@@ -867,7 +873,7 @@ function scene:create( event )
         for i=1, _myG.blockCount do
             blockGroupA[1]:insert( headsA[i] )
             blockGroupB[1]:insert( headsB[i] )
-            sceneGroup:insert( _myG.headsMatch[i] )
+            matchGroup:insert( _myG.headsMatch[i] )
         end
 
 
@@ -1019,7 +1025,7 @@ function scene:create( event )
         for i=1, _myG.blockCount do
             blockGroupA[2]:insert( torsoA[i] )
             blockGroupB[2]:insert( torsoB[i] )
-            sceneGroup:insert( _myG.torsoMatch[i] )
+            matchGroup:insert( _myG.torsoMatch[i] )
         end
 
     end -- end randomize function
@@ -1194,14 +1200,12 @@ function scene:create( event )
         for i=1, _myG.blockCount do
             blockGroupA[3]:insert( legsA[i] )
             blockGroupB[3]:insert( legsB[i] )
-            sceneGroup:insert( _myG.legsMatch[i] )
-        end        
+            matchGroup:insert( _myG.legsMatch[i] )
+        end  
+
+        sceneGroup:insert( matchGroup )      
 
     end -- end randomize function
-
--- ----------------------------------------------------------------
--- SLIDER
--- ----------------------------------------------------------------   
 
     -- slider setup for first load
 
@@ -1225,6 +1229,159 @@ function scene:create( event )
     legsB[5]:setFillColor( 1, 0, 1, 1 )
     ]]--
 
+-- ----------------------------------------------------------------
+-- SETTINGS
+-- ----------------------------------------------------------------   
+
+    -- Settings sprites
+    
+    local settingsSheetInfo = require("settings-sheet")
+    local settingsSheet = graphics.newImageSheet( "images/settings.png", settingsSheetInfo:getSheet() )
+    local settingsFrames  = { start=1, count=6 }
+
+    local settingsX = 665*mW
+
+    local homeBtnY = 40*mW
+    local replayBtnY = 168*mW
+    local audioBtnY = 300*mW
+
+    local arrowBtn = display.newSprite( settingsSheet, settingsFrames )
+    arrowBtn:setFrame(2)
+    arrowBtn.anchorY = 0 
+    arrowBtn.x = settingsX
+    arrowBtn.y = -44*mW
+    
+    local homeBtn = display.newSprite( settingsSheet, settingsFrames )
+    homeBtn:setFrame(3)
+    homeBtn.anchorY = 0 
+    homeBtn.x = settingsX
+    homeBtn.y = homeBtnY
+
+    local replayBtn = display.newSprite( settingsSheet, settingsFrames )
+    replayBtn:setFrame(5)
+    replayBtn.anchorY = 0 
+    replayBtn.x = settingsX
+    replayBtn.y = replayBtnY
+
+    local audioBtn = display.newSprite( settingsSheet, settingsFrames )
+    audioBtn:setFrame(1)
+    audioBtn.anchorY = 0 
+    audioBtn.x = settingsX
+    audioBtn.y = audioBtnY
+
+    audioBtn.yScale=0.25
+    audioBtn.alpha=0
+    replayBtn.yScale=0.5
+    replayBtn.alpha=0
+    homeBtn.yScale=0.5
+    homeBtn.alpha=0
+
+    sceneGroup:insert( audioBtn )
+    sceneGroup:insert( replayBtn )
+    sceneGroup:insert( homeBtn  )
+    sceneGroup:insert( arrowBtn )
+
+    -- settings-related functions
+    
+    local function settingsActiveTrue()
+        settingsActive = "true"
+        print ("settingsActive: " .. settingsActive)
+    end 
+
+    local function settingsActiveFalse()
+        settingsActive = "false"
+        print ("settingsActive: " .. settingsActive)
+    end 
+
+    local function arrowImageDown()
+        arrowBtn:setFrame(2)
+    end
+
+    local function arrowImageUp()
+        arrowBtn:setFrame(6)
+    end
+
+    local function settingsOpen()
+        settingsActiveFalse()
+        transition.to( homeBtn, { time=1, alpha=1 })
+        transition.to( homeBtn, { delay=1, time=150, y=homeBtnY+48*mW, yScale=1, transition=easing.outSine })
+        transition.to( homeBtn, { delay=150, time=150, y=homeBtnY, transition=easing.outSine })
+        transition.to( replayBtn, { delay=250, time=1, alpha=1 })
+        transition.to( replayBtn, { delay=250, time=150, y=replayBtnY+50*mW, yScale=1, transition=easing.outSine })
+        transition.to( replayBtn, { delay=400, time=150, y=replayBtnY, transition=easing.outSine })
+        transition.to( audioBtn, { delay=500, time=1, alpha=1 })
+        transition.to( audioBtn, { delay=500, time=150, y=audioBtnY+50*mW, yScale=1, transition=easing.outSine })
+        transition.to( audioBtn, { delay=650, time=150, y=audioBtnY, transition=easing.outSine })
+        timer.performWithDelay( 700, arrowImageUp )
+        timer.performWithDelay( 700, settingsActiveTrue )
+    end
+
+    local function settingsClose()
+        settingsActiveFalse()
+        transition.to( audioBtn, { time=100, yScale=0.25, transition=easing.outSine })
+        transition.to( audioBtn, { delay=100, time=1, alpha=0 })
+        transition.to( replayBtn, { delay=100, time=75, yScale=0.5, transition=easing.outSine  })
+        transition.to( replayBtn, { delay=175, time=1, alpha=0 })
+        transition.to( homeBtn, { delay=175, time=60, yScale=0.5, transition=easing.outSine  })
+        transition.to( homeBtn, { delay=235, time=1, alpha=0 })
+        timer.performWithDelay( 235, arrowImageDown )
+        timer.performWithDelay( 235, settingsActiveTrue )
+    end
+
+    local function clickArrow( event )
+        if( settingsActive == "true" ) then
+            if( arrowState == "up" ) then
+                arrowState = "down"
+                settingsClose()
+            elseif( arrowState == "down") then
+                arrowState = "up"
+                settingsOpen()
+            end
+        end
+        return true
+    end
+
+    local function clickHome( event )
+        if( settingsActive == "true" ) then
+            composer.removeScene( "goblin-slider" )
+            composer.gotoScene( "start-screen" )
+        end
+        return true
+    end
+
+    local function clickReplay( event )
+        if( settingsActive == "true" ) then
+            composer.gotoScene( "replay" )
+        end
+        return true
+    end
+
+    local function clickAudio( event )
+        if( settingsActive == "true" ) then
+            --show audio settings
+            if( _myG.audioOn == "true" ) then
+                audioBtn:setFrame(4)
+                _myG.audioOn = "false"
+                audio.stop()
+            elseif( _myG.audioOn == "false" ) then
+                audioBtn:setFrame(1)
+                _myG.audioOn = "true"
+            end
+        end
+        return true
+    end
+
+    arrowBtn:addEventListener( "touch", clickArrow )
+    homeBtn:addEventListener( "tap", clickHome )
+    replayBtn:addEventListener( "tap", clickReplay )
+    audioBtn:addEventListener( "tap", clickAudio )
+
+    -- ad space
+    local adBg = display.newRect( cX, cH, display.contentWidth, 90*mW )
+    adBg:setFillColor( 0, 0, 0, 1 )
+    adBg.anchorY = 1
+    sceneGroup:insert( adBg ) 
+
 end --end scene:create
 
 ---------------------------------------------------------------------------------
@@ -1241,6 +1398,8 @@ function scene:show( event )
         _myG.ribbon[2].alpha=0
         _myG.ribbon[3].alpha=0
 
+        matchGroup.alpha=0
+
         randomizeHeads()
         randomizeTorso()
         randomizeLegs()
@@ -1249,7 +1408,8 @@ function scene:show( event )
         -- Called when the scene is now on screen
 
         -- Load Goblin banner and UI 
-        composer.showOverlay( "ui-overlay", { effect="fade" }  )
+        composer.showOverlay( "ui-overlay" )
+        print( "calling overlay" )
 
         -- activeBlock always starts at 1
 

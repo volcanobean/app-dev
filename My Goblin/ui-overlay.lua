@@ -19,7 +19,10 @@ local crankTimer
 local signTimer
 local uiActiveTrue
 local turnCrank
-local uiShader2
+local gearGroup
+local gearShade
+local signShade
+local shader
 
 local signSprite
 local signIsUp
@@ -28,14 +31,14 @@ local replaySign
 local replayYesBtn
 local replayNoBtn
 local bannerGroup
-local replayShade2
+local replayBtnShade
 
 local bannerUpY
 local bannerDownY
 local bannerStretchY
 local getMatchParts
-
 local notGobPlayed = "false"
+local playIntro
 
 ---------------------------------------------------------------------------------
 -- SCENE:CREATE - Initialize the scene here.
@@ -43,6 +46,10 @@ local notGobPlayed = "false"
 
 function scene:create( event )
     local sceneGroup = self.view
+
+    print( "creating overlay" )
+
+    --local thing = display.newRect( sceneGroup, cX, cY, 50, 50 )
 
     local startX
     local endX
@@ -69,10 +76,6 @@ function scene:create( event )
 
     -- Create table to hold data for goblin match
 
-    local matchBlocks = {}
-    matchBlocks[1] = 1
-    matchBlocks[2] = 1
-    matchBlocks[3] = 1
     _myG.headsMatch.activeBlock = 1
     _myG.torsoMatch.activeBlock = 1
     _myG.legsMatch.activeBlock = 1
@@ -81,37 +84,17 @@ function scene:create( event )
     local bannerState = "up"
     local handleState = "up"
     local signState = "goblin"
-    local arrowState = "down"
-    local settingsActive = "true"
 
-    --local debug
-
-    local goblinText = display.newText( "", display.contentCenterX, 985, native.systemFont, 30 )  
-    local activeText = display.newText( "UI Active: " .. _myG.uiActive, display.contentCenterX, 950, native.systemFont, 30 ) 
-
-    local matchBlocksText = display.newText( "Match these: " .. _myG.headsMatch.activeBlock .. ", " .. _myG.torsoMatch.activeBlock .. ", " .. _myG.legsMatch.activeBlock, display.contentCenterX, 20, native.systemFont, 30 )
-    _myG.activeRibbonsText = display.newText( "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock, display.contentCenterX, 60, native.systemFont, 30 )
-
-    sceneGroup:insert( goblinText )
-    sceneGroup:insert( activeText )
-    sceneGroup:insert( matchBlocksText )
-    sceneGroup:insert( _myG.activeRibbonsText )
-
-    goblinText.isVisible = false
-    activeText.isVisible = false
-    matchBlocksText.isVisible = false
-    _myG.activeRibbonsText.isVisible = false
-
-    -- UI on/off functions
+        -- UI on/off functions
 
     local function uiActiveFalse()
         _myG.uiActive = "false"
-        activeText.text = "UI Active: " .. _myG.uiActive
+        --activeText.text = "UI Active: " .. _myG.uiActive
     end
 
     function uiActiveTrue()
         _myG.uiActive = "true"
-        activeText.text = "UI Active: " .. _myG.uiActive
+        --activeText.text = "UI Active: " .. _myG.uiActive
     end
 
     -- Audio
@@ -158,11 +141,11 @@ function scene:create( event )
     local yayGoblin = audio.loadSound( "audio/yays.wav" )
 
     local function stopAudio()
-        goblinText.text = ""
+        --goblinText.text = ""
     end
 
     local function audioWheresMyGoblin()
-        goblinText.text = "Where's my goblin?" 
+        --goblinText.text = "Where's my goblin?" 
         -- Play sound
         if( _myG.audioOn == "true" ) then
             audio.play( whereGoblin )
@@ -171,7 +154,7 @@ function scene:create( event )
     end
 
     local function audioThatsMyGoblin()
-        goblinText.text = "That's my goblin!" 
+        --goblinText.text = "That's my goblin!" 
         if( _myG.audioOn == "true" ) then
             audio.play( thatGoblin )
         end
@@ -179,7 +162,7 @@ function scene:create( event )
     end
 
     local function audioNotMyGoblin()
-        goblinText.text = "That's not my goblin." 
+        --goblinText.text = "That's not my goblin." 
         if( _myG.audioOn == "true" ) and ( notGobPlayed == "false") then
             audio.play( notGoblin )
             notGobPlayed = "true"
@@ -188,197 +171,46 @@ function scene:create( event )
     end
 
     local function audioYay()
-        goblinText.text = "Yay!" 
+        --goblinText.text = "Yay!" 
         if( _myG.audioOn == "true" ) then
             audio.play( yayGoblin )
         end
         --timer.performWithDelay( 2000, stopAudio )
     end
 
-    local uiShader1 = display.newImageRect( "images/ui-shader-1.png", 385*mW, 399*mW )
-    uiShader1.anchorX = 0
-    uiShader1.anchorY = 1
-    uiShader1.x = 0
-    uiShader1.y = cH
-    sceneGroup:insert( uiShader1 )
+    -- UI bg shade
 
-    uiShader2 = display.newImageRect( "images/ui-shader-2.png", 384*mW, 295*mW )
-    uiShader2.anchorX = 1
-    uiShader2.anchorY = 1
-    uiShader2.x = cW
-    uiShader2.y = cH
-    sceneGroup:insert( uiShader2 )
+    gearShade = display.newImageRect( "images/ui-shader-1.png", 385*mW, 399*mW )
+    gearShade.anchorX = 0
+    gearShade.anchorY = 1
+    gearShade.x = 0
+    gearShade.y = cH
+    sceneGroup:insert( gearShade )
 
-    -- Settings sprites
-    
-    local settingsSheetInfo = require("settings-sheet")
-    local settingsSheet = graphics.newImageSheet( "images/settings.png", settingsSheetInfo:getSheet() )
-    local settingsFrames  = { start=1, count=6 }
+    signShade = display.newImageRect( "images/ui-shader-2.png", 384*mW, 295*mW )
+    signShade.anchorX = 1
+    signShade.anchorY = 1
+    signShade.x = cW
+    signShade.y = cH
+    sceneGroup:insert( signShade )
 
-    local settingsX = 665*mW
+    -- expanded handle hit area
 
-    local homeBtnY = 40*mW
-    local replayBtnY = 168*mW
-    local audioBtnY = 300*mW
-
-    local arrowBtn = display.newSprite( settingsSheet, settingsFrames )
-    arrowBtn:setFrame(2)
-    arrowBtn.anchorY = 0 
-    arrowBtn.x = settingsX
-    arrowBtn.y = -44*mW
-    
-    local homeBtn = display.newSprite( settingsSheet, settingsFrames )
-    homeBtn:setFrame(3)
-    homeBtn.anchorY = 0 
-    homeBtn.x = settingsX
-    homeBtn.y = homeBtnY
-
-    local replayBtn = display.newSprite( settingsSheet, settingsFrames )
-    replayBtn:setFrame(5)
-    replayBtn.anchorY = 0 
-    replayBtn.x = settingsX
-    replayBtn.y = replayBtnY
-
-    local audioBtn = display.newSprite( settingsSheet, settingsFrames )
-    audioBtn:setFrame(1)
-    audioBtn.anchorY = 0 
-    audioBtn.x = settingsX
-    audioBtn.y = audioBtnY
-
-    audioBtn.yScale=0.25
-    audioBtn.alpha=0
-    replayBtn.yScale=0.5
-    replayBtn.alpha=0
-    homeBtn.yScale=0.5
-    homeBtn.alpha=0
-
-    sceneGroup:insert( audioBtn )
-    sceneGroup:insert( replayBtn )
-    sceneGroup:insert( homeBtn  )
-    sceneGroup:insert( arrowBtn )
-
-    -- settings-related functions
-    
-    local function settingsActiveTrue()
-        settingsActive = "true"
-        print ("settingsActive: " .. settingsActive)
-    end 
-
-    local function settingsActiveFalse()
-        settingsActive = "false"
-        print ("settingsActive: " .. settingsActive)
-    end 
-
-    local function arrowImageDown()
-        arrowBtn:setFrame(2)
-    end
-
-    local function arrowImageUp()
-        arrowBtn:setFrame(6)
-    end
-
-    local function settingsOpen()
-        settingsActiveFalse()
-        transition.to( homeBtn, { time=1, alpha=1 })
-        transition.to( homeBtn, { delay=1, time=150, y=homeBtnY+48*mW, yScale=1, transition=easing.outSine })
-        transition.to( homeBtn, { delay=150, time=150, y=homeBtnY, transition=easing.outSine })
-        transition.to( replayBtn, { delay=250, time=1, alpha=1 })
-        transition.to( replayBtn, { delay=250, time=150, y=replayBtnY+50*mW, yScale=1, transition=easing.outSine })
-        transition.to( replayBtn, { delay=400, time=150, y=replayBtnY, transition=easing.outSine })
-        transition.to( audioBtn, { delay=500, time=1, alpha=1 })
-        transition.to( audioBtn, { delay=500, time=150, y=audioBtnY+50*mW, yScale=1, transition=easing.outSine })
-        transition.to( audioBtn, { delay=650, time=150, y=audioBtnY, transition=easing.outSine })
-        timer.performWithDelay( 700, arrowImageUp )
-        timer.performWithDelay( 700, settingsActiveTrue )
-    end
-
-    local function settingsClose()
-        settingsActiveFalse()
-        transition.to( audioBtn, { time=100, yScale=0.25, transition=easing.outSine })
-        transition.to( audioBtn, { delay=100, time=1, alpha=0 })
-        transition.to( replayBtn, { delay=100, time=75, yScale=0.5, transition=easing.outSine  })
-        transition.to( replayBtn, { delay=175, time=1, alpha=0 })
-        transition.to( homeBtn, { delay=175, time=60, yScale=0.5, transition=easing.outSine  })
-        transition.to( homeBtn, { delay=235, time=1, alpha=0 })
-        timer.performWithDelay( 235, arrowImageDown )
-        timer.performWithDelay( 235, settingsActiveTrue )
-    end
-
-    local function clickArrow( event )
-        if( settingsActive == "true" ) then
-            if( arrowState == "up" ) then
-                arrowState = "down"
-                settingsClose()
-            elseif( arrowState == "down") then
-                arrowState = "up"
-                settingsOpen()
-            end
-        end
-        return true
-    end
-
-    local function clickHome( event )
-        if( settingsActive == "true" ) then
-            composer.removeScene( "goblin-slider" )
-            composer.gotoScene( "start-screen" )
-        end
-        return true
-    end
-
-    local function clickReplay( event )
-        if( settingsActive == "true" ) then
-            composer.gotoScene( "replay" )
-        end
-        return true
-    end
-
-    local function clickAudio( event )
-        if( settingsActive == "true" ) then
-            --show audio settings
-            if( _myG.audioOn == "true" ) then
-                audioBtn:setFrame(4)
-                _myG.audioOn = "false"
-                audio.stop()
-            elseif( _myG.audioOn == "false" ) then
-                audioBtn:setFrame(1)
-                _myG.audioOn = "true"
-            end
-        end
-        return true
-    end
-
-    arrowBtn:addEventListener( "touch", clickArrow )
-    homeBtn:addEventListener( "tap", clickHome )
-    replayBtn:addEventListener( "tap", clickReplay )
-    audioBtn:addEventListener( "tap", clickAudio )
-
-    -- handle block
-
-    local gearBlock = display.newRect( 0, display.contentHeight, 125*mW, 400*mW )
-    gearBlock.anchorX = 0
-    gearBlock.anchorY = 1
+    local handleHit = display.newRect( 0, display.contentHeight, 125*mW, 400*mW )
+    handleHit.anchorX = 0
+    handleHit.anchorY = 1
     if ( _myG.adsLoaded == "true" ) then
-        gearBlock.y = display.contentHeight-(91*mW)
+        handleHit.y = display.contentHeight-(91*mW)
     end
 
-    gearBlock.isVisible = false
-    gearBlock.isHitTestable = true
+    handleHit.isVisible = false
+    handleHit.isHitTestable = true
 
-    sceneGroup:insert( gearBlock ) 
+    sceneGroup:insert( handleHit )
 
-    -- Banner sprites
-
-    local shader = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth+10, display.contentHeight+10 )
-    -- can't start object with an alpha of 0 or corona will not render it
-    -- also, transition values will be relative to intial value, so we start with 1 (100%)
-    shader:setFillColor( 0, 0, 0, 1 ) 
-    -- transition to alpha 0 to hide shader on page load
-    transition.to( shader, { time=1, alpha=0 } )
-    sceneGroup:insert( shader )
-
-    local banner = display.newImageRect( "images/banner.png", 569*mW, 1050*mW) --scale up from 512
-
-    -- Add goblin match pieces to banner
+---------------------------------------------------------------------------------
+-- Match parts
+---------------------------------------------------------------------------------
 
     local matchGroup = display.newGroup()
 
@@ -418,12 +250,20 @@ function scene:create( event )
         _myG.legsMatch[r1].y = 850*mW
 
         -- debug
-        matchBlocksText.text = "Match these: " .. _myG.headsMatch.activeBlock .. ", " .. _myG.torsoMatch.activeBlock .. ", " .. _myG.legsMatch.activeBlock
+        --matchBlocksText.text = "Match these: " .. _myG.headsMatch.activeBlock .. ", " .. _myG.torsoMatch.activeBlock .. ", " .. _myG.legsMatch.activeBlock
     end
 
-    -- generate intial values
+---------------------------------------------------------------------------------
+-- Banner
+---------------------------------------------------------------------------------
 
-    --getMatchParts()
+    shader = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth+10, display.contentHeight+10 )
+    shader:setFillColor( 0, 0, 0, 1 )
+    sceneGroup:insert( shader )
+
+    local banner = display.newImageRect( "images/banner.png", 569*mW, 1050*mW) --scale up from 512
+
+    -- Add goblin match pieces to banner
 
     local mScale = 0.83 
     matchGroup:scale( mScale, mScale )
@@ -499,7 +339,9 @@ function scene:create( event )
         end
     end
 
-    -- gear sprite
+---------------------------------------------------------------------------------
+-- Gear
+---------------------------------------------------------------------------------
 
     local gearSequence =
     {
@@ -515,7 +357,6 @@ function scene:create( event )
     local gearHandleY = display.contentHeight-(91*mW)
     gearHandle.y = gearHandleY
     gearHandle.anchorY = 1
-    sceneGroup:insert( gearHandle )
 
     local function handleStateDown()
         handleState = "down"
@@ -545,7 +386,12 @@ function scene:create( event )
     gearSprite.x = 0
     gearSprite.y = cH
     gearSprite:setFrame(1) -- 1 refers to the first frame in the sequence (6), not the frame number
-    sceneGroup:insert( gearSprite )
+
+    gearGroup = display.newGroup()
+    gearGroup:insert( gearHandle )
+    gearGroup:insert( gearSprite )
+
+    sceneGroup:insert( gearGroup )
 
     local function gearForward()
         gearSprite:setSequence( "forward" )
@@ -557,7 +403,9 @@ function scene:create( event )
         gearSprite:play()
     end
 
-    -- sign sprite
+---------------------------------------------------------------------------------
+-- Sign
+---------------------------------------------------------------------------------
 
     local signSequence =
     {
@@ -573,7 +421,8 @@ function scene:create( event )
     signSprite = display.newSprite( signSheet, signSequence )
     signSprite.anchorY = 1
     signSprite.x = 654*mW
-    signSprite.y = cH 
+    signSprite.y = cH
+    signSprite:setSequence( "spin" )
     signSprite:setFrame(1) -- 1 refers to the first frame in the sequence (6), not the frame number
     sceneGroup:insert( signSprite )
 
@@ -606,15 +455,17 @@ function scene:create( event )
         signState = "goblin"
     end
 
-    -- replay sign sprites
+---------------------------------------------------------------------------------
+-- Reply banner
+---------------------------------------------------------------------------------
 
     replayShader = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth+10, display.contentHeight+10 )
     replayShader:setFillColor( 0, 0, 0, 1 ) 
     sceneGroup:insert( replayShader )
 
-    replayShade2 = display.newImageRect( sceneGroup, "images/replay-shader.png", cW, 510*mW )
-    replayShade2.x = cX
-    replayShade2.y = cY+130*mW
+    replayBtnShade = display.newImageRect( sceneGroup, "images/replay-shader.png", cW, 510*mW )
+    replayBtnShade.x = cX
+    replayBtnShade.y = cY+130*mW
 
     local replaySheetInfo = require("replay-sheet")
     local replaySheet = graphics.newImageSheet( "images/replay-sheet.png", replaySheetInfo:getSheet() )
@@ -629,6 +480,17 @@ function scene:create( event )
     replayNoBtn:setFrame(1)
     replayNoBtn.anchorY = 0 
     replayNoBtn.x = 490*mW
+
+    local function clickHome( event )
+        composer.removeScene( "goblin-slider" )
+        composer.gotoScene( "start-screen" )
+        return true
+    end
+
+    local function clickReplay( event )
+        composer.gotoScene( "replay" )
+        return true
+    end
 
     replayYesBtn:addEventListener( "tap", clickReplay )
     replayNoBtn:addEventListener( "tap", clickHome )
@@ -731,12 +593,13 @@ function scene:create( event )
     ]]--
 
     local function replaySignDown()
+        --replaySign.isVisible=true
         playBannerFX()
         transition.to( replaySign, { time=1, alpha=1 })
         transition.to( replaySign, { time=350, y=50*mW, yScale=1, transition=easing.outSine })
         transition.to( replaySign, { delay=350, time=200, y=0, transition=easing.outSine })
         transition.to( replayShader, { time=300, alpha=0.5 } )
-        transition.to( replayShade2, { time=600, alpha=1 } )
+        transition.to( replayBtnShade, { time=600, alpha=1 } )
         timer.performWithDelay( 200, replayBtnsOpen )
     end
 
@@ -779,10 +642,10 @@ function scene:create( event )
         gearSprite.y = cH-_myG.adsHeight
         gearHandle.y = gearHandleY-_myG.adsHeight
         signSprite.y = cH-_myG.adsHeight
-        uiShader1.y = cH-_myG.adsHeight
-        uiShader2.y = cH-_myG.adsHeight
+        gearShade.y = cH-_myG.adsHeight
+        signShade.y = cH-_myG.adsHeight
 
-        -- fake ad, ad space
+        -- ad space
         local adSpace = display.newRect( cX, cH, display.contentWidth, 90*mW )
         adSpace:setFillColor( 0, 0, 0, 1 )
         adSpace.anchorY = 1
@@ -793,7 +656,6 @@ function scene:create( event )
         local myTime 
         local myMinutes
         local mySeconds
-
         if secs > 59 then
             myMinutes = math.floor(secs/60)
             mySeconds = secs-(math.floor(secs/60)*60)
@@ -1004,11 +866,17 @@ function scene:create( event )
 
     signSprite:addEventListener( "tap", signCompare )
     gearSprite:addEventListener( "tap", turnCrank )
-    --gearHandle:addEventListener( "tap", turnCrank )
     gearHandle:addEventListener( "touch", handleDrag )
-    gearBlock:addEventListener( "touch", handleDrag )
+    handleHit:addEventListener( "touch", handleDrag )
     shader:addEventListener( "tap", raiseBannerNow )
 
+    -- INTRO ANIMATION:
+
+    function playIntro()
+        uiActiveTrue() -- temporarily true to allow first animation
+        transition.to( gearGroup, { time=800, y=0, transition=easing.outSine })
+        crankTimer = timer.performWithDelay( 1200, turnCrank )
+    end
 
 --end scene:create
 end 
@@ -1021,35 +889,43 @@ function scene:show( event )
     local sceneGroup = self.view
 
     if ( event.phase == "will" ) then
+        print( "WILL show scene" )
         -- Called when the scene is still off screen (but is about to come on screen).
 
         getMatchParts()
 
         signIsUp = "false"
-        transition.to( signSprite, { time=0, y=cH+100*mW })
-        transition.to( uiShader2, { time=0, alpha=0 })
-
-        transition.to( replayShader, { time=0, alpha=0 })
-        transition.to( replayShade2, { time=0, alpha=0 } )
+        signSprite.y=cH+100*mW
+        gearShade.alpha=0
+        signShade.alpha=0
+        shader.alpha=0
+        replayShader.alpha=0
+        replayBtnShade.alpha=0
 
         -- set inital banner values
-        transition.to( bannerGroup, { time=0, y=bannerUpY, yScale=0.5 })
+        bannerGroup.y=bannerUpY
+        bannerGroup.yScale=0.5
 
         -- set inital sign position
-        transition.to( replaySign, { time=0, y=-300, yScale=0.5 })
-        transition.to( replaySign, { time=1, alpha=0 }) 
-        transition.to( replayYesBtn, { time=0, y=cY-40*mW, yScale=0.25, alpha=0 })
-        transition.to( replayNoBtn, { time=0, y=cY-40*mW, yScale=0.25, alpha=0 })
-        
+        replaySign.y=-300*mW
+        replaySign.yScale=0.5
+        replaySign.alpha=0
+        replayYesBtn.y=cY-40*mW
+        replayYesBtn.yScale=0.25
+        replayYesBtn.alpha=0
+        replayNoBtn.y=cY-40*mW
+        replayNoBtn.yScale=0.25
+        replayNoBtn.alpha=0
+
+        gearGroup.y=cH-100*mW
+
     elseif ( event.phase == "did" ) then
+        print( "DID show scene" )
         -- Called when the scene is now on screen.
 
-        -- INTRO ANIMATION:
-
-        uiActiveTrue() -- temporarily true to allow first animation
-        crankTimer = timer.performWithDelay( 800, turnCrank )
-
+        playIntro()
     end
+
 end
 
 ---------------------------------------------------------------------------------

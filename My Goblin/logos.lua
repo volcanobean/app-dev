@@ -128,13 +128,13 @@ function scene:create( event )
     letterC:setFrame(1)
     letterC:setFillColor( 0.392, 0.976, 0.682, 1 )
     letterC.x = 345*mW
-    letterC.y = textY-3*mW
+    letterC.y = textY
     
     letterO = display.newSprite( letterSheet, letterFrames )
     letterO:setFrame(5)
     letterO:setFillColor( 0.369, 1, 0.909, 1 )
     letterO.x = 425*mW
-    letterO.y = textY-3*mW
+    letterO.y = textY
     
     letterR = display.newSprite( letterSheet, letterFrames )
     letterR:setFrame(6)
@@ -146,7 +146,7 @@ function scene:create( event )
     letterG:setFrame(2)
     letterG:setFillColor( 1, 0.447, 0.369, 1)
     letterG.x = 582*mW
-    letterG.y = textY-3*mW
+    letterG.y = textY
     
     letterI2 = display.newSprite( letterSheet, letterFrames )
     letterI2:setFrame(3)
@@ -333,6 +333,8 @@ function scene:show( event )
 
         timer.performWithDelay( 8000, whiteToBlack )
         transition.to( whiteMask, { delay=8001, time=300, alpha=1 } )
+        transition.to( vbText, { delay=8310, time=1, alpha=0 } )
+        transition.to( vbFire, { delay=8310, time=1, alpha=0 } )
 
         timer.performWithDelay( 9000, nextScene )
 

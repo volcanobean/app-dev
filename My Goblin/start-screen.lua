@@ -1,7 +1,5 @@
 ---------------------------------------------------------------------------------
---
 -- start-screen.lua
---
 ---------------------------------------------------------------------------------
 
 print ("start of start-screen")
@@ -52,12 +50,20 @@ local tapGroup
 local playGoblinTheme
 local stopGoblinTheme
 
--- -----------------------------------------------------------------------------------------------------------------
--- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called.
--- -----------------------------------------------------------------------------------------------------------------
+local easyText
+local medText
+local hardText
+local easyTextDark
+local medTextDark
+local hardTextDark
 
--- "scene:create()"
--- Initialize the scene here.
+local titleGroup
+local levelsSignGroup
+
+---------------------------------------------------------------------------------
+-- SCENE:CREATE - Initialize the scene here.
+---------------------------------------------------------------------------------
+
 function scene:create( event )
     local sceneGroup = self.view
 
@@ -75,64 +81,157 @@ function scene:create( event )
         audio.stop()
     end
 
-    -- create start function
-
-    local function startGame( event ) 
-        composer.gotoScene( "goblin-slider" )
-        --_myG.background.isVisible = false
-        return true
-    end
-
     _myG.background = display.newImageRect( "images/forest-bg.jpg", display.contentWidth, 1366*mW)
+    --_myG.background = display.newImageRect( "images/new-title-mock.jpg", display.contentWidth, 1024*mW)
     _myG.background.x = display.contentCenterX
     _myG.background.y = display.contentCenterY
     sceneGroup:insert( _myG.background )
 
     -- game title
-    local titleText1 = display.newText( "where's my", display.contentCenterX, display.contentCenterY-(180*mW), "Mathlete-Skinny", 135*mW )
-    local titleText1b = display.newText( "where's my", display.contentCenterX+3*mW, display.contentCenterY-(177*mW), "Mathlete-Skinny", 135*mW )
+    local titleText1 = display.newText( "where's my", display.contentCenterX, display.contentCenterY-(220*mW), "Mathlete-Skinny", 135*mW )
+    local titleText1b = display.newText( "where's my", display.contentCenterX+3*mW, display.contentCenterY-(217*mW), "Mathlete-Skinny", 135*mW )
     titleText1b:setFillColor( 0, 0, 0, 0.8 )
-    local titleText2 = display.newText( "goblin?", display.contentCenterX, display.contentCenterY-(60*mW), "Mathlete-Skinny", 235*mW)
-    local titleText2b = display.newText( "goblin?", display.contentCenterX+5*mW, display.contentCenterY-(55*mW), "Mathlete-Skinny", 235*mW)
+    local titleText2 = display.newText( "goblin?", display.contentCenterX, display.contentCenterY-(100*mW), "Mathlete-Skinny", 235*mW)
+    local titleText2b = display.newText( "goblin?", display.contentCenterX+5*mW, display.contentCenterY-(95*mW), "Mathlete-Skinny", 235*mW)
     titleText2b:setFillColor( 0, 0, 0, 0.8 )
 
-    sceneGroup:insert( titleText1b )
-    sceneGroup:insert( titleText1 )
-    sceneGroup:insert( titleText2b )
-    sceneGroup:insert( titleText2 )
+    titleGroup = display.newGroup()
+    titleGroup:insert( titleText1b )
+    titleGroup:insert( titleText1 )
+    titleGroup:insert( titleText2b )
+    titleGroup:insert( titleText2 )
 
-    local easyBtn = display.newText( "easy", display.contentCenterX, display.contentCenterY+(165*mW), "Mathlete-SkinnySlant", 80*mW )
-    local medBtn = display.newText( "medium", display.contentCenterX, display.contentCenterY+(255*mW), "Mathlete-SkinnySlant", 80*mW )
-    local hardBtn = display.newText( "hard", display.contentCenterX, display.contentCenterY+(345*mW), "Mathlete-SkinnySlant", 80*mW )
+    sceneGroup:insert( titleGroup )
+
+
+    -- levels sprites
+
+    local levelsSheetInfo = require("levels-sheet")
+    local levelsSheet = graphics.newImageSheet( "images/levels-sheet.png", levelsSheetInfo:getSheet() )
+    local levelsFrames =  { start=1, count=9 }
     
-    local function setToEasy( event )
-        _myG.difficulty = "easy"
-        print( _myG.difficulty )
-        startGame()
-        return true
+    local levelSequence =
+    {
+        { name="easy", frames={ 1, 5, 6, 7, 8, 9, 1, }, time=252, loopCount=1 },
+        { name="med", frames={ 3, 5, 6, 7, 8, 9, 3 }, time=252, loopCount=1 },
+        { name="hard", frames={ 2, 5, 6, 7, 8, 9, 2 }, time=252, loopCount=1 },
+    }
+
+    local levelsPost = display.newSprite( levelsSheet, levelsFrames )
+    levelsPost:setFrame( 4 )
+    levelsPost.x = cX
+    levelsPost.y = cH-195*mW
+
+    local easySign = display.newSprite( levelsSheet, levelSequence )
+    easySign:setSequence( "easy" )
+    easySign:setFrame(1)
+    easySign.x = cX+3*mW
+    easySign.y = cH-350*mW
+
+    local medSign = display.newSprite( levelsSheet, levelSequence )
+    medSign:setSequence( "med" )
+    medSign:setFrame(1)
+    medSign.x = cX
+    medSign.y = cH-250*mW
+
+    local hardSign = display.newSprite( levelsSheet, levelSequence )
+    hardSign:setSequence( "hard" )
+    hardSign:setFrame(1)
+    hardSign.x = cX+7*mW
+    hardSign.y = cH-140*mW 
+
+    easyText = display.newText( "easy", display.contentCenterX, display.contentCenterY+(165*mW), "Mathlete-Skinny", 80*mW )
+    easyText.x = cX+5*mW
+    easyText.y = cH-375*mW 
+    easyText:setFillColor( 232/255, 1, 186/255, 1 )
+
+    medText = display.newText( "medium", display.contentCenterX, display.contentCenterY+(255*mW), "Mathlete-Skinny", 80*mW )
+    medText.x = cX
+    medText.y = cH-275*mW
+    medText:setFillColor( 232/255, 1, 186/255, 1 )
+
+    hardText = display.newText( "hard", display.contentCenterX, display.contentCenterY+(345*mW), "Mathlete-Skinny", 80*mW )
+    hardText.x = cX+7*mW
+    hardText.y = cH-165*mW 
+    hardText:setFillColor( 232/255, 1, 186/255, 1 )
+
+    easyTextDark = display.newText( "easy", display.contentCenterX, display.contentCenterY+(165*mW), "Mathlete-Skinny", 80*mW )
+    easyTextDark.x = cX+5*mW
+    easyTextDark.y = cH-375*mW 
+    easyTextDark:setFillColor( 123/255, 123/255, 87/255, 1 )
+
+    medTextDark = display.newText( "medium", display.contentCenterX, display.contentCenterY+(255*mW), "Mathlete-Skinny", 80*mW )
+    medTextDark.x = cX
+    medTextDark.y = cH-275*mW
+    medTextDark:setFillColor( 123/255, 123/255, 87/255, 1 )
+
+    hardTextDark = display.newText( "hard", display.contentCenterX, display.contentCenterY+(345*mW), "Mathlete-Skinny", 80*mW )
+    hardTextDark.x = cX+7*mW
+    hardTextDark.y = cH-165*mW 
+    hardTextDark:setFillColor( 123/255, 123/255, 87/255, 1 )
+
+    local shadowDistance = 3*mW
+    local easyTextShadow = display.newText( "easy", display.contentCenterX, display.contentCenterY+(165*mW), "Mathlete-Skinny", 80*mW )
+    easyTextShadow.x = easyText.x + shadowDistance
+    easyTextShadow.y = easyText.y + shadowDistance
+    easyTextShadow:setFillColor( 0, 0, 0, 0.8 )
+
+    local medTextShadow = display.newText( "medium", display.contentCenterX, display.contentCenterY+(255*mW), "Mathlete-Skinny", 80*mW )
+    medTextShadow.x = medText.x + shadowDistance
+    medTextShadow.y = medText.y + shadowDistance
+    medTextShadow:setFillColor( 0, 0, 0, 0.8 )
+
+    local hardTextShadow = display.newText( "hard", display.contentCenterX, display.contentCenterY+(345*mW), "Mathlete-Skinny", 80*mW )
+    hardTextShadow.x = hardText.x + shadowDistance
+    hardTextShadow.y = hardText.y + shadowDistance
+    hardTextShadow:setFillColor( 0, 0, 0, 0.8 )
+
+    local function textToWhite()
+        if( _myG.difficulty == "easy" ) then
+            easyText:setFillColor( 1, 1, 1, 1 )
+        elseif( _myG.difficulty == "medium" ) then
+            medText:setFillColor( 1, 1, 1, 1 )
+        elseif( _myG.difficulty == "hard" ) then
+            hardText:setFillColor( 1, 1, 1, 1 )
+        end
     end
 
-    local function setToMed( event )
-        _myG.difficulty = "medium"
-        print( _myG.difficulty )
-        startGame()
-        return true
+    local function textSpin()
+        local spinText
+        local spinTextShadow
+        if( _myG.difficulty == "easy" ) then
+            spinText = easyText
+            spinTextShadow = easyTextShadow
+        elseif( _myG.difficulty == "medium" ) then
+            spinText = medText
+            spinTextShadow = medTextShadow
+        elseif( _myG.difficulty == "hard" ) then
+            spinText = hardText
+            spinTextShadow = hardTextShadow
+        end
+        transition.to( spinText, { delay=35, time=0, alpha=0 })
+        transition.to( spinTextShadow, { delay=35, time=0, alpha=0 })
+        timer.performWithDelay( 216, textToWhite )
+        transition.to( spinText, { delay=216, time=0, alpha=1 })
+        transition.to( spinTextShadow, { delay=216, time=0, alpha=1 })
     end
 
-    local function setToHard( event )
-        _myG.difficulty = "hard"
-        print( _myG.difficulty )
-        startGame()
-        return true
-    end
+    levelsSignGroup = display.newGroup()
+    levelsSignGroup:insert( levelsPost )
+    levelsSignGroup:insert( easySign )
+    levelsSignGroup:insert( medSign )
+    levelsSignGroup:insert( hardSign ) 
+    levelsSignGroup:insert( easyTextShadow )
+    levelsSignGroup:insert( medTextShadow )
+    levelsSignGroup:insert( hardTextShadow )
+    levelsSignGroup:insert( easyText )
+    levelsSignGroup:insert( medText )
+    levelsSignGroup:insert( hardText )
+    levelsSignGroup:insert( easyTextDark )
+    levelsSignGroup:insert( medTextDark )
+    levelsSignGroup:insert( hardTextDark )
 
-    easyBtn:addEventListener( "tap", setToEasy )
-    medBtn:addEventListener( "tap", setToMed )
-    hardBtn:addEventListener( "tap", setToHard )
-
-    sceneGroup:insert( easyBtn )
-    sceneGroup:insert( medBtn )
-    sceneGroup:insert( hardBtn )
+    sceneGroup:insert( levelsSignGroup ) 
 
     -- Settings sprites
     
@@ -241,15 +340,79 @@ function scene:create( event )
     blackMask:setFillColor( 0, 0, 0, 1 )
     sceneGroup:insert( blackMask )
 
-    -- fake ad, ad space
-    local adSpace = display.newRect( cX, cH, display.contentWidth, 90*mW )
-    adSpace:setFillColor( 0, 0, 0, 1 )
-    adSpace.anchorY = 1
-    sceneGroup:insert( adSpace ) 
+    -- ad space
+    local adBg = display.newRect( cX, cH, display.contentWidth, 90*mW )
+    adBg:setFillColor( 0, 0, 0, 1 )
+    adBg.anchorY = 1
+    sceneGroup:insert( adBg ) 
+
+
+    -- create start function
+
+    local function startGame() 
+        composer.gotoScene( "goblin-slider" )
+    end
+
+    local function goToStart()
+        transition.to( levelsSignGroup, { delay=100, time=100, y=-50*mW, transition=easing.outSine })
+        transition.to( levelsSignGroup, { delay=200, time=200, y=400*mW, transition=easing.inSine })
+        transition.to ( titleGroup, { delay=100, time=500, alpha=0 })
+        timer.performWithDelay( 800, startGame )
+    end
+
+       local function setToEasy( event )
+        _myG.difficulty = "easy"
+        print( _myG.difficulty )
+        easySign:setSequence( "easy" )
+        easySign:play()
+        textSpin()
+        easyText:setFillColor( 1, 1, 1, 1 )
+        transition.to( medTextDark, { time=216, alpha=1 })
+        transition.to( hardTextDark, { time=216, alpha=1 })
+        transition.to( medText, { time=216, alpha=0 })
+        transition.to( hardText, { time=216, alpha=0 })
+        timer.performWithDelay( 300, goToStart )
+        return true
+    end
+
+    local function setToMed( event )
+        _myG.difficulty = "medium"
+        print( _myG.difficulty )
+        medSign:setSequence( "med" )
+        medSign:play()
+        textSpin()
+        transition.to( easyTextDark, { time=216, alpha=1 })
+        transition.to( hardTextDark, { time=216, alpha=1 })
+        transition.to( easyText, { time=216, alpha=0 })
+        transition.to( hardText, { time=216, alpha=0 })
+        timer.performWithDelay( 300, goToStart )
+        return true
+    end
+
+    local function setToHard( event )
+        _myG.difficulty = "hard"
+        print( _myG.difficulty )
+        hardSign:setSequence( "hard" )
+        hardSign:play()
+        textSpin()
+        transition.to( easyTextDark, { time=216, alpha=1 })
+        transition.to( medTextDark, { time=216, alpha=1 })
+        transition.to( easyText, { time=216, alpha=0 })
+        transition.to( medText, { time=216, alpha=0 })
+        timer.performWithDelay( 300, goToStart )
+        return true
+    end
+
+    easySign:addEventListener( "tap", setToEasy )
+    medSign:addEventListener( "tap", setToMed )
+    hardSign:addEventListener( "tap", setToHard )
 
 end
 
--- "scene:show()"
+---------------------------------------------------------------------------------
+-- SCENE:SHOW
+---------------------------------------------------------------------------------
+
 function scene:show( event )
     local sceneGroup = self.view
 
@@ -258,9 +421,23 @@ function scene:show( event )
 
         -- Show banner ad
         ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
- 
+
         -- Set pre-animated object positions
-        transition.to( tapGroup, { time=0, y=50, alpha=0 } )
+        
+        levelsSignGroup.y=0
+
+        titleGroup.alpha=1
+
+        easyText.alpha=1
+        medText.alpha=1
+        hardText.alpha=1
+        easyText:setFillColor( 232/255, 1, 186/255, 1 )
+        medText:setFillColor( 232/255, 1, 186/255, 1 )
+        hardText:setFillColor( 232/255, 1, 186/255, 1 )
+
+        easyTextDark.alpha=0
+        medTextDark.alpha=0
+        hardTextDark.alpha=0
 
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
@@ -276,8 +453,10 @@ function scene:show( event )
     end
 end
 
+---------------------------------------------------------------------------------
+-- SCENE:HIDE
+---------------------------------------------------------------------------------
 
--- "scene:hide()"
 function scene:hide( event )
     local sceneGroup = self.view
 
@@ -297,8 +476,10 @@ function scene:hide( event )
     end
 end
 
+---------------------------------------------------------------------------------
+-- SCENE:DESTROY
+---------------------------------------------------------------------------------
 
--- "scene:destroy()"
 function scene:destroy( event )
     local sceneGroup = self.view
     -- Called prior to the removal of scene's view ("sceneGroup").
@@ -306,10 +487,9 @@ function scene:destroy( event )
     -- Example: remove display objects, save state, etc.
 end
 
-
--- -------------------------------------------------------------------------------
-
+---------------------------------------------------------------------------------
 -- Listener setup
+---------------------------------------------------------------------------------
 scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
