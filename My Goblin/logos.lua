@@ -13,9 +13,16 @@ local cX = display.contentCenterX
 local cY = display.contentCenterY
 local mW = 0.0013022*cW
 
+-- global fader for scene transitions
+
+_myG.blackFader = display.newRect( cX, cY, cW, cH )
+_myG.blackFader:setFillColor( 0, 0, 0, 1 )
+_myG.blackFader.alpha=0
+
 -- Initial audio state is ON
 
 _myG.audioOn = "true"
+_myG.fromReplay = "false"
 
 -- forward declarations
 
@@ -26,7 +33,6 @@ local playIntroTone
 local playUnicorgiVO
 local playSprout
 local playVbVO
-local whiteToBlack
 local nextScene
 
 -- objects
@@ -174,10 +180,6 @@ function scene:create( event )
     whiteMask:setFillColor( 1, 1, 1, 1 )
     sceneGroup:insert( whiteMask )
 
-    function whiteToBlack()
-        whiteMask:setFillColor( 0, 0, 0, 1 )
-    end
-
     vbText = display.newImageRect( "images/vb-text.png", 584.5*mW, 76.5*mW )
     vbText.x = cX
     vbText.y = cY+120*mW
@@ -217,8 +219,6 @@ function scene:create( event )
     function nextScene()
         composer.gotoScene( "start-screen" )
     end
-
-    
 
 end
 
@@ -329,14 +329,11 @@ function scene:show( event )
         timer.performWithDelay( 5200, playSprout )
         timer.performWithDelay( 5200, playVbVO )
 
-        --transition.to( vbSprout, { time=1, alpha=1 } )
+        transition.to( _myG.blackFader, { delay=8000, time=400, alpha=1 } )
+        transition.to( vbText, { delay=8410, time=1, alpha=0 } )
+        transition.to( vbFire, { delay=8410, time=1, alpha=0 } )
 
-        timer.performWithDelay( 8000, whiteToBlack )
-        transition.to( whiteMask, { delay=8001, time=300, alpha=1 } )
-        transition.to( vbText, { delay=8310, time=1, alpha=0 } )
-        transition.to( vbFire, { delay=8310, time=1, alpha=0 } )
-
-        timer.performWithDelay( 9000, nextScene )
+        timer.performWithDelay( 8420, nextScene )
 
     end
 end

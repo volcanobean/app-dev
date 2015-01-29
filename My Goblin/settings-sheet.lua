@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:ebe7ce9a2a829f6858e97d1df4342e51:e997fe005116f523bdf13364ad2264fa:81aad88cedae2198d48186096928dacc$
+-- $TexturePacker:SmartUpdate:031ac15d13b892c67a8b319243af4644:bed837e03aaee23c31f08fd8e9893a5c:81aad88cedae2198d48186096928dacc$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -18,9 +18,21 @@ SheetInfo.sheet =
     frames = {
     
         {
-            -- settings-audio
+            -- settings-about
             x=158*mW,
             y=190*mW,
+            width=155*mW,
+            height=183*mW,
+
+            sourceX = 0,
+            sourceY = 0,
+            sourceWidth = 156*mW,
+            sourceHeight = 187*mW
+        },
+        {
+            -- settings-audio
+            x=160*mW,
+            y=2*mW,
             width=156*mW,
             height=180*mW,
 
@@ -31,8 +43,8 @@ SheetInfo.sheet =
         },
         {
             -- settings-down
-            x=318*mW,
-            y=2*mW,
+            x=315*mW,
+            y=184*mW,
             width=155*mW,
             height=141*mW,
 
@@ -55,7 +67,7 @@ SheetInfo.sheet =
         },
         {
             -- settings-mute
-            x=160*mW,
+            x=318*mW,
             y=2*mW,
             width=156*mW,
             height=180*mW,
@@ -79,8 +91,8 @@ SheetInfo.sheet =
         },
         {
             -- settings-up
-            x=318*mW,
-            y=145*mW,
+            x=315*mW,
+            y=327*mW,
             width=155*mW,
             height=141*mW,
 
@@ -98,12 +110,13 @@ SheetInfo.sheet =
 SheetInfo.frameIndex =
 {
 
-    ["settings-audio"] = 1,
-    ["settings-down"] = 2,
-    ["settings-home"] = 3,
-    ["settings-mute"] = 4,
-    ["settings-replay"] = 5,
-    ["settings-up"] = 6,
+    ["settings-about"] = 1,
+    ["settings-audio"] = 2,
+    ["settings-down"] = 3,
+    ["settings-home"] = 4,
+    ["settings-mute"] = 5,
+    ["settings-replay"] = 6,
+    ["settings-up"] = 7,
 }
 
 function SheetInfo:getSheet()

@@ -45,7 +45,6 @@ ads.init( adProvider, bannerAppID, adListener )
 
 _myG.difficulty = "easy"
 
-local blackMask 
 local tapGroup
 local playGoblinTheme
 local stopGoblinTheme
@@ -82,7 +81,6 @@ function scene:create( event )
     end
 
     _myG.background = display.newImageRect( "images/forest-bg.jpg", display.contentWidth, 1366*mW)
-    --_myG.background = display.newImageRect( "images/new-title-mock.jpg", display.contentWidth, 1024*mW)
     _myG.background.x = display.contentCenterX
     _myG.background.y = display.contentCenterY
     sceneGroup:insert( _myG.background )
@@ -237,29 +235,39 @@ function scene:create( event )
     
     local settingsSheetInfo = require("settings-sheet")
     local settingsSheet = graphics.newImageSheet( "images/settings.png", settingsSheetInfo:getSheet() )
-    local settingsFrames  = { start=1, count=6 }
+    local settingsFrames  = { start=1, count=7 }
 
     local settingsX = 665*mW
-
-    local audioBtnY = 42*mW
-
-    local arrowBtn = display.newSprite( settingsSheet, settingsFrames )
-    arrowBtn:setFrame(2)
-    arrowBtn.anchorY = 0 
-    arrowBtn.x = settingsX
-    arrowBtn.y = -44*mW
+    
+    local audioBtnY = -50*mW
+    local aboutBtnY = 72*mW
+    local arrowBtnY = 215*mW
 
     local audioBtn = display.newSprite( settingsSheet, settingsFrames )
-    audioBtn:setFrame(1)
+    audioBtn:setFrame(2)
     audioBtn.anchorY = 0 
     audioBtn.x = settingsX
     audioBtn.y = audioBtnY
 
-    audioBtn.yScale=0.25
-    audioBtn.alpha=0
+    --audioBtn.yScale=0.25
+    --audioBtn.alpha=0
 
-    sceneGroup:insert( audioBtn )
+    local aboutBtn = display.newSprite( settingsSheet, settingsFrames )
+    aboutBtn:setFrame(1)
+    aboutBtn.anchorY = 0 
+    aboutBtn.x = settingsX
+    aboutBtn.y = aboutBtnY
+
+    local arrowBtn = display.newSprite( settingsSheet, settingsFrames )
+    arrowBtn:setFrame(3)
+    arrowBtn.anchorY = 0 
+    arrowBtn.x = settingsX
+    arrowBtn.y = arrowBtnY
+
     sceneGroup:insert( arrowBtn )
+    sceneGroup:insert( aboutBtn )
+    sceneGroup:insert( audioBtn )
+    
 
        -- settings-related functions
 
@@ -277,11 +285,11 @@ function scene:create( event )
     end 
 
     local function arrowImageDown()
-        arrowBtn:setFrame(2)
+        arrowBtn:setFrame(3)
     end
 
     local function arrowImageUp()
-        arrowBtn:setFrame(6)
+        arrowBtn:setFrame(7)
     end
 
     local function settingsOpen()
@@ -295,10 +303,10 @@ function scene:create( event )
 
     local function settingsClose()
         settingsActiveFalse()
-        transition.to( audioBtn, { delay=175, time=60, yScale=0.5, transition=easing.outSine  })
-        transition.to( audioBtn, { delay=235, time=1, alpha=0 })
-        timer.performWithDelay( 235, arrowImageDown )
-        timer.performWithDelay( 235, settingsActiveTrue )
+        transition.to( audioBtn, { time=60, yScale=0.5, transition=easing.outSine  })
+        transition.to( audioBtn, { delay=60, time=1, alpha=0 })
+        timer.performWithDelay( 100, arrowImageDown )
+        timer.performWithDelay( 100, settingsActiveTrue )
     end
 
     local function clickArrow( event )
@@ -320,11 +328,11 @@ function scene:create( event )
         if( settingsActive == "true" ) then
             --show audio settings
             if( _myG.audioOn == "true" ) then
-                audioBtn:setFrame(4)
+                audioBtn:setFrame(5)
                 _myG.audioOn = "false"
                 audio.stop()
             elseif( _myG.audioOn == "false" ) then
-                audioBtn:setFrame(1)
+                audioBtn:setFrame(2)
                 _myG.audioOn = "true"
                 -- restart the music
                 playGoblinTheme()
@@ -333,12 +341,17 @@ function scene:create( event )
         return true
     end
 
+    local function clickAbout( event )
+        print( "clickAbout" )
+        if( settingsActive == "true" ) then
+            --show audio settings
+        end
+        return true
+    end
+
     arrowBtn:addEventListener( "tap", clickArrow )
     audioBtn:addEventListener( "tap", clickAudio )
-
-    blackMask = display.newRect( cX, cY, cW, cH )
-    blackMask:setFillColor( 0, 0, 0, 1 )
-    sceneGroup:insert( blackMask )
+    aboutBtn:addEventListener( "tap", clickAbout )
 
     -- ad space
     local adBg = display.newRect( cX, cH, display.contentWidth, 90*mW )
@@ -354,6 +367,9 @@ function scene:create( event )
     end
 
     local function goToStart()
+        if( arrowState == "up" ) then
+            settingsClose()
+        end
         transition.to( levelsSignGroup, { delay=100, time=100, y=-50*mW, transition=easing.outSine })
         transition.to( levelsSignGroup, { delay=200, time=200, y=400*mW, transition=easing.inSine })
         transition.to ( titleGroup, { delay=100, time=500, alpha=0 })
@@ -423,6 +439,8 @@ function scene:show( event )
         ads.show( "banner", { x=0, y=100000, appId=bannerAppID } )
 
         -- Set pre-animated object positions
+
+        _myG.blackFader.alpha=1
         
         levelsSignGroup.y=0
 
@@ -447,9 +465,8 @@ function scene:show( event )
         composer.loadScene( "goblin-slider" )
 
         -- play goblin theme
-        timer.performWithDelay( 600, playGoblinTheme )
-        transition.to( blackMask, { delay=600, time=400, alpha=0 } )
-        transition.to( tapGroup, { delay=1200, time=800, y=0, alpha=1, transition=easing.outSine } )
+        timer.performWithDelay( 700, playGoblinTheme )
+        transition.to( _myG.blackFader, { delay=200, time=400, alpha=0 } )
     end
 end
 

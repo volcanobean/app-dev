@@ -671,14 +671,6 @@ function scene:create( event )
     --bushLeft.isVisible = false
     --bushRight.isVisible = false
 
-    --[[
-    local uiShader = display.newImageRect( "images/ui-shader.png", display.contentWidth, 403*mW )
-    uiShader.anchorY = 1
-    uiShader.x = display.contentCenterX
-    uiShader.y = cH
-    sceneGroup:insert( uiShader )
-    ]]--
-
 -- ----------------------------------------------------------------
 -- RIBBONS
 -- ----------------------------------------------------------------
@@ -1237,7 +1229,7 @@ function scene:create( event )
     
     local settingsSheetInfo = require("settings-sheet")
     local settingsSheet = graphics.newImageSheet( "images/settings.png", settingsSheetInfo:getSheet() )
-    local settingsFrames  = { start=1, count=6 }
+    local settingsFrames  = { start=1, count=7 }
 
     local settingsX = 665*mW
 
@@ -1246,25 +1238,25 @@ function scene:create( event )
     local audioBtnY = 300*mW
 
     local arrowBtn = display.newSprite( settingsSheet, settingsFrames )
-    arrowBtn:setFrame(2)
+    arrowBtn:setFrame(3)
     arrowBtn.anchorY = 0 
     arrowBtn.x = settingsX
     arrowBtn.y = -44*mW
     
     local homeBtn = display.newSprite( settingsSheet, settingsFrames )
-    homeBtn:setFrame(3)
+    homeBtn:setFrame(4)
     homeBtn.anchorY = 0 
     homeBtn.x = settingsX
     homeBtn.y = homeBtnY
 
     local replayBtn = display.newSprite( settingsSheet, settingsFrames )
-    replayBtn:setFrame(5)
+    replayBtn:setFrame(6)
     replayBtn.anchorY = 0 
     replayBtn.x = settingsX
     replayBtn.y = replayBtnY
 
     local audioBtn = display.newSprite( settingsSheet, settingsFrames )
-    audioBtn:setFrame(1)
+    audioBtn:setFrame(2)
     audioBtn.anchorY = 0 
     audioBtn.x = settingsX
     audioBtn.y = audioBtnY
@@ -1294,11 +1286,11 @@ function scene:create( event )
     end 
 
     local function arrowImageDown()
-        arrowBtn:setFrame(2)
+        arrowBtn:setFrame(3)
     end
 
     local function arrowImageUp()
-        arrowBtn:setFrame(6)
+        arrowBtn:setFrame(7)
     end
 
     local function settingsOpen()
@@ -1341,17 +1333,34 @@ function scene:create( event )
         return true
     end
 
-    local function clickHome( event )
+        -- scene outro
+
+    local function gotoHome( event )
+        composer.removeScene( "goblin-slider" )
+        composer.gotoScene( "start-screen" )
+        return true
+    end
+
+    local function gotoReplay( event )
+        composer.removeScene( "goblin-slider" )
+        composer.gotoScene( "goblin-slider" )
+        return true
+    end
+
+    function _myG.clickHome( event )
         if( settingsActive == "true" ) then
-            composer.removeScene( "goblin-slider" )
-            composer.gotoScene( "start-screen" )
+            transition.to( _myG.blackFader, { time=400, alpha=1 })
+            timer.performWithDelay( 600, gotoHome )
         end
         return true
     end
 
-    local function clickReplay( event )
+    function _myG.clickReplay( event )
         if( settingsActive == "true" ) then
-            composer.gotoScene( "replay" )
+            _myG.fromReplay = "true"
+            print( "Replay: " .. _myG.fromReplay)
+            transition.to( _myG.blackFader, { time=400, alpha=1 })
+            timer.performWithDelay( 600, gotoReplay )
         end
         return true
     end
@@ -1360,11 +1369,11 @@ function scene:create( event )
         if( settingsActive == "true" ) then
             --show audio settings
             if( _myG.audioOn == "true" ) then
-                audioBtn:setFrame(4)
+                audioBtn:setFrame(5)
                 _myG.audioOn = "false"
                 audio.stop()
             elseif( _myG.audioOn == "false" ) then
-                audioBtn:setFrame(1)
+                audioBtn:setFrame(2)
                 _myG.audioOn = "true"
             end
         end
@@ -1372,8 +1381,8 @@ function scene:create( event )
     end
 
     arrowBtn:addEventListener( "touch", clickArrow )
-    homeBtn:addEventListener( "tap", clickHome )
-    replayBtn:addEventListener( "tap", clickReplay )
+    homeBtn:addEventListener( "tap", _myG.clickHome )
+    replayBtn:addEventListener( "tap", _myG.clickReplay )
     audioBtn:addEventListener( "tap", clickAudio )
 
     -- ad space
@@ -1381,6 +1390,7 @@ function scene:create( event )
     adBg:setFillColor( 0, 0, 0, 1 )
     adBg.anchorY = 1
     sceneGroup:insert( adBg ) 
+
 
 end --end scene:create
 

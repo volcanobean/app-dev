@@ -25,7 +25,6 @@ composer.myGlobals = {}
 
 local _myG = composer.myGlobals
 
-
 -- Now that our variables are set, let's start the game.
 
 composer.gotoScene( "logos" )

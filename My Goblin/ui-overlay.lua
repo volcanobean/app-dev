@@ -140,42 +140,30 @@ function scene:create( event )
     local thatGoblin = audio.loadSound( "audio/mason-thats-my-goblin.wav" )
     local yayGoblin = audio.loadSound( "audio/yays.wav" )
 
-    local function stopAudio()
-        --goblinText.text = ""
-    end
-
     local function audioWheresMyGoblin()
-        --goblinText.text = "Where's my goblin?" 
         -- Play sound
         if( _myG.audioOn == "true" ) then
             audio.play( whereGoblin )
         end
-        --timer.performWithDelay( 2000, stopAudio )
     end
 
     local function audioThatsMyGoblin()
-        --goblinText.text = "That's my goblin!" 
         if( _myG.audioOn == "true" ) then
             audio.play( thatGoblin )
         end
-        --timer.performWithDelay( 2000, stopAudio )
     end
 
     local function audioNotMyGoblin()
-        --goblinText.text = "That's not my goblin." 
         if( _myG.audioOn == "true" ) and ( notGobPlayed == "false") then
             audio.play( notGoblin )
             notGobPlayed = "true"
         end
-        --timer.performWithDelay( 2000, stopAudio )
     end
 
     local function audioYay()
-        --goblinText.text = "Yay!" 
         if( _myG.audioOn == "true" ) then
             audio.play( yayGoblin )
         end
-        --timer.performWithDelay( 2000, stopAudio )
     end
 
     -- UI bg shade
@@ -320,7 +308,6 @@ function scene:create( event )
     local function bannerPlayDown()
         if ( bannerState == "up" ) then
             print( bannerState )
-            --bannerStateDown()
             playBannerFX()
             transition.to( bannerGroup, { time=350, y=bannerDownY+bannerStretchY, yScale=1, transition=easing.outSine })
             transition.to( bannerGroup, { delay=350, time=200, y=bannerDownY, transition=easing.outSine })
@@ -481,20 +468,6 @@ function scene:create( event )
     replayNoBtn.anchorY = 0 
     replayNoBtn.x = 490*mW
 
-    local function clickHome( event )
-        composer.removeScene( "goblin-slider" )
-        composer.gotoScene( "start-screen" )
-        return true
-    end
-
-    local function clickReplay( event )
-        composer.gotoScene( "replay" )
-        return true
-    end
-
-    replayYesBtn:addEventListener( "tap", clickReplay )
-    replayNoBtn:addEventListener( "tap", clickHome )
-
     local replayPaper = display.newSprite( replaySheet, replayFrames )
     replayPaper:setFrame(2)
     replayPaper.height = 303*mW
@@ -502,6 +475,9 @@ function scene:create( event )
     replayPaper.anchorY = 0 
     replayPaper.x = cX
     replayPaper.y = cY-275*mW
+
+    replayYesBtn:addEventListener( "tap", _myG.clickReplay )
+    replayNoBtn:addEventListener( "tap", _myG.clickHome )
 
     -- rope sprites
 
@@ -581,17 +557,6 @@ function scene:create( event )
         transition.to( replayNoBtn, { delay=300, time=200, y=cY-45*mW, transition=easing.outSine })
     end
 
-    --[[
-    local function replayBtnsClose()
-        transition.to( audioBtn, { time=100, yScale=0.25, transition=easing.outSine })
-        transition.to( audioBtn, { delay=100, time=1, alpha=0 })
-        transition.to( replayBtn, { delay=100, time=75, yScale=0.5, transition=easing.outSine  })
-        transition.to( replayBtn, { delay=175, time=1, alpha=0 })
-        transition.to( homeBtn, { delay=175, time=60, yScale=0.5, transition=easing.outSine  })
-        transition.to( homeBtn, { delay=235, time=1, alpha=0 })
-    end
-    ]]--
-
     local function replaySignDown()
         --replaySign.isVisible=true
         playBannerFX()
@@ -602,14 +567,6 @@ function scene:create( event )
         transition.to( replayBtnShade, { time=600, alpha=1 } )
         timer.performWithDelay( 200, replayBtnsOpen )
     end
-
-    --[[
-    local function replaySignUp()
-        playBannerFX()
-        transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
-        transition.to( shader, { time=300, alpha=0 } )
-    end
-    ]]--
 
     -- victory animation
 
@@ -710,7 +667,6 @@ function scene:create( event )
                 -- if we don't have a match, lower the banner, etc
                 signSpinToX()
                 timer.performWithDelay( 600, playWrongAnswerFX )
-                --timer.performWithDelay( 700, audioNotMyGoblin )
                 signTimer = timer.performWithDelay( 2000, signSpinFromX )
                 timer.performWithDelay( 2500, uiActiveTrue )
             end
@@ -723,7 +679,6 @@ function scene:create( event )
             -- if this is the intro, skip the comparison and just lower the banner
             timer.performWithDelay( 700, bannerPlayDown )
             timer.performWithDelay( 1400, audioWheresMyGoblin )
-            --bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
         elseif ( _myG.introComplete == "true" ) then
             -- raise sign if needed
             if( signIsUp == "false" ) then
@@ -742,11 +697,9 @@ function scene:create( event )
             else
                 -- if we don't have a match, lower the banner, etc
                 timer.performWithDelay( 400, signSpinToX )
-                --timer.performWithDelay( 600, playWrongAnswerFX )
                 timer.performWithDelay( 1100, bannerPlayDown )
                 timer.performWithDelay( 1800, audioNotMyGoblin )
                 signTimer = timer.performWithDelay( 4400, signSpinFromX )
-                --bannerStayTimer = timer.performWithDelay( 4000, raiseBanner )
             end
         end
     end
@@ -857,7 +810,6 @@ function scene:create( event )
         _myG.introComplete = "true"
         _myG.uiActive = "true"
         settingsActive = "true"
-        --_myG.activeRibbonsText.text = "You picked: " .. _myG.ribbon[1].activeBlock .. ", " .. _myG.ribbon[2].activeBlock .. ", " .. _myG.ribbon[3].activeBlock
         -- capture current time for game start
         gameStartTime = system.getTimer()
         print( "start: ", gameStartTime)
@@ -893,6 +845,8 @@ function scene:show( event )
         print( "WILL show scene" )
         -- Called when the scene is still off screen (but is about to come on screen).
 
+        _myG.blackFader.alpha=0
+
         getMatchParts()
 
         signIsUp = "false"
@@ -920,11 +874,21 @@ function scene:show( event )
 
         gearGroup.y=cH-100*mW
 
+        if( _myG.fromReplay == "true" ) then
+            _myG.blackFader.alpha=1
+        end
+
     elseif ( event.phase == "did" ) then
         print( "DID show scene" )
         -- Called when the scene is now on screen.
 
-        playIntro()
+        if( _myG.fromReplay == "true" ) then
+            transition.to( _myG.blackFader, { delay=200, time=400, alpha=0 } )
+            timer.performWithDelay( 600, playIntro )
+            _myG.fromReplay = "false"
+        else
+            playIntro()
+        end
     end
 
 end
