@@ -58,6 +58,7 @@ local hardTextDark
 
 local titleGroup
 local levelsSignGroup
+local settingsGroup
 
 ---------------------------------------------------------------------------------
 -- SCENE:CREATE - Initialize the scene here.
@@ -100,7 +101,6 @@ function scene:create( event )
     titleGroup:insert( titleText2 )
 
     sceneGroup:insert( titleGroup )
-
 
     -- levels sprites
 
@@ -264,9 +264,12 @@ function scene:create( event )
     arrowBtn.x = settingsX
     arrowBtn.y = arrowBtnY
 
-    sceneGroup:insert( arrowBtn )
-    sceneGroup:insert( aboutBtn )
-    sceneGroup:insert( audioBtn )
+    settingsGroup = display.newGroup()
+    settingsGroup:insert( arrowBtn )
+    settingsGroup:insert( aboutBtn )
+    settingsGroup:insert( audioBtn )
+
+    sceneGroup:insert( settingsGroup )
     
 
        -- settings-related functions
@@ -294,19 +297,30 @@ function scene:create( event )
 
     local function settingsOpen()
         settingsActiveFalse()
+        --[[
         transition.to( audioBtn, { time=1, alpha=1 })
         transition.to( audioBtn, { delay=1, time=150, y=audioBtnY+48*mW, yScale=1, transition=easing.outSine })
         transition.to( audioBtn, { delay=150, time=150, y=audioBtnY, transition=easing.outSine })
-        timer.performWithDelay( 500, arrowImageUp )
-        timer.performWithDelay( 500, settingsActiveTrue )
+                ]]--
+        transition.to( settingsGroup, { time=300, y=50*mW, transition=easing.outSine })
+        transition.to( settingsGroup, { delay=300, time=100, y=0, transition=easing.inSine })
+        timer.performWithDelay( 300, arrowImageUp )
+        timer.performWithDelay( 400, settingsActiveTrue )
+
     end
 
     local function settingsClose()
         settingsActiveFalse()
+        --[[
         transition.to( audioBtn, { time=60, yScale=0.5, transition=easing.outSine  })
         transition.to( audioBtn, { delay=60, time=1, alpha=0 })
         timer.performWithDelay( 100, arrowImageDown )
-        timer.performWithDelay( 100, settingsActiveTrue )
+               ]]--
+        transition.to( settingsGroup, { time=100, y=50*mW, transition=easing.outSine })
+        transition.to( settingsGroup, { delay=100, time=300, y=-260*mW, transition=easing.inSine })
+        timer.performWithDelay( 100, arrowImageDown )
+        timer.performWithDelay( 400, settingsActiveTrue )
+
     end
 
     local function clickArrow( event )
@@ -441,10 +455,10 @@ function scene:show( event )
         -- Set pre-animated object positions
 
         _myG.blackFader.alpha=1
-        
+        titleGroup.alpha=1
         levelsSignGroup.y=0
 
-        titleGroup.alpha=1
+        settingsGroup.y = -260*mW
 
         easyText.alpha=1
         medText.alpha=1

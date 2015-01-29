@@ -683,7 +683,7 @@ function scene:create( event )
             -- raise sign if needed
             if( signIsUp == "false" ) then
                 transition.to( signSprite, { time=400, y=cH-_myG.adsHeight, transition=easing.outSine })
-                transition.to( uiShader2, { time=800, alpha=1 })
+                transition.to( signShade, { time=800, alpha=1 })
                 signIsUp = true
             end
             -- else do our comparison
@@ -829,6 +829,7 @@ function scene:create( event )
         uiActiveTrue() -- temporarily true to allow first animation
         transition.to( gearGroup, { time=800, y=0, transition=easing.outSine })
         crankTimer = timer.performWithDelay( 1200, turnCrank )
+        transition.to( gearShade, { delay=2000, time=800, alpha=1 })
     end
 
 --end scene:create
