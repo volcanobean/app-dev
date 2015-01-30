@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:031ac15d13b892c67a8b319243af4644:bed837e03aaee23c31f08fd8e9893a5c:81aad88cedae2198d48186096928dacc$
+-- $TexturePacker:SmartUpdate:ee64b3c093b1c015b3542689d19d33f3:8649f155b1ee4a107052f35f7a448ad6:81aad88cedae2198d48186096928dacc$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -19,10 +19,10 @@ SheetInfo.sheet =
     
         {
             -- settings-about
-            x=158*mW,
-            y=190*mW,
-            width=155*mW,
-            height=183*mW,
+            x=2*mW,
+            y=2*mW,
+            width=156*mW,
+            height=186*mW,
 
             sourceX = 0,
             sourceY = 0,
@@ -42,25 +42,25 @@ SheetInfo.sheet =
             sourceHeight = 187*mW
         },
         {
-            -- settings-down
-            x=315*mW,
-            y=184*mW,
-            width=155*mW,
-            height=141*mW,
-
-            sourceX = 0,
-            sourceY = 0,
-            sourceWidth = 156*mW,
-            sourceHeight = 142*mW
-        },
-        {
             -- settings-home
-            x=2*mW,
-            y=190*mW,
+            x=160*mW,
+            y=184*mW,
             width=154*mW,
             height=184*mW,
 
             sourceX = 1*mW,
+            sourceY = 0,
+            sourceWidth = 156*mW,
+            sourceHeight = 187*mW
+        },
+        {
+            -- settings-menu
+            x=316*mW,
+            y=184*mW,
+            width=155*mW,
+            height=150*mW,
+
+            sourceX = 0,
             sourceY = 0,
             sourceWidth = 156*mW,
             sourceHeight = 187*mW
@@ -80,7 +80,7 @@ SheetInfo.sheet =
         {
             -- settings-replay
             x=2*mW,
-            y=2*mW,
+            y=190*mW,
             width=156*mW,
             height=186*mW,
 
@@ -88,18 +88,6 @@ SheetInfo.sheet =
             sourceY = 0,
             sourceWidth = 156*mW,
             sourceHeight = 187*mW
-        },
-        {
-            -- settings-up
-            x=315*mW,
-            y=327*mW,
-            width=155*mW,
-            height=141*mW,
-
-            sourceX = 0,
-            sourceY = 0,
-            sourceWidth = 156*mW,
-            sourceHeight = 142*mW
         },
     },
     
@@ -112,11 +100,10 @@ SheetInfo.frameIndex =
 
     ["settings-about"] = 1,
     ["settings-audio"] = 2,
-    ["settings-down"] = 3,
-    ["settings-home"] = 4,
+    ["settings-home"] = 3,
+    ["settings-menu"] = 4,
     ["settings-mute"] = 5,
     ["settings-replay"] = 6,
-    ["settings-up"] = 7,
 }
 
 function SheetInfo:getSheet()

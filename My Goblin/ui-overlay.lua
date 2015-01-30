@@ -35,7 +35,7 @@ local replayBtnShade
 
 local bannerUpY
 local bannerDownY
-local bannerStretchY
+local bannerStretchY = 0
 local getMatchParts
 local notGobPlayed = "false"
 local playIntro
@@ -233,9 +233,9 @@ function scene:create( event )
 
         -- assign Y values now that objects have been created
 
-        _myG.headsMatch[r3].y = 385*mW
-        _myG.torsoMatch[r2].y = 675*mW
-        _myG.legsMatch[r1].y = 850*mW
+        _myG.headsMatch[r3].y = 0*mW
+        _myG.torsoMatch[r2].y = 290*mW
+        _myG.legsMatch[r1].y = 465*mW
 
         -- debug
         --matchBlocksText.text = "Match these: " .. _myG.headsMatch.activeBlock .. ", " .. _myG.torsoMatch.activeBlock .. ", " .. _myG.legsMatch.activeBlock
@@ -249,18 +249,48 @@ function scene:create( event )
     shader:setFillColor( 0, 0, 0, 1 )
     sceneGroup:insert( shader )
 
-    local banner = display.newImageRect( "images/banner.png", 569*mW, 1050*mW) --scale up from 512
+    -- rope sprites
+
+    local ropeSheetInfo = require("ropes-sheet")
+    local ropeSheet = graphics.newImageSheet( "images/ropes.png", ropeSheetInfo:getSheet() )
+    local ropeFrames  = { start=1, count=2 }
+
+    local matchRopeL = display.newSprite( ropeSheet, ropeFrames )
+    matchRopeL:setFrame(1)
+    matchRopeL.anchorY = 1 
+    matchRopeL.x = 275*mW
+    matchRopeL.y = cY-420*mW
+    
+    local matchRopeR = display.newSprite( ropeSheet, ropeFrames )
+    matchRopeR:setFrame(2)
+    matchRopeR.anchorY = 1
+    matchRopeR.x = 510*mW
+    matchRopeR.y = cY-420*mW
+
+    local banner = display.newImageRect( "images/banner.png", 512*mW, 795*mW)
+    banner.x = cX+10*mW
+    banner.y = cY-60*mW
+
+    local matchGoblinText = display.newText( "match this goblin", cX+14*mW, cY-366*mW, "Mathlete-Skinny", 85*mW )
+    matchGoblinText:setFillColor( 74/255, 54/255, 22/255, 1)
 
     -- Add goblin match pieces to banner
 
-    local mScale = 0.83 
+    local mScale = 0.77 
     matchGroup:scale( mScale, mScale )
+    matchGroup.x = cX
+    matchGroup.y = cY-220*mW
 
     bannerGroup = display.newGroup()
     bannerGroup:insert( banner )
+    bannerGroup:insert( matchRopeL )
+    bannerGroup:insert( matchRopeR )
+    bannerGroup:insert( matchGoblinText )
     bannerGroup:insert( matchGroup )
+
     sceneGroup:insert( bannerGroup )
 
+--[[
     if( screenRatio >= 0.7 ) then
         -- if our device has iPad-eque proportions
         bannerGroup.anchorY = 1
@@ -289,9 +319,9 @@ function scene:create( event )
         bannerDownY = -50*mW
         bannerStretchY = 50*mW
     end
-
-    bannerGroup.y = bannerUpY
-    bannerGroup.x = display.contentCenterX
+]]--
+    --bannerGroup.y = bannerUpY
+    --bannerGroup.x = display.contentCenterX
 
     -- animate banner
 
@@ -309,8 +339,8 @@ function scene:create( event )
         if ( bannerState == "up" ) then
             print( bannerState )
             playBannerFX()
-            transition.to( bannerGroup, { time=350, y=bannerDownY+bannerStretchY, yScale=1, transition=easing.outSine })
-            transition.to( bannerGroup, { delay=350, time=200, y=bannerDownY, transition=easing.outSine })
+            --transition.to( bannerGroup, { time=350, y=bannerDownY+bannerStretchY, yScale=1, transition=easing.outSine })
+            --transition.to( bannerGroup, { delay=350, time=200, y=bannerDownY, transition=easing.outSine })
             transition.to( shader, { time=300, alpha=0.5 } )
             timer.performWithDelay( 300, bannerStateDown )
         end
@@ -320,8 +350,8 @@ function scene:create( event )
         if ( bannerState == "down" ) then
             print( bannerState )
             playBannerFX()
-            transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
-            transition.to( shader, { time=300, alpha=0 } )
+            --transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
+            --transition.to( shader, { time=300, alpha=0 } )
             timer.performWithDelay( 400, bannerStateUp )
         end
     end
@@ -481,10 +511,6 @@ function scene:create( event )
 
     -- rope sprites
 
-    local ropeSheetInfo = require("ropes-sheet")
-    local ropeSheet = graphics.newImageSheet( "images/ropes.png", ropeSheetInfo:getSheet() )
-    local ropeFrames  = { start=1, count=2 }
-
     local ropeL = display.newSprite( ropeSheet, ropeFrames )
     ropeL:setFrame(1)
     ropeL.anchorY = 1 
@@ -585,14 +611,14 @@ function scene:create( event )
     if ( _myG.adsLoaded == "true" ) then
         -- alter banner position on devices that are not taller/thinner 
         if( screenRatio > 0.6 ) then
-            bannerDownY = cH-_myG.adsHeight-(80*mW)
+            --bannerDownY = cH-_myG.adsHeight-(80*mW)
         end
         --alter banner size on iPad
         if( screenRatio >= 0.7 ) then
-            banner.height = 960*mW
-            matchGroup.y = -850*mW
-            mScale = 0.90
-            matchGroup:scale( mScale, mScale )
+            --banner.height = 960*mW
+            --matchGroup.y = -850*mW
+            --mScale = 0.90
+            --matchGroup:scale( mScale, mScale )
         end
 
         --move UI above banner ad
@@ -859,8 +885,8 @@ function scene:show( event )
         replayBtnShade.alpha=0
 
         -- set inital banner values
-        bannerGroup.y=bannerUpY
-        bannerGroup.yScale=0.5
+        --bannerGroup.y=bannerUpY
+        --bannerGroup.yScale=0.5
 
         -- set inital sign position
         replaySign.y=-300*mW

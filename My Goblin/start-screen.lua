@@ -237,11 +237,11 @@ function scene:create( event )
     local settingsSheet = graphics.newImageSheet( "images/settings.png", settingsSheetInfo:getSheet() )
     local settingsFrames  = { start=1, count=7 }
 
-    local settingsX = 665*mW
+    local settingsX = 668*mW
     
-    local audioBtnY = -50*mW
-    local aboutBtnY = 72*mW
-    local arrowBtnY = 215*mW
+    local menuBtnY = -35*mW
+    local audioBtnY = 30*mW
+    local aboutBtnY = 155*mW
 
     local audioBtn = display.newSprite( settingsSheet, settingsFrames )
     audioBtn:setFrame(2)
@@ -249,29 +249,27 @@ function scene:create( event )
     audioBtn.x = settingsX
     audioBtn.y = audioBtnY
 
-    --audioBtn.yScale=0.25
-    --audioBtn.alpha=0
-
     local aboutBtn = display.newSprite( settingsSheet, settingsFrames )
     aboutBtn:setFrame(1)
     aboutBtn.anchorY = 0 
     aboutBtn.x = settingsX
     aboutBtn.y = aboutBtnY
 
-    local arrowBtn = display.newSprite( settingsSheet, settingsFrames )
-    arrowBtn:setFrame(3)
-    arrowBtn.anchorY = 0 
-    arrowBtn.x = settingsX
-    arrowBtn.y = arrowBtnY
+    local menuBtn = display.newSprite( settingsSheet, settingsFrames )
+    menuBtn:setFrame(4)
+    menuBtn.anchorY = 0 
+    menuBtn.x = settingsX
+    menuBtn.y = menuBtnY
 
-    settingsGroup = display.newGroup()
-    settingsGroup:insert( arrowBtn )
-    settingsGroup:insert( aboutBtn )
-    settingsGroup:insert( audioBtn )
+    aboutBtn.yScale=0.5
+    aboutBtn.alpha=0
+    audioBtn.yScale=0.5
+    audioBtn.alpha=0
 
-    sceneGroup:insert( settingsGroup )
+    sceneGroup:insert( aboutBtn )
+    sceneGroup:insert( audioBtn )
+    sceneGroup:insert( menuBtn )
     
-
        -- settings-related functions
 
     local settingsActive = "true"
@@ -287,44 +285,28 @@ function scene:create( event )
         print ("settingsActive: " .. settingsActive)
     end 
 
-    local function arrowImageDown()
-        arrowBtn:setFrame(3)
-    end
-
-    local function arrowImageUp()
-        arrowBtn:setFrame(7)
-    end
-
     local function settingsOpen()
         settingsActiveFalse()
-        --[[
         transition.to( audioBtn, { time=1, alpha=1 })
         transition.to( audioBtn, { delay=1, time=150, y=audioBtnY+48*mW, yScale=1, transition=easing.outSine })
         transition.to( audioBtn, { delay=150, time=150, y=audioBtnY, transition=easing.outSine })
-                ]]--
-        transition.to( settingsGroup, { time=300, y=50*mW, transition=easing.outSine })
-        transition.to( settingsGroup, { delay=300, time=100, y=0, transition=easing.inSine })
-        timer.performWithDelay( 300, arrowImageUp )
-        timer.performWithDelay( 400, settingsActiveTrue )
-
+        transition.to( aboutBtn, { delay=250, time=1, alpha=1 })
+        transition.to( aboutBtn, { delay=250, time=150, y=aboutBtnY+50*mW, yScale=1, transition=easing.outSine })
+        transition.to( aboutBtn, { delay=400, time=150, y=aboutBtnY, transition=easing.outSine })
+        timer.performWithDelay( 650, settingsActiveTrue )
     end
 
     local function settingsClose()
         settingsActiveFalse()
-        --[[
-        transition.to( audioBtn, { time=60, yScale=0.5, transition=easing.outSine  })
-        transition.to( audioBtn, { delay=60, time=1, alpha=0 })
-        timer.performWithDelay( 100, arrowImageDown )
-               ]]--
-        transition.to( settingsGroup, { time=100, y=50*mW, transition=easing.outSine })
-        transition.to( settingsGroup, { delay=100, time=300, y=-260*mW, transition=easing.inSine })
-        timer.performWithDelay( 100, arrowImageDown )
-        timer.performWithDelay( 400, settingsActiveTrue )
-
+        transition.to( aboutBtn, { time=75, yScale=0.5, transition=easing.outSine  })
+        transition.to( aboutBtn, { delay=75, time=1, alpha=0 })
+        transition.to( audioBtn, { delay=75, time=60, yScale=0.5, transition=easing.outSine  })
+        transition.to( audioBtn, { delay=135, time=1, alpha=0 })
+        timer.performWithDelay( 135, settingsActiveTrue )
     end
 
-    local function clickArrow( event )
-        print( "clickArrow" )
+    local function clickMenu( event )
+        print( "clickMenu" )
         if( settingsActive == "true" ) then
             if( arrowState == "up" ) then
                 arrowState = "down"
@@ -363,7 +345,7 @@ function scene:create( event )
         return true
     end
 
-    arrowBtn:addEventListener( "tap", clickArrow )
+    menuBtn:addEventListener( "tap", clickMenu )
     audioBtn:addEventListener( "tap", clickAudio )
     aboutBtn:addEventListener( "tap", clickAbout )
 
@@ -457,8 +439,6 @@ function scene:show( event )
         _myG.blackFader.alpha=1
         titleGroup.alpha=1
         levelsSignGroup.y=0
-
-        settingsGroup.y = -260*mW
 
         easyText.alpha=1
         medText.alpha=1

@@ -1229,22 +1229,23 @@ function scene:create( event )
     
     local settingsSheetInfo = require("settings-sheet")
     local settingsSheet = graphics.newImageSheet( "images/settings.png", settingsSheetInfo:getSheet() )
-    local settingsFrames  = { start=1, count=7 }
+    local settingsFrames  = { start=1, count=6 }
 
-    local settingsX = 665*mW
+    local settingsX = 668*mW
 
-    local homeBtnY = 40*mW
-    local replayBtnY = 168*mW
-    local audioBtnY = 300*mW
+    local menuBtnY = -35*mW
+    local homeBtnY = 28*mW
+    local replayBtnY = 155*mW
+    local audioBtnY = 285*mW
 
-    local arrowBtn = display.newSprite( settingsSheet, settingsFrames )
-    arrowBtn:setFrame(3)
-    arrowBtn.anchorY = 0 
-    arrowBtn.x = settingsX
-    arrowBtn.y = -44*mW
+    local menuBtn = display.newSprite( settingsSheet, settingsFrames )
+    menuBtn:setFrame(4)
+    menuBtn.anchorY = 0 
+    menuBtn.x = settingsX
+    menuBtn.y = menuBtnY
     
     local homeBtn = display.newSprite( settingsSheet, settingsFrames )
-    homeBtn:setFrame(4)
+    homeBtn:setFrame(3)
     homeBtn.anchorY = 0 
     homeBtn.x = settingsX
     homeBtn.y = homeBtnY
@@ -1271,7 +1272,7 @@ function scene:create( event )
     sceneGroup:insert( audioBtn )
     sceneGroup:insert( replayBtn )
     sceneGroup:insert( homeBtn  )
-    sceneGroup:insert( arrowBtn )
+    sceneGroup:insert( menuBtn )
 
     -- settings-related functions
     
@@ -1285,14 +1286,6 @@ function scene:create( event )
         print ("settingsActive: " .. settingsActive)
     end 
 
-    local function arrowImageDown()
-        arrowBtn:setFrame(3)
-    end
-
-    local function arrowImageUp()
-        arrowBtn:setFrame(7)
-    end
-
     local function settingsOpen()
         settingsActiveFalse()
         transition.to( homeBtn, { time=1, alpha=1 })
@@ -1304,7 +1297,6 @@ function scene:create( event )
         transition.to( audioBtn, { delay=500, time=1, alpha=1 })
         transition.to( audioBtn, { delay=500, time=150, y=audioBtnY+50*mW, yScale=1, transition=easing.outSine })
         transition.to( audioBtn, { delay=650, time=150, y=audioBtnY, transition=easing.outSine })
-        timer.performWithDelay( 700, arrowImageUp )
         timer.performWithDelay( 700, settingsActiveTrue )
     end
 
@@ -1316,7 +1308,6 @@ function scene:create( event )
         transition.to( replayBtn, { delay=175, time=1, alpha=0 })
         transition.to( homeBtn, { delay=175, time=60, yScale=0.5, transition=easing.outSine  })
         transition.to( homeBtn, { delay=235, time=1, alpha=0 })
-        timer.performWithDelay( 235, arrowImageDown )
         timer.performWithDelay( 235, settingsActiveTrue )
     end
 
@@ -1380,7 +1371,7 @@ function scene:create( event )
         return true
     end
 
-    arrowBtn:addEventListener( "touch", clickArrow )
+    menuBtn:addEventListener( "touch", clickArrow )
     homeBtn:addEventListener( "tap", _myG.clickHome )
     replayBtn:addEventListener( "tap", _myG.clickReplay )
     audioBtn:addEventListener( "tap", clickAudio )
