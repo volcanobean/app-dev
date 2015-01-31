@@ -290,38 +290,11 @@ function scene:create( event )
 
     sceneGroup:insert( bannerGroup )
 
---[[
-    if( screenRatio >= 0.7 ) then
-        -- if our device has iPad-eque proportions
-        bannerGroup.anchorY = 1
-        banner.anchorY = 1
-        matchGroup.y = -940*mW
-        bannerUpY = 0 --0
-        bannerDownY = cH*0.91 --440
-        bannerStretchY = 50*mW
-        print( "more than 0.7")
-    elseif( screenRatio > 0.6 ) and ( screenRatio < 0.7 ) then
-        -- if we're on shorter mobile devices
-        bannerGroup.anchorY = 1
-        banner.anchorY = 1
-        matchGroup.y = -940*mW
-        bannerUpY = 0 --0
-        bannerDownY = cH*0.82 --440
-        bannerStretchY = 50*mW
-        print( "between 0.6 and 0.7")
-        print( bannerDownY )
-     else
-        -- if we're on a taller thinner device
-        bannerGroup.anchorY = 0
-        banner.anchorY = 0
-        matchGroup.y = 120*mW
-        bannerUpY = -1050*mW
-        bannerDownY = -50*mW
-        bannerStretchY = 50*mW
-    end
-]]--
-    --bannerGroup.y = bannerUpY
-    --bannerGroup.x = display.contentCenterX
+    bannerUpY = -800*mW
+    bannerDownY = 0
+    bannerStretchY = 50*mW
+
+    bannerGroup.y = bannerUpY
 
     -- animate banner
 
@@ -339,10 +312,10 @@ function scene:create( event )
         if ( bannerState == "up" ) then
             print( bannerState )
             playBannerFX()
-            --transition.to( bannerGroup, { time=350, y=bannerDownY+bannerStretchY, yScale=1, transition=easing.outSine })
-            --transition.to( bannerGroup, { delay=350, time=200, y=bannerDownY, transition=easing.outSine })
-            transition.to( shader, { time=300, alpha=0.5 } )
-            timer.performWithDelay( 300, bannerStateDown )
+            transition.to( bannerGroup, { time=400, y=bannerDownY+bannerStretchY, yScale=1, transition=easing.outSine })
+            transition.to( bannerGroup, { delay=400, time=200, y=bannerDownY, transition=easing.outSine })
+            transition.to( shader, { time=350, alpha=0.5 } )
+            timer.performWithDelay( 350, bannerStateDown )
         end
     end
 
@@ -350,8 +323,8 @@ function scene:create( event )
         if ( bannerState == "down" ) then
             print( bannerState )
             playBannerFX()
-            --transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
-            --transition.to( shader, { time=300, alpha=0 } )
+            transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
+            transition.to( shader, { time=300, alpha=0 } )
             timer.performWithDelay( 400, bannerStateUp )
         end
     end
@@ -584,7 +557,6 @@ function scene:create( event )
     end
 
     local function replaySignDown()
-        --replaySign.isVisible=true
         playBannerFX()
         transition.to( replaySign, { time=1, alpha=1 })
         transition.to( replaySign, { time=350, y=50*mW, yScale=1, transition=easing.outSine })
@@ -620,6 +592,38 @@ function scene:create( event )
             --mScale = 0.90
             --matchGroup:scale( mScale, mScale )
         end
+
+        --[[
+        if( screenRatio >= 0.7 ) then
+            -- if our device has iPad-eque proportions
+            bannerGroup.anchorY = 1
+            banner.anchorY = 1
+            matchGroup.y = -940*mW
+            bannerUpY = 0 --0
+            bannerDownY = cH*0.91 --440
+            bannerStretchY = 50*mW
+            print( "more than 0.7")
+        elseif( screenRatio > 0.6 ) and ( screenRatio < 0.7 ) then
+            -- if we're on shorter mobile devices
+            bannerGroup.anchorY = 1
+            banner.anchorY = 1
+            matchGroup.y = -940*mW
+            bannerUpY = 0 --0
+            bannerDownY = cH*0.82 --440
+            bannerStretchY = 50*mW
+            print( "between 0.6 and 0.7")
+            print( bannerDownY )
+         else
+            -- if we're on a taller thinner device
+            bannerGroup.anchorY = 0
+            banner.anchorY = 0
+            matchGroup.y = 120*mW
+            bannerUpY = -1050*mW
+            bannerDownY = -50*mW
+            bannerStretchY = 50*mW
+        end
+        ]]--
+
 
         --move UI above banner ad
         gearSprite.y = cH-_myG.adsHeight
@@ -885,8 +889,8 @@ function scene:show( event )
         replayBtnShade.alpha=0
 
         -- set inital banner values
-        --bannerGroup.y=bannerUpY
-        --bannerGroup.yScale=0.5
+        bannerGroup.y=bannerUpY
+        bannerGroup.yScale=0.5
 
         -- set inital sign position
         replaySign.y=-300*mW
