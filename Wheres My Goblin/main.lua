@@ -32,3 +32,4 @@ local _myG = composer.myGlobals
 
 composer.gotoScene( "logos" )
 --composer.gotoScene( "start-screen" )
+--composer.gotoScene( "goblin-slider" )

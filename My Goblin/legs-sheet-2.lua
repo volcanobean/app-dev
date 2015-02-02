@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:12fcf9fab2b4b4b72463c647a309a631:9cc0845a6fcff152fec77bdc45d0ff97:741e39ba1d0d714dad191e57c57f7355$
+-- $TexturePacker:SmartUpdate:e192f972ffb11b1c86f22f687c83027c:cd9bab7532c9b956179fcaec46f0eb79:741e39ba1d0d714dad191e57c57f7355$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -30,21 +30,33 @@ SheetInfo.sheet =
             sourceHeight = 396*mW
         },
         {
-            -- legs-kilt
-            x=2*mW,
-            y=334*mW,
-            width=307*mW,
-            height=343*mW,
+            -- legs-kilt-bottom
+            x=365*mW,
+            y=2*mW,
+            width=223*mW,
+            height=248*mW,
 
-            sourceX = 114*mW,
+            sourceX = 155*mW,
             sourceY = 31*mW,
             sourceWidth = 512*mW,
             sourceHeight = 396*mW
         },
         {
-            -- legs-knight
+            -- legs-kilt-top
             x=2*mW,
             y=679*mW,
+            width=276*mW,
+            height=341*mW,
+
+            sourceX = 114*mW,
+            sourceY = 33*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 396*mW
+        },
+        {
+            -- legs-knight-bottom
+            x=269*mW,
+            y=334*mW,
             width=253*mW,
             height=341*mW,
 
@@ -54,14 +66,38 @@ SheetInfo.sheet =
             sourceHeight = 396*mW
         },
         {
+            -- legs-skates
+            x=280*mW,
+            y=677*mW,
+            width=280*mW,
+            height=337*mW,
+
+            sourceX = 123*mW,
+            sourceY = 47*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 396*mW
+        },
+        {
             -- legs-traveler
-            x=257*mW,
-            y=679*mW,
+            x=524*mW,
+            y=252*mW,
             width=286*mW,
             height=331*mW,
 
             sourceX = 112*mW,
             sourceY = 50*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 396*mW
+        },
+        {
+            -- legs-yeehaw
+            x=2*mW,
+            y=334*mW,
+            width=265*mW,
+            height=343*mW,
+
+            sourceX = 130*mW,
+            sourceY = 18*mW,
             sourceWidth = 512*mW,
             sourceHeight = 396*mW
         },
@@ -75,9 +111,12 @@ SheetInfo.frameIndex =
 {
 
     ["legs-bigfoot"] = 1,
-    ["legs-kilt"] = 2,
-    ["legs-knight"] = 3,
-    ["legs-traveler"] = 4,
+    ["legs-kilt-bottom"] = 2,
+    ["legs-kilt-top"] = 3,
+    ["legs-knight-bottom"] = 4,
+    ["legs-skates"] = 5,
+    ["legs-traveler"] = 6,
+    ["legs-yeehaw"] = 7,
 }
 
 function SheetInfo:getSheet()

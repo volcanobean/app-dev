@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:12fcf9fab2b4b4b72463c647a309a631:9cc0845a6fcff152fec77bdc45d0ff97:741e39ba1d0d714dad191e57c57f7355$
+-- $TexturePacker:SmartUpdate:e192f972ffb11b1c86f22f687c83027c:cd9bab7532c9b956179fcaec46f0eb79:741e39ba1d0d714dad191e57c57f7355$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -20,7 +20,7 @@ SheetInfo.sheet =
         {
             -- legs-bermuda
             x=2*mW,
-            y=656*mW,
+            y=618*mW,
             width=326*mW,
             height=349*mW,
 
@@ -32,7 +32,7 @@ SheetInfo.sheet =
         {
             -- legs-buccaneer
             x=708*mW,
-            y=656*mW,
+            y=634*mW,
             width=312*mW,
             height=363*mW,
 
@@ -42,9 +42,9 @@ SheetInfo.sheet =
             sourceHeight = 396*mW
         },
         {
-            -- legs-dancer
-            x=269*mW,
-            y=323*mW,
+            -- legs-dancer-bottom
+            x=373*mW,
+            y=301*mW,
             width=480*mW,
             height=331*mW,
 
@@ -54,9 +54,33 @@ SheetInfo.sheet =
             sourceHeight = 396*mW
         },
         {
+            -- legs-dancer-top
+            x=479*mW,
+            y=2*mW,
+            width=476*mW,
+            height=297*mW,
+
+            sourceX = 19*mW,
+            sourceY = 78*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 396*mW
+        },
+        {
+            -- legs-knight-top
+            x=2*mW,
+            y=2*mW,
+            width=62*mW,
+            height=158*mW,
+
+            sourceX = 228*mW,
+            sourceY = 35*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 396*mW
+        },
+        {
             -- legs-prisoner
             x=330*mW,
-            y=656*mW,
+            y=634*mW,
             width=376*mW,
             height=363*mW,
 
@@ -66,9 +90,9 @@ SheetInfo.sheet =
             sourceHeight = 396*mW
         },
         {
-            -- legs-wizard-color
-            x=415*mW,
-            y=2*mW,
+            -- legs-wizard-bottom
+            x=2*mW,
+            y=297*mW,
             width=369*mW,
             height=319*mW,
 
@@ -78,26 +102,14 @@ SheetInfo.sheet =
             sourceHeight = 396*mW
         },
         {
-            -- legs-wizard
-            x=2*mW,
+            -- legs-wizard-top
+            x=66*mW,
             y=2*mW,
             width=411*mW,
             height=293*mW,
 
             sourceX = 63*mW,
             sourceY = 76*mW,
-            sourceWidth = 512*mW,
-            sourceHeight = 396*mW
-        },
-        {
-            -- legs-yeehaw
-            x=2*mW,
-            y=297*mW,
-            width=265*mW,
-            height=343*mW,
-
-            sourceX = 130*mW,
-            sourceY = 18*mW,
             sourceWidth = 512*mW,
             sourceHeight = 396*mW
         },
@@ -112,11 +124,12 @@ SheetInfo.frameIndex =
 
     ["legs-bermuda"] = 1,
     ["legs-buccaneer"] = 2,
-    ["legs-dancer"] = 3,
-    ["legs-prisoner"] = 4,
-    ["legs-wizard-color"] = 5,
-    ["legs-wizard"] = 6,
-    ["legs-yeehaw"] = 7,
+    ["legs-dancer-bottom"] = 3,
+    ["legs-dancer-top"] = 4,
+    ["legs-knight-top"] = 5,
+    ["legs-prisoner"] = 6,
+    ["legs-wizard-bottom"] = 7,
+    ["legs-wizard-top"] = 8,
 }
 
 function SheetInfo:getSheet()

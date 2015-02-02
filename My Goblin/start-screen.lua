@@ -14,6 +14,11 @@ local cX = display.contentCenterX
 local cY = display.contentCenterY
 local mW = 0.0013022*cW
 
+--temp
+_myG.blackFader = display.newRect( cX, cY, cW, cH )
+_myG.blackFader:setFillColor( 0, 0, 0, 1 )
+_myG.blackFader.alpha=0
+
 -- Ad code
 
 local ads = require( "ads" )
@@ -59,6 +64,22 @@ local hardTextDark
 local titleGroup
 local levelsSignGroup
 local settingsGroup
+
+--[[
+local screenRatio = cW/cH
+print ("screenRatio " .. screenRatio)
+
+if( screenRatio >= 0.7 ) then
+    -- if our device has iPad-eque proportions
+    print( "ipad")
+elseif( screenRatio > 0.6 ) and ( screenRatio < 0.7 ) then
+    -- if we're on shorter mobile devices
+    print( "short mobile")
+else
+    -- if we're on a taller thinner device
+    print( "tall mobile")
+end
+]]--
 
 ---------------------------------------------------------------------------------
 -- SCENE:CREATE - Initialize the scene here.
@@ -235,7 +256,7 @@ function scene:create( event )
     
     local settingsSheetInfo = require("settings-sheet")
     local settingsSheet = graphics.newImageSheet( "images/settings.png", settingsSheetInfo:getSheet() )
-    local settingsFrames  = { start=1, count=7 }
+    local settingsFrames  = { start=1, count=6 }
 
     local settingsX = 668*mW
     

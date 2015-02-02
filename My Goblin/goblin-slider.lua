@@ -15,12 +15,15 @@ local mW = 0.0013022*cW
 -- Begin global settings
 -- Block and ribbon values. Adjust as needed
 
+--temp values
+_myG.difficulty = "easy"
+
 if( _myG.difficulty == "easy" ) then
-    _myG.blockCount = 10
+    _myG.blockCount = 11
 elseif( _myG.difficulty == "medium" ) then
-    _myG.blockCount = 10
+    _myG.blockCount = 11
 elseif( _myG.difficulty == "hard" ) then
-    _myG.blockCount = 10
+    _myG.blockCount = 11
 end
 
 _myG.blockWidth = 512*mW
@@ -280,8 +283,18 @@ function scene:create( event )
         -- ON MOVE:
         elseif ( event.target.isFocus ) then
             if ( event.phase == "moved" ) then
+                -- START DRAG:
+                _myG.ribbon[activeRibbon].x = event.x - event.target.offset
+                -- debug
+                --ribbonXText.text = "X: " .. _myG.ribbon[activeRibbon].x
+                -- track x and y movement, store as last positions touched
                 endX = event.x
                 local difX = endX - startX
+                -- Swap groups as needed
+                groupSwap( activeRibbon )
+                 -- Check for active block
+                getActiveBlock( _myG.ribbon[activeRibbon].x, activeRibbon )
+
                 
             -- ON RELEASE: 
             elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
@@ -301,7 +314,8 @@ function scene:create( event )
                     print( "blockRelease: " ..blockRelease)
 
                     -- TAP or SWIPE RIGHT:
-                    if ( totalTime < 400 and startX == endX ) or ( totalTime < 200 and endX > startX ) then
+                    --if ( totalTime < 400 and startX == endX ) or ( totalTime < 200 and endX > startX ) then
+                    if ( totalTime < 200 and endX > startX ) then
                         print("swipe right")
                         nextBlockSnap = blockTouch - 1
                         -- if at start of center block region
@@ -350,6 +364,19 @@ function scene:create( event )
                             -- debug
                             -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                         end
+                    -- DRAG:
+                    else
+                        -- if the ribbon has been dragged out of the center region into the left or the right regions
+                        if( blockRegion ~= "center" ) then
+                            -- shift back to center
+                            transition.to( _myG.ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
+                        -- else if we're still in the center
+                        else
+                            -- just snap to nearest block
+                            --print ("abs: " .. activeBlockSnap)
+                            --transition.to( _myG.ribbon[activeRibbon], { time=150, x=blockSnap[blockTouch], onStart=moveStart, onComplete=moveEnd } )
+                            transition.to( _myG.ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=moveEnd } )
+                        end
                     end
                 end
             end
@@ -382,7 +409,7 @@ function scene:create( event )
     hitRibbon2:addEventListener( "touch", scrollMe )
     sceneGroup:insert( hitRibbon2 )
 
-    local hitRibbon3 = display.newRect( display.contentCenterX, display.contentCenterY+(238*mW), hitRibbonWidth, 275*mW ) --770,275
+    local hitRibbon3 = display.newRect( display.contentCenterX, display.contentCenterY+(238*mW), 325*mW, 275*mW ) --770,275
     hitRibbon3:setFillColor( 0, 1, 1, 0.25 )
     hitRibbon3.id = 3
     hitRibbon3:addEventListener( "touch", scrollMe )
@@ -423,7 +450,7 @@ function scene:create( event )
     _myG.background.y = display.contentCenterY
     sceneGroup:insert( _myG.background )
 
-    --_myG.background.isVisible = false
+    _myG.background.isVisible = false
 
     -- Cheering goblins
 
@@ -775,6 +802,15 @@ function scene:create( event )
             if( i ~= 3 ) then
                 headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5           
             end
+
+            -- head-cheshire (copy)
+            tCount = tCount+1; tC = t1[tCount]
+            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
+            headsArray[tC]:setFrame(1)
+            headsArray[tC]:setFillColor( 0, 1, 0, 1 ) -- green
+            if( i ~= 3 ) then
+                headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5           
+            end
             
             -- head-classic
             tCount = tCount+1; tC = t1[tCount]
@@ -882,7 +918,11 @@ function scene:create( event )
 
     local torsoSheetInfo2 = require("torso-sheet-2")
     local torsoSheet2 = graphics.newImageSheet( "images/torso-2.png", torsoSheetInfo2:getSheet() )
-    local torsoFrames2 =  { start=1, count=4 }
+    local torsoFrames2 =  { start=1, count=7 }
+
+    local torsoSheetInfo3 = require("torso-sheet-3")
+    local torsoSheet3 = graphics.newImageSheet( "images/torso-3.png", torsoSheetInfo3:getSheet() )
+    local torsoFrames3 =  { start=1, count=2 }
 
     local torsoArray
     local torsoA = {}
@@ -922,7 +962,7 @@ function scene:create( event )
             -- torso-chef
             local tCount = 1
             local tC = t2[tCount]
-            torsoArray[tC] = display.newSprite( torsoSheet, torsoFrames )
+            torsoArray[tC] = display.newSprite( torsoSheet2, torsoFrames2 )
             torsoArray[tC]:setFrame(1)
             if( i ~= 3 ) then
                 torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5           
@@ -936,26 +976,34 @@ function scene:create( event )
                 torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-            -- torso-hoodie
+            -- torso-hoodie - original (blue)
+            local torsoHoodieTop = display.newSprite( torsoSheet, torsoFrames )
+            torsoHoodieTop:setFrame(3)
+
+            local torsoHoodieBottom = display.newSprite( torsoSheet2, torsoFrames2 )
+            torsoHoodieBottom:setFrame(2)
+            torsoHoodieBottom:setFillColor( 0, 1, 0, 1 ) -- green
+
             tCount = tCount+1; tC = t2[tCount]
-            torsoArray[tC] = display.newSprite( torsoSheet, torsoFrames )
-            torsoArray[tC]:setFrame(3)
+            torsoArray[tC] = display.newGroup()
+            torsoArray[tC]:insert( torsoHoodieBottom )
+            torsoArray[tC]:insert( torsoHoodieTop )
             if( i ~= 3 ) then
                 torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
            -- torso-loon
             tCount = tCount+1; tC = t2[tCount]
-            torsoArray[tC] = display.newSprite( torsoSheet, torsoFrames )
-            torsoArray[tC]:setFrame(4)
+            torsoArray[tC] = display.newSprite( torsoSheet3, torsoFrames3 )
+            torsoArray[tC]:setFrame(1)
             if( i ~= 3 ) then
                 torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
            -- torso-suit
             tCount = tCount+1; tC = t2[tCount]
-            torsoArray[tC] = display.newSprite( torsoSheet, torsoFrames )
-            torsoArray[tC]:setFrame(5)
+            torsoArray[tC] = display.newSprite( torsoSheet2, torsoFrames2 )
+            torsoArray[tC]:setFrame(4)
             if( i ~= 3 ) then
                 torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -970,16 +1018,24 @@ function scene:create( event )
 
            -- torso-bomb
             tCount = tCount+1; tC = t2[tCount]
-            torsoArray[tC] = display.newSprite( torsoSheet2, torsoFrames2 )
+            torsoArray[tC] = display.newSprite( torsoSheet, torsoFrames )
             torsoArray[tC]:setFrame(1)
             if( i ~= 3 ) then
                 torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-           -- torso-knight
+           -- torso-knight - original (red)
+            local torsoKnightTop = display.newSprite( torsoSheet, torsoFrames )
+            torsoKnightTop:setFrame(5)
+
+            local torsoKnightBottom = display.newSprite( torsoSheet, torsoFrames )
+            torsoKnightBottom:setFrame(4)
+            torsoKnightBottom:setFillColor( 0, 1, 0, 1 ) -- green
+
             tCount = tCount+1; tC = t2[tCount]
-            torsoArray[tC] = display.newSprite( torsoSheet2, torsoFrames2 )
-            torsoArray[tC]:setFrame(2)
+            torsoArray[tC] = display.newGroup()
+            torsoArray[tC]:insert( torsoKnightBottom )
+            torsoArray[tC]:insert( torsoKnightTop )
             if( i ~= 3 ) then
                 torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -992,10 +1048,34 @@ function scene:create( event )
                 torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-           -- torso-sweater
+           -- torso-sweater - original (red/green)
+            local torsoSweaterTop = display.newSprite( torsoSheet2, torsoFrames2 )
+            torsoSweaterTop:setFrame(5)
+
+            local torsoSweaterBottom = display.newSprite( torsoSheet3, torsoFrames3 )
+            torsoSweaterBottom:setFrame(2)
+            torsoSweaterBottom:setFillColor( 0, 1, 0, 1 ) -- green
+
             tCount = tCount+1; tC = t2[tCount]
-            torsoArray[tC] = display.newSprite( torsoSheet2, torsoFrames2 )
-            torsoArray[tC]:setFrame(4)
+            torsoArray[tC] = display.newGroup()
+            torsoArray[tC]:insert( torsoSweaterBottom )
+            torsoArray[tC]:insert( torsoSweaterTop )
+            if( i ~= 3 ) then
+                torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- torso-wizard - original (blue)
+            local torsoWizardTop = display.newSprite( torsoSheet2, torsoFrames2 )
+            torsoWizardTop:setFrame(7)
+
+            local torsoWizardBottom = display.newSprite( torsoSheet2, torsoFrames2 )
+            torsoWizardBottom:setFrame(6)
+            torsoWizardBottom:setFillColor( 0, 1, 0, 1 ) -- green
+
+            tCount = tCount+1; tC = t2[tCount]
+            torsoArray[tC] = display.newGroup()
+            torsoArray[tC]:insert( torsoWizardBottom )
+            torsoArray[tC]:insert( torsoWizardTop )
             if( i ~= 3 ) then
                 torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1028,11 +1108,11 @@ function scene:create( event )
 
     local legsSheetInfo = require("legs-sheet-1")
     local legsSheet = graphics.newImageSheet( "images/legs-1.png", legsSheetInfo:getSheet() )
-    local legsFrames =  { start=1, count=7 }
+    local legsFrames =  { start=1, count=8 }
 
     local legsSheetInfo2 = require("legs-sheet-2")
     local legsSheet2 = graphics.newImageSheet( "images/legs-2.png", legsSheetInfo2:getSheet() )
-    local legsFrames2 =  { start=1, count=4 }
+    local legsFrames2 =  { start=1, count=7 }
 
     local legsArray
     local legsA = {}
@@ -1086,10 +1166,18 @@ function scene:create( event )
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-            -- legs-dancer
+            -- legs-dancer - original (pink)
+            local legsDancerTop = display.newSprite( legsSheet, legsFrames )
+            legsDancerTop:setFrame(4)
+
+            local legsDancerBottom = display.newSprite( legsSheet, legsFrames )
+            legsDancerBottom:setFrame(3)
+            legsDancerBottom:setFillColor( 0, 1, 0, 1 ) -- green
+
             tCount = tCount+1; tC = t3[tCount]
-            legsArray[tC] = display.newSprite( legsSheet, legsFrames )
-            legsArray[tC]:setFrame(3)
+            legsArray[tC] = display.newGroup()
+            legsArray[tC]:insert( legsDancerBottom )
+            legsArray[tC]:insert( legsDancerTop )
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1097,29 +1185,30 @@ function scene:create( event )
             -- legs-prisoner
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet, legsFrames )
-            legsArray[tC]:setFrame(4)
+            legsArray[tC]:setFrame(6)
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
             -- legs-wizard - original (blue)
-            local legsWizardBase = display.newSprite( legsSheet, legsFrames )
-            legsWizardBase:setFrame(6)
+            local legsWizardTop = display.newSprite( legsSheet, legsFrames )
+            legsWizardTop:setFrame(8)
 
-            local legsWizardColor = display.newSprite( legsSheet, legsFrames )
-            legsWizardColor:setFrame(5)
+            local legsWizardBottom = display.newSprite( legsSheet, legsFrames )
+            legsWizardBottom:setFrame(7)
+            legsWizardBottom:setFillColor( 0, 1, 0, 1 ) -- green
 
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newGroup()
-            legsArray[tC]:insert( legsWizardColor )
-            legsArray[tC]:insert( legsWizardBase )
+            legsArray[tC]:insert( legsWizardBottom )
+            legsArray[tC]:insert( legsWizardTop )
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
             -- legs-yeehaw
             tCount = tCount+1; tC = t3[tCount]
-            legsArray[tC] = display.newSprite( legsSheet, legsFrames )
+            legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
             legsArray[tC]:setFrame(7)
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
@@ -1133,18 +1222,34 @@ function scene:create( event )
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-            -- legs-kilt
+            -- legs-kilt - original (red)
+            local legsKiltTop = display.newSprite( legsSheet2, legsFrames2 )
+            legsKiltTop:setFrame(3)
+
+            local legsKiltBottom = display.newSprite( legsSheet2, legsFrames2 )
+            legsKiltBottom:setFrame(2)
+            legsKiltBottom:setFillColor( 0, 1, 0, 1 ) -- green
+
             tCount = tCount+1; tC = t3[tCount]
-            legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
-            legsArray[tC]:setFrame(2)
+            legsArray[tC] = display.newGroup()
+            legsArray[tC]:insert( legsKiltBottom )
+            legsArray[tC]:insert( legsKiltTop )
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-            -- legs-knight
+            -- legs-knight - original (red)
+            local legsKnightTop = display.newSprite( legsSheet, legsFrames )
+            legsKnightTop:setFrame(5)
+            legsKnightTop:setFillColor( 0, 1, 0, 1 ) -- green
+
+            local legsKnightBottom = display.newSprite( legsSheet2, legsFrames2 )
+            legsKnightBottom:setFrame(4)
+
             tCount = tCount+1; tC = t3[tCount]
-            legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
-            legsArray[tC]:setFrame(3)
+            legsArray[tC] = display.newGroup()
+            legsArray[tC]:insert( legsKnightBottom )
+            legsArray[tC]:insert( legsKnightTop )
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1152,7 +1257,15 @@ function scene:create( event )
             -- legs-traveler
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
-            legsArray[tC]:setFrame(4)
+            legsArray[tC]:setFrame(6)
+            if( i ~= 3 ) then
+                legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+            end
+
+            -- legs-skates
+            tCount = tCount+1; tC = t3[tCount]
+            legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
+            legsArray[tC]:setFrame(5)
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1163,17 +1276,17 @@ function scene:create( event )
             if ( _myG.difficulty ~= "easy" ) then
                 
                 -- legs-wizard - green
-                local legsWizardBase2 = display.newSprite( legsSheet, legsFrames )
-                legsWizardBase2:setFrame(6)
+                local legsWizardTop2 = display.newSprite( legsSheet, legsFrames )
+                legsWizardTop2:setFrame(6)
 
-                local legsWizardColor2 = display.newSprite( legsSheet, legsFrames )
-                legsWizardColor2:setFrame(5)
-                legsWizardColor2:setFillColor( 0, 1, 0, 1 ) -- green
+                local legsWizardBottom2 = display.newSprite( legsSheet, legsFrames )
+                legsWizardBottom2:setFrame(5)
+                legsWizardBottom2:setFillColor( 0, 1, 0, 1 ) -- green
 
                 tCount = tCount+1; tC = t3[tCount]
                 legsArray[tC] = display.newGroup()
-                legsArray[tC]:insert( legsWizardColor2 )
-                legsArray[tC]:insert( legsWizardBase2 )
+                legsArray[tC]:insert( legsWizardBottom2 )
+                legsArray[tC]:insert( legsWizardTop2 )
                 if( i ~= 3 ) then
                     legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
                 end

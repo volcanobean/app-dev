@@ -11,8 +11,6 @@ local cH = display.contentHeight
 local cX = display.contentCenterX
 local cY = display.contentCenterY
 local mW = 0.0013022*cW
-local screenRatio = cW/cH
-print ("screenRatio " .. screenRatio)
 
 local bannerStayTimer
 local crankTimer
@@ -39,6 +37,9 @@ local bannerStretchY = 0
 local getMatchParts
 local notGobPlayed = "false"
 local playIntro
+
+local screenRatio = cW/cH
+print ("screenRatio " .. screenRatio)
 
 ---------------------------------------------------------------------------------
 -- SCENE:CREATE - Initialize the scene here.
