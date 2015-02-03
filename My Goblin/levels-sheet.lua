@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:cbd576eb383cf0082cbbae87decf5f43:d5bbe6ad953c0f9f71658d1af340f96d:f295a5e41bd228871f9553b08109f893$
+-- $TexturePacker:SmartUpdate:0aa4782e14fb44e3ab0a0566973e3616:d3b405d33219fe85a0f89e70a179151c:f295a5e41bd228871f9553b08109f893$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -18,8 +18,28 @@ SheetInfo.sheet =
     frames = {
     
         {
-            -- levels-easy
+            -- easy
+            x=134*mW,
+            y=442*mW,
+            width=91*mW,
+            height=56*mW,
+
+            sourceX = 0,
+            sourceY = 0,
+            sourceWidth = 91*mW,
+            sourceHeight = 56*mW
+        },
+        {
+            -- hard
             x=42*mW,
+            y=2*mW,
+            width=88*mW,
+            height=55*mW,
+
+        },
+        {
+            -- levels-easy
+            x=134*mW,
             y=2*mW,
             width=219*mW,
             height=95*mW,
@@ -31,8 +51,8 @@ SheetInfo.sheet =
         },
         {
             -- levels-hard
-            x=263*mW,
-            y=2*mW,
+            x=134*mW,
+            y=99*mW,
             width=219*mW,
             height=94*mW,
 
@@ -43,8 +63,8 @@ SheetInfo.sheet =
         },
         {
             -- levels-med
-            x=263*mW,
-            y=98*mW,
+            x=134*mW,
+            y=195*mW,
             width=218*mW,
             height=98*mW,
 
@@ -67,8 +87,8 @@ SheetInfo.sheet =
         },
         {
             -- levels-spin-2
-            x=42*mW,
-            y=99*mW,
+            x=216*mW,
+            y=296*mW,
             width=174*mW,
             height=125*mW,
 
@@ -79,8 +99,8 @@ SheetInfo.sheet =
         },
         {
             -- levels-spin-3
-            x=392*mW,
-            y=258*mW,
+            x=355*mW,
+            y=2*mW,
             width=98*mW,
             height=131*mW,
 
@@ -91,8 +111,8 @@ SheetInfo.sheet =
         },
         {
             -- levels-spin-4
-            x=483*mW,
-            y=98*mW,
+            x=455*mW,
+            y=2*mW,
             width=27*mW,
             height=158*mW,
 
@@ -103,8 +123,8 @@ SheetInfo.sheet =
         },
         {
             -- levels-spin-5
-            x=42*mW,
-            y=344*mW,
+            x=355*mW,
+            y=135*mW,
             width=97*mW,
             height=159*mW,
 
@@ -115,8 +135,8 @@ SheetInfo.sheet =
         },
         {
             -- levels-spin-6
-            x=218*mW,
-            y=198*mW,
+            x=42*mW,
+            y=296*mW,
             width=172*mW,
             height=144*mW,
 
@@ -124,6 +144,18 @@ SheetInfo.sheet =
             sourceY = 20*mW,
             sourceWidth = 223*mW,
             sourceHeight = 164*mW
+        },
+        {
+            -- medium
+            x=2*mW,
+            y=454*mW,
+            width=130*mW,
+            height=56*mW,
+
+            sourceX = 0,
+            sourceY = 0,
+            sourceWidth = 130*mW,
+            sourceHeight = 56*mW
         },
     },
     
@@ -134,15 +166,18 @@ SheetInfo.sheet =
 SheetInfo.frameIndex =
 {
 
-    ["levels-easy"] = 1,
-    ["levels-hard"] = 2,
-    ["levels-med"] = 3,
-    ["levels-post"] = 4,
-    ["levels-spin-2"] = 5,
-    ["levels-spin-3"] = 6,
-    ["levels-spin-4"] = 7,
-    ["levels-spin-5"] = 8,
-    ["levels-spin-6"] = 9,
+    ["easy"] = 1,
+    ["hard"] = 2,
+    ["levels-easy"] = 3,
+    ["levels-hard"] = 4,
+    ["levels-med"] = 5,
+    ["levels-post"] = 6,
+    ["levels-spin-2"] = 7,
+    ["levels-spin-3"] = 8,
+    ["levels-spin-4"] = 9,
+    ["levels-spin-5"] = 10,
+    ["levels-spin-6"] = 11,
+    ["medium"] = 12,
 }
 
 function SheetInfo:getSheet()

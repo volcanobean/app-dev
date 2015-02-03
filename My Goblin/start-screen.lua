@@ -19,6 +19,11 @@ _myG.blackFader = display.newRect( cX, cY, cW, cH )
 _myG.blackFader:setFillColor( 0, 0, 0, 1 )
 _myG.blackFader.alpha=0
 
+-- Initial audio state is ON
+
+_myG.audioOn = "true"
+_myG.fromReplay = "false"
+
 -- Ad code
 
 local ads = require( "ads" )
@@ -29,7 +34,7 @@ if ( system.getInfo( "platformName" ) == "Android" ) then
 end
 
 _myG.adsLoaded = "true"
-_myG.adsHeight = 90*mW
+_myG.adsHeight = 100*mW
 
 local function adListener( event )
     local msg = event.response
@@ -64,6 +69,13 @@ local hardTextDark
 local titleGroup
 local levelsSignGroup
 local settingsGroup
+
+local bannerGroup
+local bannerUpY
+local bannerDownY
+local bannerStretchY = 0
+local shader
+local bannerState = "up"
 
 --[[
 local screenRatio = cW/cH
@@ -102,6 +114,22 @@ function scene:create( event )
         audio.stop()
     end
 
+    local bannerFX = audio.loadSound( "audio/banner-short.wav" )
+
+    local function playBannerFX()
+        if( _myG.audioOn == "true" ) then
+            audio.play( bannerFX )
+        end
+    end
+
+    local swipeFX = audio.loadSound( "audio/swipe.wav" )
+
+    local function playSwipeFX()
+        if( _myG.audioOn == "true" ) then
+            audio.play( swipeFX )
+        end
+    end
+
     _myG.background = display.newImageRect( "images/forest-bg.jpg", display.contentWidth, 1366*mW)
     _myG.background.x = display.contentCenterX
     _myG.background.y = display.contentCenterY
@@ -127,83 +155,73 @@ function scene:create( event )
 
     local levelsSheetInfo = require("levels-sheet")
     local levelsSheet = graphics.newImageSheet( "images/levels-sheet.png", levelsSheetInfo:getSheet() )
-    local levelsFrames =  { start=1, count=9 }
+    local levelsFrames =  { start=1, count=12 }
     
     local levelSequence =
     {
-        { name="easy", frames={ 1, 5, 6, 7, 8, 9, 1, }, time=252, loopCount=1 },
-        { name="med", frames={ 3, 5, 6, 7, 8, 9, 3 }, time=252, loopCount=1 },
-        { name="hard", frames={ 2, 5, 6, 7, 8, 9, 2 }, time=252, loopCount=1 },
+        { name="easy", frames={ 3, 7, 8, 9, 10, 11, 3 }, time=252, loopCount=1 },
+        { name="med", frames={ 5, 7, 8, 9, 10, 11, 5 }, time=252, loopCount=1 },
+        { name="hard", frames={ 4, 7, 8, 9, 10, 11, 4 }, time=252, loopCount=1 },
     }
 
     local levelsPost = display.newSprite( levelsSheet, levelsFrames )
-    levelsPost:setFrame( 4 )
+    levelsPost:setFrame(6)
     levelsPost.x = cX
-    levelsPost.y = cH-195*mW
+    levelsPost.y = cH-205*mW
 
     local easySign = display.newSprite( levelsSheet, levelSequence )
     easySign:setSequence( "easy" )
     easySign:setFrame(1)
     easySign.x = cX+3*mW
-    easySign.y = cH-350*mW
+    easySign.y = cH-360*mW
 
     local medSign = display.newSprite( levelsSheet, levelSequence )
     medSign:setSequence( "med" )
     medSign:setFrame(1)
     medSign.x = cX
-    medSign.y = cH-250*mW
+    medSign.y = cH-260*mW
 
     local hardSign = display.newSprite( levelsSheet, levelSequence )
     hardSign:setSequence( "hard" )
     hardSign:setFrame(1)
     hardSign.x = cX+7*mW
-    hardSign.y = cH-140*mW 
+    hardSign.y = cH-150*mW 
 
-    easyText = display.newText( "easy", display.contentCenterX, display.contentCenterY+(165*mW), "Mathlete-Skinny", 80*mW )
+    easyText = display.newSprite( levelsSheet, levelsFrames )
+    easyText:setFrame(1)
     easyText.x = cX+5*mW
-    easyText.y = cH-375*mW 
+    easyText.y = cH-370*mW
     easyText:setFillColor( 232/255, 1, 186/255, 1 )
 
-    medText = display.newText( "medium", display.contentCenterX, display.contentCenterY+(255*mW), "Mathlete-Skinny", 80*mW )
+    medText = display.newSprite( levelsSheet, levelsFrames )
+    medText:setFrame(12)
     medText.x = cX
-    medText.y = cH-275*mW
+    medText.y = cH-270*mW
     medText:setFillColor( 232/255, 1, 186/255, 1 )
 
-    hardText = display.newText( "hard", display.contentCenterX, display.contentCenterY+(345*mW), "Mathlete-Skinny", 80*mW )
+    hardText = display.newSprite( levelsSheet, levelsFrames )
+    hardText:setFrame(2)
     hardText.x = cX+7*mW
-    hardText.y = cH-165*mW 
+    hardText.y = cH-160*mW 
     hardText:setFillColor( 232/255, 1, 186/255, 1 )
 
-    easyTextDark = display.newText( "easy", display.contentCenterX, display.contentCenterY+(165*mW), "Mathlete-Skinny", 80*mW )
+    easyTextDark = display.newSprite( levelsSheet, levelsFrames )
+    easyTextDark:setFrame(1)
     easyTextDark.x = cX+5*mW
-    easyTextDark.y = cH-375*mW 
+    easyTextDark.y = cH-370*mW 
     easyTextDark:setFillColor( 123/255, 123/255, 87/255, 1 )
 
-    medTextDark = display.newText( "medium", display.contentCenterX, display.contentCenterY+(255*mW), "Mathlete-Skinny", 80*mW )
+    medTextDark = display.newSprite( levelsSheet, levelsFrames )
+    medTextDark:setFrame(12)
     medTextDark.x = cX
-    medTextDark.y = cH-275*mW
+    medTextDark.y = cH-270*mW
     medTextDark:setFillColor( 123/255, 123/255, 87/255, 1 )
 
-    hardTextDark = display.newText( "hard", display.contentCenterX, display.contentCenterY+(345*mW), "Mathlete-Skinny", 80*mW )
+    hardTextDark = display.newSprite( levelsSheet, levelsFrames )
+    hardTextDark:setFrame(2)
     hardTextDark.x = cX+7*mW
-    hardTextDark.y = cH-165*mW 
+    hardTextDark.y = cH-160*mW 
     hardTextDark:setFillColor( 123/255, 123/255, 87/255, 1 )
-
-    local shadowDistance = 3*mW
-    local easyTextShadow = display.newText( "easy", display.contentCenterX, display.contentCenterY+(165*mW), "Mathlete-Skinny", 80*mW )
-    easyTextShadow.x = easyText.x + shadowDistance
-    easyTextShadow.y = easyText.y + shadowDistance
-    easyTextShadow:setFillColor( 0, 0, 0, 0.8 )
-
-    local medTextShadow = display.newText( "medium", display.contentCenterX, display.contentCenterY+(255*mW), "Mathlete-Skinny", 80*mW )
-    medTextShadow.x = medText.x + shadowDistance
-    medTextShadow.y = medText.y + shadowDistance
-    medTextShadow:setFillColor( 0, 0, 0, 0.8 )
-
-    local hardTextShadow = display.newText( "hard", display.contentCenterX, display.contentCenterY+(345*mW), "Mathlete-Skinny", 80*mW )
-    hardTextShadow.x = hardText.x + shadowDistance
-    hardTextShadow.y = hardText.y + shadowDistance
-    hardTextShadow:setFillColor( 0, 0, 0, 0.8 )
 
     local function textToWhite()
         if( _myG.difficulty == "easy" ) then
@@ -220,19 +238,14 @@ function scene:create( event )
         local spinTextShadow
         if( _myG.difficulty == "easy" ) then
             spinText = easyText
-            spinTextShadow = easyTextShadow
         elseif( _myG.difficulty == "medium" ) then
             spinText = medText
-            spinTextShadow = medTextShadow
         elseif( _myG.difficulty == "hard" ) then
             spinText = hardText
-            spinTextShadow = hardTextShadow
         end
         transition.to( spinText, { delay=35, time=0, alpha=0 })
-        transition.to( spinTextShadow, { delay=35, time=0, alpha=0 })
         timer.performWithDelay( 216, textToWhite )
         transition.to( spinText, { delay=216, time=0, alpha=1 })
-        transition.to( spinTextShadow, { delay=216, time=0, alpha=1 })
     end
 
     levelsSignGroup = display.newGroup()
@@ -240,9 +253,6 @@ function scene:create( event )
     levelsSignGroup:insert( easySign )
     levelsSignGroup:insert( medSign )
     levelsSignGroup:insert( hardSign ) 
-    levelsSignGroup:insert( easyTextShadow )
-    levelsSignGroup:insert( medTextShadow )
-    levelsSignGroup:insert( hardTextShadow )
     levelsSignGroup:insert( easyText )
     levelsSignGroup:insert( medText )
     levelsSignGroup:insert( hardText )
@@ -358,20 +368,12 @@ function scene:create( event )
         return true
     end
 
-    local function clickAbout( event )
-        print( "clickAbout" )
-        if( settingsActive == "true" ) then
-            --show audio settings
-        end
-        return true
-    end
-
     menuBtn:addEventListener( "tap", clickMenu )
     audioBtn:addEventListener( "tap", clickAudio )
-    aboutBtn:addEventListener( "tap", clickAbout )
+    --aboutBtn:addEventListener( "tap", clickAbout )
 
     -- ad space
-    local adBg = display.newRect( cX, cH, display.contentWidth, 90*mW )
+    local adBg = display.newRect( cX, cH, display.contentWidth, 100*mW )
     adBg:setFillColor( 0, 0, 0, 1 )
     adBg.anchorY = 1
     sceneGroup:insert( adBg ) 
@@ -389,6 +391,7 @@ function scene:create( event )
         end
         transition.to( levelsSignGroup, { delay=100, time=100, y=-50*mW, transition=easing.outSine })
         transition.to( levelsSignGroup, { delay=200, time=200, y=400*mW, transition=easing.inSine })
+        timer.performWithDelay( 300, playSwipeFX )
         transition.to ( titleGroup, { delay=100, time=500, alpha=0 })
         timer.performWithDelay( 800, startGame )
     end
@@ -440,6 +443,107 @@ function scene:create( event )
     medSign:addEventListener( "tap", setToMed )
     hardSign:addEventListener( "tap", setToHard )
 
+
+---------------------------------------------------------------------------------
+-- Banner
+---------------------------------------------------------------------------------
+
+    shader = display.newRect( display.contentCenterX, display.contentCenterY, display.contentWidth+10, display.contentHeight+10 )
+    shader:setFillColor( 0, 0, 0, 1 )
+    sceneGroup:insert( shader )
+
+    -- rope sprites
+
+    local ropeSheetInfo = require("ropes-sheet")
+    local ropeSheet = graphics.newImageSheet( "images/ropes.png", ropeSheetInfo:getSheet() )
+    local ropeFrames  = { start=1, count=2 }
+
+    local matchRopeL = display.newSprite( ropeSheet, ropeFrames )
+    matchRopeL:setFrame(1)
+    matchRopeL.anchorY = 1 
+    matchRopeL.x = 275*mW
+    matchRopeL.y = cY-420*mW
+    
+    local matchRopeR = display.newSprite( ropeSheet, ropeFrames )
+    matchRopeR:setFrame(2)
+    matchRopeR.anchorY = 1
+    matchRopeR.x = 510*mW
+    matchRopeR.y = cY-420*mW
+
+    local banner = display.newImageRect( "images/banner.png", 512*mW, 795*mW)
+    banner.x = cX+10*mW
+    banner.y = cY-60*mW
+
+    local matchGoblinText = display.newText( "about", cX+14*mW, cY-366*mW, "Mathlete-Skinny", 85*mW )
+    matchGoblinText:setFillColor( 74/255, 54/255, 22/255, 1)
+
+    bannerGroup = display.newGroup()
+    bannerGroup:insert( banner )
+    bannerGroup:insert( matchRopeL )
+    bannerGroup:insert( matchRopeR )
+    bannerGroup:insert( matchGoblinText )
+
+    sceneGroup:insert( bannerGroup )
+
+    bannerUpY = -800*mW
+    bannerDownY = 0
+    bannerStretchY = 50*mW
+
+    bannerGroup.y = bannerUpY
+
+    -- animate banner
+
+    local function bannerStateDown()
+        bannerState = "down"
+        print( "bannerState down")
+    end
+
+    local function bannerStateUp()
+        bannerState = "up"
+        print( "bannerState up")
+    end
+
+    local function bannerPlayDown()
+        if ( bannerState == "up" ) then
+            print( bannerState )
+            playBannerFX()
+            transition.to( bannerGroup, { time=400, y=bannerDownY+bannerStretchY, yScale=1, transition=easing.outSine })
+            transition.to( bannerGroup, { delay=400, time=200, y=bannerDownY, transition=easing.outSine })
+            transition.to( shader, { time=350, alpha=0.5 } )
+            timer.performWithDelay( 350, bannerStateDown )
+        end
+    end
+
+    local function bannerPlayUp()
+        if ( bannerState == "down" ) then
+            print( bannerState )
+            playBannerFX()
+            transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
+            transition.to( shader, { time=300, alpha=0 } )
+            timer.performWithDelay( 400, bannerStateUp )
+        end
+    end
+
+    local function raiseBanner()
+        if( bannerState == "down" ) then
+            bannerPlayUp()
+        end
+    end
+
+    local function clickAbout( event )
+        print( "clickAbout" )
+        if( settingsActive == "true" ) then
+            bannerPlayDown()
+        end
+        return true
+    end
+
+
+    -- event listeners
+
+    shader:addEventListener( "tap", raiseBanner )
+    aboutBtn:addEventListener( "tap", clickAbout )
+
 end
 
 ---------------------------------------------------------------------------------
@@ -471,6 +575,10 @@ function scene:show( event )
         easyTextDark.alpha=0
         medTextDark.alpha=0
         hardTextDark.alpha=0
+
+        shader.alpha=0
+        bannerGroup.y=bannerUpY
+        bannerGroup.yScale=0.5
 
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.

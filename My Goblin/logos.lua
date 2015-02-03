@@ -19,12 +19,9 @@ _myG.blackFader = display.newRect( cX, cY, cW, cH )
 _myG.blackFader:setFillColor( 0, 0, 0, 1 )
 _myG.blackFader.alpha=0
 
--- Initial audio state is ON
-
-_myG.audioOn = "true"
-_myG.fromReplay = "false"
-
 -- forward declarations
+
+_myG.fromReplay = "false"
 
 -- functions
 

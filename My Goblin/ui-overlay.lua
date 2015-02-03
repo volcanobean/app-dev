@@ -602,7 +602,7 @@ function scene:create( event )
         signShade.y = cH-_myG.adsHeight
 
         -- ad space
-        local adSpace = display.newRect( cX, cH, display.contentWidth, 90*mW )
+        local adSpace = display.newRect( cX, cH, display.contentWidth, 100*mW )
         adSpace:setFillColor( 0, 0, 0, 1 )
         adSpace.anchorY = 1
         sceneGroup:insert( adSpace ) 

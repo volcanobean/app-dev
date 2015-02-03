@@ -32,6 +32,14 @@ local randomizeLegs
 
 local matchGroup = display.newGroup()
 
+local yayGob1
+local yayGob2
+local yayGob3
+
+local yayGob1Y
+local yayGob2Y
+local yayGob3Y
+
 ---------------------------------------------------------------------------------
 -- SCENE:CREATE
 ---------------------------------------------------------------------------------
@@ -280,6 +288,8 @@ function scene:create( event )
 
                 -- Check for active block, this is to make sure a new tap doesn't use the old active block information
                 getActiveBlock( _myG.ribbon[activeRibbon].x, activeRibbon )
+                blockTouch = _myG.ribbon[activeRibbon].activeBlock
+
             end
 
         -- ON MOVE:
@@ -326,7 +336,7 @@ function scene:create( event )
                             -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                        -- else, if we're not at the end but still in the center region
                        elseif ( blockRegion == "center" ) then
-                            nextBlockSnap = _myG.ribbon[activeRibbon].activeBlock + 1
+                            nextBlockSnap = blockTouch + 1
                             transition.to( _myG.ribbon[activeRibbon], { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
                             -- play sound fx
                             playSwipeFX()
@@ -356,7 +366,7 @@ function scene:create( event )
                             -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
                          -- else, if we're not at the end but still in the center region
                        elseif ( blockRegion == "center" ) then
-                            nextBlockSnap = _myG.ribbon[activeRibbon].activeBlock - 1
+                            nextBlockSnap = blockTouch - 1
                             transition.to( _myG.ribbon[activeRibbon], { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
                             -- play sound fx
                             playSwipeFX()
@@ -443,7 +453,7 @@ function scene:create( event )
     signBlock.anchorX = 1
     signBlock.anchorY = 1
     if ( _myG.adsLoaded == "true" ) then
-        signBlock.y = display.contentHeight-(91*mW)
+        signBlock.y = display.contentHeight-(101*mW)
     end
 
     sceneGroup:insert( signBlock )
@@ -457,7 +467,7 @@ function scene:create( event )
     _myG.background.y = display.contentCenterY
     sceneGroup:insert( _myG.background )
 
-    _myG.background.isVisible = false
+    --_myG.background.isVisible = false
 
     -- Cheering goblins
 
@@ -560,36 +570,36 @@ function scene:create( event )
     yayArmR3.x = 10*mW
     yayArmR3.y = 50*mW
 
-    local yayGob1 = display.newGroup()
+    yayGob1 = display.newGroup()
     yayGob1:insert( yayArmL )
     yayGob1:insert( yayArmR )
     yayGob1:insert( yayBody )
     yayGob1:insert( yayHead )
     yayGob1.x = 110*mW
-    local yayGob1Y = cY-130*mW
+    yayGob1Y = cY-130*mW
     yayGob1.y = yayGob1Y
     yayGob1:scale( 0.65, 0.65 )
     yayGob1.rotation = 25
 
-    local yayGob2 = display.newGroup()
+    yayGob2 = display.newGroup()
     yayGob2:insert( yayArmL2 )
     yayGob2:insert( yayArmR2 )
     yayGob2:insert( yayBody2 )
     yayGob2:insert( yayHead2 )
     yayGob2.x = 600*mW
-    local yayGob2Y = cY-120*mW
+    yayGob2Y = cY-120*mW
     yayGob2.y = yayGob2Y
     yayGob2.xScale = -1
     yayGob2:scale( 0.45, 0.45 )
     yayGob2.rotation = -30
 
-    local yayGob3 = display.newGroup()
+    yayGob3 = display.newGroup()
     yayGob3:insert( yayArmL3 )
     yayGob3:insert( yayArmR3 )
     yayGob3:insert( yayBody3 )
     yayGob3:insert( yayHead3 )
     yayGob3.x = 685*mW
-    local yayGob3Y = cY-230*mW
+    yayGob3Y = cY-230*mW
     yayGob3.y = yayGob3Y
     yayGob3:scale( 0.65, 0.65 )
     yayGob3.rotation = -20
@@ -635,13 +645,6 @@ function scene:create( event )
         transition.to( yayArmR3, { delay=200, time=100, x=10*mW, y=70*mW, rotation=-150 })
         transition.to( yayArmR3, { delay=300, time=100, x=10*mW, y=50*mW, rotation=-90, onComplete=armWave })
     end
-
-    -- set default hidden positions
-
-    transition.to( yayGob1, { time=1, y=yayGob1Y+100*mW, alpha=0 })
-    transition.to( yayGob2, { time=1, y=yayGob2Y+100*mW, alpha=0 })
-    transition.to( yayGob3, { time=1, y=yayGob3Y+100*mW, alpha=0 })
-
 
     function _myG.yayGoblins( event )
         -- start loops
@@ -1381,19 +1384,6 @@ function scene:create( event )
         timer.performWithDelay( 700, _myG.startGamePlay )
     end
 
-    -- COLOR EXPERIMENTS
-    
-    --[[
-    headsA[1]:setFillColor( 1, 1, 0, 1 )
-    headsB[1]:setFillColor( 1, 1, 0, 1 )
-
-    headsA[2]:setFillColor( 1, 0, 1, 1 )
-    headsB[2]:setFillColor( 1, 0, 1, 1 )
-
-    legsA[5]:setFillColor( 1, 0, 1, 1 )
-    legsB[5]:setFillColor( 1, 0, 1, 1 )
-    ]]--
-
 -- ----------------------------------------------------------------
 -- SETTINGS
 -- ----------------------------------------------------------------   
@@ -1577,6 +1567,16 @@ function scene:show( event )
         randomizeHeads()
         randomizeTorso()
         randomizeLegs()
+
+        -- set default hidden positions
+
+        yayGob1.y=yayGob1Y+100*mW
+        yayGob2.y=yayGob2Y+100*mW
+        yayGob3.y=yayGob3Y+100*mW
+
+        yayGob1.alpha=0
+        yayGob2.alpha=0
+        yayGob3.alpha=0
 
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen
