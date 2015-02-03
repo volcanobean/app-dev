@@ -15,17 +15,6 @@ local mW = 0.0013022*cW
 -- Begin global settings
 -- Block and ribbon values. Adjust as needed
 
---temp values
-_myG.difficulty = "easy"
-
-if( _myG.difficulty == "easy" ) then
-    _myG.blockCount = 11
-elseif( _myG.difficulty == "medium" ) then
-    _myG.blockCount = 11
-elseif( _myG.difficulty == "hard" ) then
-    _myG.blockCount = 11
-end
-
 _myG.blockWidth = 512*mW
 _myG.blockMargin = 120*mW
 
@@ -54,6 +43,23 @@ local matchGroup = display.newGroup()
 
 function scene:create( event )
     local sceneGroup = self.view
+
+    --temp values
+    --_myG.difficulty = "easy"
+
+    if( _myG.difficulty == "easy" ) then
+        _myG.blockCount = 8
+        _myG.poolCount = 11
+        print("easy")
+    elseif( _myG.difficulty == "medium" ) then
+        _myG.blockCount = 12
+        _myG.poolCount = 12
+        print("medium")
+    elseif( _myG.difficulty == "hard" ) then
+        _myG.blockCount = 12
+        _myG.poolCount = 12
+        print("hard")
+    end
 
     -- create ribbon table/array for storage of ribbon pieces/variables later in this file
     -- This table is in my globals so it can be accessed by other scenes
@@ -273,11 +279,7 @@ function scene:create( event )
                 endX = event.x
 
                 -- Check for active block, this is to make sure a new tap doesn't use the old active block information
-                groupSwap( activeRibbon )
                 getActiveBlock( _myG.ribbon[activeRibbon].x, activeRibbon )
-                blockTouch = _myG.ribbon[activeRibbon].activeBlock
-                print( "blockTouch: " ..blockTouch)
-
             end
 
         -- ON MOVE:
@@ -294,7 +296,6 @@ function scene:create( event )
                 groupSwap( activeRibbon )
                  -- Check for active block
                 getActiveBlock( _myG.ribbon[activeRibbon].x, activeRibbon )
-
                 
             -- ON RELEASE: 
             elseif ( event.phase == "ended" or event.phase == "cancelled" ) then
@@ -307,41 +308,10 @@ function scene:create( event )
 
                 -- if not in the middle of a previous swipe/drag
                 if ( _myG.uiActive == "true" )  and ( moveAllowed == "true" ) then
-
-                    nextBlockSnap = blockTouch + 1
-                    --getActiveBlock( _myG.ribbon[activeRibbon].x, activeRibbon )
-                    blockRelease = _myG.ribbon[activeRibbon].activeBlock
-                    print( "blockRelease: " ..blockRelease)
-
-                    -- TAP or SWIPE RIGHT:
-                    --if ( totalTime < 400 and startX == endX ) or ( totalTime < 200 and endX > startX ) then
-                    if ( totalTime < 200 and endX > startX ) then
-                        print("swipe right")
-                        nextBlockSnap = blockTouch - 1
-                        -- if at start of center block region
-                        if( _myG.ribbon[activeRibbon].activeBlock == 1) then
-                            -- transition to last block in left region, then shift to center
-                            blockRegion = "left"
-                            activeBlockSnap = blockSnapLeft[_myG.blockCount]
-                            transition.to( _myG.ribbon[activeRibbon], { time=300, transition=easing.outSine, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
-                            -- play sound fx
-                            playSwipeFX()
-                            -- debug
-                            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
-                         -- else, if we're not at the end but still in the center region
-                       elseif ( blockRegion == "center" ) then
-                            transition.to( _myG.ribbon[activeRibbon], { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
-                            -- play sound fx
-                            playSwipeFX()
-                            -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
-                            _myG.ribbon[activeRibbon].activeBlock = nextBlockSnap
-                            -- debug
-                            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
-                        end
+                    -- if a swip command has been triggered
 
                     -- SWIPE LEFT:
-                    elseif ( totalTime < 200 ) and ( endX < startX ) then
-                    print("swipe left")
+                    if ( totalTime < 200 ) and ( endX < startX ) then
                         -- if at end of center block region
                         if ( _myG.ribbon[activeRibbon].activeBlock == _myG.blockCount ) then
                             -- transition to first block in right region, then shift to center
@@ -354,8 +324,9 @@ function scene:create( event )
                             
                             -- debug
                             -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
-                        -- else, if we're not at the end but still in the center region
-                        elseif ( blockRegion == "center" ) then
+                       -- else, if we're not at the end but still in the center region
+                       elseif ( blockRegion == "center" ) then
+                            nextBlockSnap = _myG.ribbon[activeRibbon].activeBlock + 1
                             transition.to( _myG.ribbon[activeRibbon], { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
                             -- play sound fx
                             playSwipeFX()
@@ -363,7 +334,44 @@ function scene:create( event )
                             _myG.ribbon[activeRibbon].activeBlock = nextBlockSnap
                             -- debug
                             -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+                        -- else if we are not in the center region (because of a very fast/long swipe going into the right region before code trigger)
+                        else
+                            -- don't do the full swipe animation, just shift to the next block
+                            -- play sound fx
+                            playSwipeFX()
+                            transition.to( _myG.ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
                         end
+
+                    -- SWIPE RIGHT:
+                    elseif ( totalTime < 200 ) and ( endX > startX ) then
+                        -- if at start of center block region
+                        if( _myG.ribbon[activeRibbon].activeBlock == 1) then
+                            -- transition to last block in left region, then shift to center
+                            blockRegion = "left"
+                            activeBlockSnap = blockSnapLeft[_myG.blockCount]
+                            transition.to( _myG.ribbon[activeRibbon], { time=300, transition=easing.outSine, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
+                            -- play sound fx
+                            playSwipeFX()
+                            -- debug
+                            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+                         -- else, if we're not at the end but still in the center region
+                       elseif ( blockRegion == "center" ) then
+                            nextBlockSnap = _myG.ribbon[activeRibbon].activeBlock - 1
+                            transition.to( _myG.ribbon[activeRibbon], { time=300 ,transition=easing.outSine, x=blockSnap[nextBlockSnap], onStart=moveStart, onComplete=moveEnd } )
+                            -- play sound fx
+                            playSwipeFX()
+                            -- Make sure active block is updated since the scroll is moving without the user touch to track last X position
+                            _myG.ribbon[activeRibbon].activeBlock = nextBlockSnap
+                            -- debug
+                            -- activeBlockText.text = "ARibbon: " .. activeRibbon .. ", ABlock: " .. _myG.ribbon[activeRibbon].activeBlock .. ", Region: " .. blockRegion
+                        -- else if we are not in the center region (because of a very fast/long swipe going into the right region before code trigger)
+                        else
+                            -- don't do the full swipe animation, just shift to the next block
+                            transition.to( _myG.ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=shiftToCenter } )
+                            -- play sound fx
+                            playSwipeFX()
+                        end
+
                     -- DRAG:
                     else
                         -- if the ribbon has been dragged out of the center region into the left or the right regions
@@ -374,7 +382,6 @@ function scene:create( event )
                         else
                             -- just snap to nearest block
                             --print ("abs: " .. activeBlockSnap)
-                            --transition.to( _myG.ribbon[activeRibbon], { time=150, x=blockSnap[blockTouch], onStart=moveStart, onComplete=moveEnd } )
                             transition.to( _myG.ribbon[activeRibbon], { time=150, x=activeBlockSnap, onStart=moveStart, onComplete=moveEnd } )
                         end
                     end
@@ -767,7 +774,7 @@ function scene:create( event )
     -- Array to generate 1-10 digits for randomization
         
     local t1 = {}
-    for i = 1, _myG.blockCount do
+    for i = 1, _myG.poolCount do
         t1[i] = i
     end
 
@@ -775,10 +782,12 @@ function scene:create( event )
 
         -- Randomize array for use in shuffling the order of leg sprites as they are generated.
         
-        for i = _myG.blockCount, 2, -1 do -- backwards
+        for i = _myG.poolCount, 2, -1 do -- backwards
             local r1 = math.random(i) -- select a random number between 1 and i
             t1[i], t1[r1] = t1[r1], t1[i] -- swap the randomly selected item to position i
         end
+        print( "poolCount: " .. _myG.poolCount )
+        print( "blockCount: " ..  _myG.blockCount )
 
         -- Generate leg sprites.
         -- We need to run all this code twice to create duplicate groups for the purpose of allowing our ribbons to loop
@@ -886,9 +895,17 @@ function scene:create( event )
 
             -- include bonus parts based on difficulty level
 
-            --if ( _myG.difficulty ~= "easy" ) then
-                -- parts here
-            --end
+            if ( _myG.difficulty ~= "easy" ) then
+
+                -- head-cheshire
+                tCount = tCount+1; tC = t1[tCount]
+                headsArray[tC] = display.newSprite( headsSheet, headsFrames )
+                headsArray[tC]:setFrame(1)
+                headsArray[tC]:setFillColor( 1, 0, 0, 1 ) -- red
+                if( i ~= 3 ) then
+                    headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5           
+                end
+            end
 
             -- if ( _myG.difficulty == "hard" ) then
                 --parts here
@@ -896,14 +913,16 @@ function scene:create( event )
 
         end
 
-        -- Add shuffled legs to block group
+        -- Add shuffled parts to groups
 
         for i=1, _myG.blockCount do
             blockGroupA[1]:insert( headsA[i] )
             blockGroupB[1]:insert( headsB[i] )
-            matchGroup:insert( _myG.headsMatch[i] )
         end
 
+       for i=1, _myG.poolCount do
+            matchGroup:insert( _myG.headsMatch[i] )
+        end
 
 
     end -- end randomize function
@@ -932,7 +951,7 @@ function scene:create( event )
     -- Array to generate 1-10 digits for randomization
     
     local t2 = {}
-    for i = 1, _myG.blockCount do
+    for i = 1, _myG.poolCount do
         t2[i] = i
     end
 
@@ -940,7 +959,7 @@ function scene:create( event )
 
         -- Randomize array for use in shuffling the order of leg sprites as they are generated.
         
-        for i = _myG.blockCount, 2, -1 do -- backwards
+        for i = _myG.poolCount, 2, -1 do -- backwards
             local r2 = math.random(i) -- select a random number between 1 and i
             t2[i], t2[r2] = t2[r2], t2[i] -- swap the randomly selected item to position i
         end
@@ -982,7 +1001,8 @@ function scene:create( event )
 
             local torsoHoodieBottom = display.newSprite( torsoSheet2, torsoFrames2 )
             torsoHoodieBottom:setFrame(2)
-            torsoHoodieBottom:setFillColor( 0, 1, 0, 1 ) -- green
+            torsoHoodieBottom:setFillColor( 1, 132/255, 239/255, 1 ) -- purple
+            --torsoHoodieBottom:setFillColor( 224/255, 215/255, 113/255, 1 ) -- green
 
             tCount = tCount+1; tC = t2[tCount]
             torsoArray[tC] = display.newGroup()
@@ -1024,13 +1044,14 @@ function scene:create( event )
                 torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-           -- torso-knight - original (red)
+           -- torso-knight
             local torsoKnightTop = display.newSprite( torsoSheet, torsoFrames )
             torsoKnightTop:setFrame(5)
 
             local torsoKnightBottom = display.newSprite( torsoSheet, torsoFrames )
             torsoKnightBottom:setFrame(4)
-            torsoKnightBottom:setFillColor( 0, 1, 0, 1 ) -- green
+            --torsoKnightBottom:setFillColor( 1, 82/255, 0, 1 ) -- red
+            torsoKnightBottom:setFillColor( 101/255, 162/255, 43/255, 1 ) -- green
 
             tCount = tCount+1; tC = t2[tCount]
             torsoArray[tC] = display.newGroup()
@@ -1048,13 +1069,14 @@ function scene:create( event )
                 torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-           -- torso-sweater - original (red/green)
+           -- torso-sweater
             local torsoSweaterTop = display.newSprite( torsoSheet2, torsoFrames2 )
             torsoSweaterTop:setFrame(5)
+            torsoSweaterTop:setFillColor( 204/255, 0, 0, 1 ) -- red
+            --torsoSweaterTop:setFillColor( 15/255, 126/255, 204/255, 1 ) -- blue
 
             local torsoSweaterBottom = display.newSprite( torsoSheet3, torsoFrames3 )
             torsoSweaterBottom:setFrame(2)
-            torsoSweaterBottom:setFillColor( 0, 1, 0, 1 ) -- green
 
             tCount = tCount+1; tC = t2[tCount]
             torsoArray[tC] = display.newGroup()
@@ -1064,13 +1086,14 @@ function scene:create( event )
                 torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-            -- torso-wizard - original (blue)
+            -- torso-wizard
             local torsoWizardTop = display.newSprite( torsoSheet2, torsoFrames2 )
             torsoWizardTop:setFrame(7)
 
             local torsoWizardBottom = display.newSprite( torsoSheet2, torsoFrames2 )
             torsoWizardBottom:setFrame(6)
-            torsoWizardBottom:setFillColor( 0, 1, 0, 1 ) -- green
+            torsoWizardBottom:setFillColor( 15/255, 126/255, 204/255, 1 ) -- blue
+            --torsoWizardBottom:setFillColor( 24/255, 183/255, 43/255, 1 ) -- green
 
             tCount = tCount+1; tC = t2[tCount]
             torsoArray[tC] = display.newGroup()
@@ -1082,9 +1105,26 @@ function scene:create( event )
 
             -- include bonus parts based on difficulty level
 
-            --if ( _myG.difficulty ~= "easy" ) then
-                -- parts here
-            --end
+            if ( _myG.difficulty ~= "easy" ) then
+
+                -- torso-wizard
+                local torsoWizardTop2 = display.newSprite( torsoSheet2, torsoFrames2 )
+                torsoWizardTop2:setFrame(7)
+
+                local torsoWizardBottom2 = display.newSprite( torsoSheet2, torsoFrames2 )
+                torsoWizardBottom2:setFrame(6)
+                --torsoWizardBottom2:setFillColor( 15/255, 126/255, 204/255, 1 ) -- blue
+                torsoWizardBottom2:setFillColor( 24/255, 183/255, 43/255, 1 ) -- green
+
+                tCount = tCount+1; tC = t2[tCount]
+                torsoArray[tC] = display.newGroup()
+                torsoArray[tC]:insert( torsoWizardBottom2 )
+                torsoArray[tC]:insert( torsoWizardTop2 )
+                if( i ~= 3 ) then
+                    torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+            end
 
             -- if ( _myG.difficulty == "hard" ) then
                 --parts here
@@ -1092,11 +1132,14 @@ function scene:create( event )
 
         end
 
-        -- Add shuffled legs to block group
+        -- Add shuffled parts to groups
 
         for i=1, _myG.blockCount do
             blockGroupA[2]:insert( torsoA[i] )
             blockGroupB[2]:insert( torsoB[i] )
+        end
+
+        for i=1, _myG.poolCount do
             matchGroup:insert( _myG.torsoMatch[i] )
         end
 
@@ -1122,7 +1165,7 @@ function scene:create( event )
     -- Array to generate 1-10 digits for randomization
     
     local t3 = {}
-    for i = 1, _myG.blockCount do
+    for i = 1, _myG.poolCount do
         t3[i] = i
     end
 
@@ -1130,7 +1173,7 @@ function scene:create( event )
 
         -- Randomize array for use in shuffling the order of leg sprites as they are generated.
         
-        for i = _myG.blockCount, 2, -1 do -- backwards
+        for i = _myG.poolCount, 2, -1 do -- backwards
             local r3 = math.random(i) -- select a random number between 1 and i
             t3[i], t3[r3] = t3[r3], t3[i] -- swap the randomly selected item to position i
         end
@@ -1154,6 +1197,7 @@ function scene:create( event )
             local tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet, legsFrames )
             legsArray[tC]:setFrame(1)
+            legsArray[tC].name = "legs-bermuda"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5           
             end
@@ -1162,6 +1206,7 @@ function scene:create( event )
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet, legsFrames )
             legsArray[tC]:setFrame(2)
+            legsArray[tC].name = "legs-buccaneer"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1172,12 +1217,13 @@ function scene:create( event )
 
             local legsDancerBottom = display.newSprite( legsSheet, legsFrames )
             legsDancerBottom:setFrame(3)
-            legsDancerBottom:setFillColor( 0, 1, 0, 1 ) -- green
+            legsDancerBottom:setFillColor( 139/255, 166/255, 1, 1 ) -- purple
 
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newGroup()
             legsArray[tC]:insert( legsDancerBottom )
             legsArray[tC]:insert( legsDancerTop )
+            legsArray[tC].name = "legs-dancer"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1186,22 +1232,25 @@ function scene:create( event )
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet, legsFrames )
             legsArray[tC]:setFrame(6)
+            legsArray[tC].name = "legs-prisoner"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-            -- legs-wizard - original (blue)
+            -- legs-wizard
             local legsWizardTop = display.newSprite( legsSheet, legsFrames )
             legsWizardTop:setFrame(8)
 
             local legsWizardBottom = display.newSprite( legsSheet, legsFrames )
             legsWizardBottom:setFrame(7)
-            legsWizardBottom:setFillColor( 0, 1, 0, 1 ) -- green
+            legsWizardBottom:setFillColor( 15/255, 126/255, 204/255, 1 ) -- blue
+            --legsWizardBottom:setFillColor( 24/255, 183/255, 43/255, 1 ) -- green
 
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newGroup()
             legsArray[tC]:insert( legsWizardBottom )
             legsArray[tC]:insert( legsWizardTop )
+            legsArray[tC].name = "legs-wizard"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1210,6 +1259,7 @@ function scene:create( event )
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
             legsArray[tC]:setFrame(7)
+            legsArray[tC].name = "legs-yeehaw"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1218,30 +1268,34 @@ function scene:create( event )
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
             legsArray[tC]:setFrame(1)
+            legsArray[tC].name = "legs-bigfoot"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-            -- legs-kilt - original (red)
+            -- legs-kilt
             local legsKiltTop = display.newSprite( legsSheet2, legsFrames2 )
             legsKiltTop:setFrame(3)
 
             local legsKiltBottom = display.newSprite( legsSheet2, legsFrames2 )
             legsKiltBottom:setFrame(2)
-            legsKiltBottom:setFillColor( 0, 1, 0, 1 ) -- green
+            --legsKiltBottom:setFillColor( 238/255, 0, 0, 1 ) -- red
+            legsKiltBottom:setFillColor( 0, 140/255, 238/255, 1 ) -- blue
 
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newGroup()
             legsArray[tC]:insert( legsKiltBottom )
             legsArray[tC]:insert( legsKiltTop )
+            legsArray[tC].name = "legs-kilt"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-            -- legs-knight - original (red)
+            -- legs-knight
             local legsKnightTop = display.newSprite( legsSheet, legsFrames )
             legsKnightTop:setFrame(5)
-            legsKnightTop:setFillColor( 0, 1, 0, 1 ) -- green
+            --legsKnightTop:setFillColor( 1, 82/255, 0, 1 ) -- red
+            legsKnightTop:setFillColor( 101/255, 162/255, 43/255, 1 ) -- green
 
             local legsKnightBottom = display.newSprite( legsSheet2, legsFrames2 )
             legsKnightBottom:setFrame(4)
@@ -1250,6 +1304,7 @@ function scene:create( event )
             legsArray[tC] = display.newGroup()
             legsArray[tC]:insert( legsKnightBottom )
             legsArray[tC]:insert( legsKnightTop )
+            legsArray[tC].name = "legs-knight"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1258,6 +1313,7 @@ function scene:create( event )
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
             legsArray[tC]:setFrame(6)
+            legsArray[tC].name = "legs-traveler"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1266,33 +1322,34 @@ function scene:create( event )
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
             legsArray[tC]:setFrame(5)
+            legsArray[tC].name = "legs-skates"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
             -- include bonus parts based on difficulty level
 
-            --[[
             if ( _myG.difficulty ~= "easy" ) then
                 
-                -- legs-wizard - green
+                -- legs-wizard
                 local legsWizardTop2 = display.newSprite( legsSheet, legsFrames )
-                legsWizardTop2:setFrame(6)
+                legsWizardTop2:setFrame(8)
 
                 local legsWizardBottom2 = display.newSprite( legsSheet, legsFrames )
-                legsWizardBottom2:setFrame(5)
-                legsWizardBottom2:setFillColor( 0, 1, 0, 1 ) -- green
+                legsWizardBottom2:setFrame(7)
+                --legsWizardBottom2:setFillColor( 15/255, 126/255, 204/255, 1 ) -- blue
+                legsWizardBottom2:setFillColor( 24/255, 183/255, 43/255, 1 ) -- green
 
                 tCount = tCount+1; tC = t3[tCount]
                 legsArray[tC] = display.newGroup()
                 legsArray[tC]:insert( legsWizardBottom2 )
                 legsArray[tC]:insert( legsWizardTop2 )
+                legsArray[tC].name = "legs-skates2"
                 if( i ~= 3 ) then
                     legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
                 end
 
             end
-            ]]--
 
             -- if ( _myG.difficulty == "hard" ) then
                 --parts here
@@ -1300,13 +1357,16 @@ function scene:create( event )
 
         end
 
-        -- Add shuffled legs to block group
+        -- Add shuffled parts to groups
 
         for i=1, _myG.blockCount do
             blockGroupA[3]:insert( legsA[i] )
             blockGroupB[3]:insert( legsB[i] )
+        end 
+
+        for i=1, _myG.poolCount do
             matchGroup:insert( _myG.legsMatch[i] )
-        end  
+        end
 
         sceneGroup:insert( matchGroup )      
 

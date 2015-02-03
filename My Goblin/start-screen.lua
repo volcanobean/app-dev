@@ -476,8 +476,9 @@ function scene:show( event )
         -- Called when the scene is now on screen.
 
         -- pre-load next scene
-        print ( "loading goblin-slider" )
-        composer.loadScene( "goblin-slider" )
+        -- can't preload anymore because goblin-slider needs to be built based on level selection on this screen
+        --print ( "loading goblin-slider" )
+        --composer.loadScene( "goblin-slider" )
 
         -- play goblin theme
         timer.performWithDelay( 700, playGoblinTheme )

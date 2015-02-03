@@ -594,38 +594,6 @@ function scene:create( event )
             --matchGroup:scale( mScale, mScale )
         end
 
-        --[[
-        if( screenRatio >= 0.7 ) then
-            -- if our device has iPad-eque proportions
-            bannerGroup.anchorY = 1
-            banner.anchorY = 1
-            matchGroup.y = -940*mW
-            bannerUpY = 0 --0
-            bannerDownY = cH*0.91 --440
-            bannerStretchY = 50*mW
-            print( "more than 0.7")
-        elseif( screenRatio > 0.6 ) and ( screenRatio < 0.7 ) then
-            -- if we're on shorter mobile devices
-            bannerGroup.anchorY = 1
-            banner.anchorY = 1
-            matchGroup.y = -940*mW
-            bannerUpY = 0 --0
-            bannerDownY = cH*0.82 --440
-            bannerStretchY = 50*mW
-            print( "between 0.6 and 0.7")
-            print( bannerDownY )
-         else
-            -- if we're on a taller thinner device
-            bannerGroup.anchorY = 0
-            banner.anchorY = 0
-            matchGroup.y = 120*mW
-            bannerUpY = -1050*mW
-            bannerDownY = -50*mW
-            bannerStretchY = 50*mW
-        end
-        ]]--
-
-
         --move UI above banner ad
         gearSprite.y = cH-_myG.adsHeight
         gearHandle.y = gearHandleY-_myG.adsHeight
