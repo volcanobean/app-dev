@@ -767,7 +767,7 @@ function scene:create( event )
 
     local headsSheetInfo = require("heads-sheet")
     local headsSheet = graphics.newImageSheet( "images/heads.png", headsSheetInfo:getSheet() )
-    local headsFrames = { start=1, count=10 }
+    local headsFrames = { start=1, count=14 }
 
     local headsArray
     local headsA = {}
@@ -783,7 +783,7 @@ function scene:create( event )
 
     function randomizeHeads()
 
-        -- Randomize array for use in shuffling the order of leg sprites as they are generated.
+        -- Randomize array for use in shuffling the order of sprites as they are generated.
         
         for i = _myG.poolCount, 2, -1 do -- backwards
             local r1 = math.random(i) -- select a random number between 1 and i
@@ -792,7 +792,7 @@ function scene:create( event )
         print( "poolCount: " .. _myG.poolCount )
         print( "blockCount: " ..  _myG.blockCount )
 
-        -- Generate leg sprites.
+        -- Generate sprites.
         -- We need to run all this code twice to create duplicate groups for the purpose of allowing our ribbons to loop
             
         for i=1, 3 do
@@ -825,17 +825,36 @@ function scene:create( event )
             end
             
             -- head-classic
+            local headClassicTop = display.newSprite( headsSheet, headsFrames )
+            headClassicTop:setFrame(3)
+
+            local headClassicBottom = display.newSprite( headsSheet, headsFrames )
+            headClassicBottom:setFrame(2)
+            headClassicBottom:setFillColor( 102/255, 153/255, 204/255, 1 ) -- blue
+            --headClassicBottom:setFillColor( 0, 204/255, 0, 1 ) -- green
+            --headClassicBottom:setFillColor( 228/255, 80/255, 80/255, 1 ) -- red
+
             tCount = tCount+1; tC = t1[tCount]
-            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
-            headsArray[tC]:setFrame(2)
+            headsArray[tC] = display.newGroup()
+            headsArray[tC]:insert( headClassicBottom )
+            headsArray[tC]:insert( headClassicTop )
             if( i ~= 3 ) then
                 headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
             -- head-fool
+            local headFoolTop = display.newSprite( headsSheet, headsFrames )
+            headFoolTop:setFrame(5)
+
+            local headFoolBottom = display.newSprite( headsSheet, headsFrames )
+            headFoolBottom:setFrame(4)
+            --headFoolBottom:setFillColor( 13/255, 1, 0, 1 ) -- green
+            --headFoolBottom:setFillColor( 1, 38/255, 0, 1 ) -- red
+
             tCount = tCount+1; tC = t1[tCount]
-            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
-            headsArray[tC]:setFrame(3)
+            headsArray[tC] = display.newGroup()
+            headsArray[tC]:insert( headFoolBottom )
+            headsArray[tC]:insert( headFoolTop )
             if( i ~= 3 ) then
                 headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -843,7 +862,7 @@ function scene:create( event )
             -- head-gentleman
             tCount = tCount+1; tC = t1[tCount]
             headsArray[tC] = display.newSprite( headsSheet, headsFrames )
-            headsArray[tC]:setFrame(4)
+            headsArray[tC]:setFrame(6)
             if( i ~= 3 ) then
                 headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -851,7 +870,7 @@ function scene:create( event )
             -- head-goggles
             tCount = tCount+1; tC = t1[tCount]
             headsArray[tC] = display.newSprite( headsSheet, headsFrames )
-            headsArray[tC]:setFrame(5)
+            headsArray[tC]:setFrame(7)
             if( i ~= 3 ) then
                 headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -859,7 +878,7 @@ function scene:create( event )
             -- head-grump
             tCount = tCount+1; tC = t1[tCount]
             headsArray[tC] = display.newSprite( headsSheet, headsFrames )
-            headsArray[tC]:setFrame(6)
+            headsArray[tC]:setFrame(8)
             if( i ~= 3 ) then
                 headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -867,23 +886,42 @@ function scene:create( event )
             -- head-helmet
             tCount = tCount+1; tC = t1[tCount]
             headsArray[tC] = display.newSprite( headsSheet, headsFrames )
-            headsArray[tC]:setFrame(7)
+            headsArray[tC]:setFrame(9)
             if( i ~= 3 ) then
                 headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
             -- head-hood
+            local headHoodTop = display.newSprite( headsSheet, headsFrames )
+            headHoodTop:setFrame(11)
+            headHoodTop:setFillColor( 229/255, 150/255, 92/255, 1 ) -- brown
+            --headHoodTop:setFillColor( 0, 204/255, 0, 1 ) -- green
+            --headHoodTop:setFillColor( 1, 0, 0, 1 ) -- red
+
+            local headHoodBottom = display.newSprite( headsSheet, headsFrames )
+            headHoodBottom:setFrame(10)
+
             tCount = tCount+1; tC = t1[tCount]
-            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
-            headsArray[tC]:setFrame(8)
+            headsArray[tC] = display.newGroup()
+            headsArray[tC]:insert( headHoodBottom )
+            headsArray[tC]:insert( headHoodTop )
             if( i ~= 3 ) then
                 headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
             -- head-skicap
+            local headSkicapTop = display.newSprite( headsSheet, headsFrames )
+            headSkicapTop:setFrame(13)
+
+            local headSkicapBottom = display.newSprite( headsSheet, headsFrames )
+            headSkicapBottom:setFrame(12)
+            headSkicapBottom:setFillColor( 1, 0, 0, 1 ) -- red
+            --headSkicapBottom:setFillColor( 204/255, 0, 1, 1 ) -- purple
+
             tCount = tCount+1; tC = t1[tCount]
-            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
-            headsArray[tC]:setFrame(9)
+            headsArray[tC] = display.newGroup()
+            headsArray[tC]:insert( headSkicapBottom )
+            headsArray[tC]:insert( headSkicapTop )
             if( i ~= 3 ) then
                 headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -891,7 +929,7 @@ function scene:create( event )
             -- head-tongue
             tCount = tCount+1; tC = t1[tCount]
             headsArray[tC] = display.newSprite( headsSheet, headsFrames )
-            headsArray[tC]:setFrame(10)
+            headsArray[tC]:setFrame(14)
             if( i ~= 3 ) then
                 headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -900,13 +938,22 @@ function scene:create( event )
 
             if ( _myG.difficulty ~= "easy" ) then
 
-                -- head-cheshire
+                -- head-skicap
+                local headSkicapTop2 = display.newSprite( headsSheet, headsFrames )
+                headSkicapTop2:setFrame(13)
+
+                local headSkicapBottom2 = display.newSprite( headsSheet, headsFrames )
+                headSkicapBottom2:setFrame(12)
+                --headSkicapBottom2:setFillColor( 1, 0, 0, 1 ) -- red
+                --headSkicapBottom2:setFillColor( 204/255, 0, 1, 1 ) -- purple
+                headSkicapBottom2:setFillColor( 0, 1, 0, 1 ) -- green
+
                 tCount = tCount+1; tC = t1[tCount]
-                headsArray[tC] = display.newSprite( headsSheet, headsFrames )
-                headsArray[tC]:setFrame(1)
-                headsArray[tC]:setFillColor( 1, 0, 0, 1 ) -- red
+                headsArray[tC] = display.newGroup()
+                headsArray[tC]:insert( headSkicapBottom2 )
+                headsArray[tC]:insert( headSkicapTop2 )
                 if( i ~= 3 ) then
-                    headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5           
+                    headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
                 end
             end
 
