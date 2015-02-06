@@ -65,12 +65,9 @@ local titleGroup
 local levelsSignGroup
 local settingsGroup
 
-local bannerGroup
-local bannerUpY
-local bannerDownY
-local bannerStretchY = 0
+local aboutBtn
 local shader
-local bannerState = "up"
+local infoState = "off"
 
 --[[
 local screenRatio = cW/cH
@@ -267,7 +264,7 @@ function scene:create( event )
     
     local menuBtnY = -35*mW
     local audioBtnY = 30*mW
-    local aboutBtnY = 155*mW
+    --local unlockBtnY = 155*mW
 
     local audioBtn = display.newSprite( settingsSheet, settingsFrames )
     audioBtn:setFrame(2)
@@ -275,11 +272,13 @@ function scene:create( event )
     audioBtn.x = settingsX
     audioBtn.y = audioBtnY
 
-    local aboutBtn = display.newSprite( settingsSheet, settingsFrames )
-    aboutBtn:setFrame(1)
-    aboutBtn.anchorY = 0 
-    aboutBtn.x = settingsX
-    aboutBtn.y = aboutBtnY
+    --[[
+    local unlockBtn = display.newSprite( settingsSheet, settingsFrames )
+    unlockBtn:setFrame(1)
+    unlockBtn.anchorY = 0 
+    unlockBtn.x = settingsX
+    unlockBtn.y = unlockBtnY
+    ]]--
 
     local menuBtn = display.newSprite( settingsSheet, settingsFrames )
     menuBtn:setFrame(4)
@@ -287,16 +286,21 @@ function scene:create( event )
     menuBtn.x = settingsX
     menuBtn.y = menuBtnY
 
-    aboutBtn.yScale=0.5
-    aboutBtn.alpha=0
+    --unlockBtn.yScale=0.5
+    --unlockBtn.alpha=0
     audioBtn.yScale=0.5
     audioBtn.alpha=0
 
-    sceneGroup:insert( aboutBtn )
+    --sceneGroup:insert( unlockBtn )
     sceneGroup:insert( audioBtn )
     sceneGroup:insert( menuBtn )
+
+    aboutBtn = display.newImageRect( sceneGroup, "images/about.png", 45*mW, 45*mW )
+    aboutBtn.x = 30*mW
+    aboutBtn.y = cH - 135*mW
+    aboutBtn:setFillColor( 173/255, 195/255, 128/255, 1 )
     
-       -- settings-related functions
+    -- settings-related functions
 
     local settingsActive = "true"
     local arrowState = "down"
@@ -316,19 +320,19 @@ function scene:create( event )
         transition.to( audioBtn, { time=1, alpha=1 })
         transition.to( audioBtn, { delay=1, time=150, y=audioBtnY+48*mW, yScale=1, transition=easing.outSine })
         transition.to( audioBtn, { delay=150, time=150, y=audioBtnY, transition=easing.outSine })
-        transition.to( aboutBtn, { delay=250, time=1, alpha=1 })
-        transition.to( aboutBtn, { delay=250, time=150, y=aboutBtnY+50*mW, yScale=1, transition=easing.outSine })
-        transition.to( aboutBtn, { delay=400, time=150, y=aboutBtnY, transition=easing.outSine })
-        timer.performWithDelay( 650, settingsActiveTrue )
+        --transition.to( unlockBtn, { delay=250, time=1, alpha=1 })
+        --transition.to( unlockBtn, { delay=250, time=150, y=aboutBtnY+50*mW, yScale=1, transition=easing.outSine })
+        --transition.to( unlockBtn, { delay=400, time=150, y=aboutBtnY, transition=easing.outSine })
+        timer.performWithDelay( 350, settingsActiveTrue )
     end
 
     local function settingsClose()
         settingsActiveFalse()
-        transition.to( aboutBtn, { time=75, yScale=0.5, transition=easing.outSine  })
-        transition.to( aboutBtn, { delay=75, time=1, alpha=0 })
-        transition.to( audioBtn, { delay=75, time=60, yScale=0.5, transition=easing.outSine  })
-        transition.to( audioBtn, { delay=135, time=1, alpha=0 })
-        timer.performWithDelay( 135, settingsActiveTrue )
+        --transition.to( unlockBtn, { time=75, yScale=0.5, transition=easing.outSine  })
+        --transition.to( unlockBtn, { delay=75, time=1, alpha=0 })
+        transition.to( audioBtn, { time=60, yScale=0.5, transition=easing.outSine  })
+        transition.to( audioBtn, { delay=61, time=1, alpha=0 })
+        timer.performWithDelay( 65, settingsActiveTrue )
     end
 
     local function clickMenu( event )
@@ -365,7 +369,7 @@ function scene:create( event )
 
     menuBtn:addEventListener( "tap", clickMenu )
     audioBtn:addEventListener( "tap", clickAudio )
-    --aboutBtn:addEventListener( "tap", clickAbout )
+    --unlockBtn:addEventListener( "tap", clickUnlock )
 
     -- ad space
     local adBg = display.newRect( cX, cH, display.contentWidth, 100*mW )
@@ -386,8 +390,9 @@ function scene:create( event )
         end
         transition.to( levelsSignGroup, { delay=100, time=100, y=-50*mW, transition=easing.outSine })
         transition.to( levelsSignGroup, { delay=200, time=200, y=400*mW, transition=easing.inSine })
+        transition.to( titleGroup, { delay=100, time=500, alpha=0 })
         timer.performWithDelay( 300, playSwipeFX )
-        transition.to ( titleGroup, { delay=100, time=500, alpha=0 })
+        transition.to( aboutBtn, { time=400, alpha=0 } )
         timer.performWithDelay( 800, startGame )
     end
 
@@ -447,38 +452,22 @@ function scene:create( event )
     shader:setFillColor( 0, 0, 0, 1 )
     sceneGroup:insert( shader )
 
-    -- rope sprites
-
-    local ropeSheetInfo = require("ropes-sheet")
-    local ropeSheet = graphics.newImageSheet( "images/ropes.png", ropeSheetInfo:getSheet() )
-    local ropeFrames  = { start=1, count=2 }
-
-    local matchRopeL = display.newSprite( ropeSheet, ropeFrames )
-    matchRopeL:setFrame(1)
-    matchRopeL.anchorY = 1 
-    matchRopeL.x = 275*mW
-    matchRopeL.y = cY-420*mW
+    local infoText1 = display.newText( "where's my goblin?", cX, cY-410*mW, "Mathlete-Skinny", 75*mW )
+    local infoText2 = display.newText( "© 2015 Volcano Bean, LLC", cX, cY-350*mW, "Mathlete-Skinny", 75*mW )
     
-    local matchRopeR = display.newSprite( ropeSheet, ropeFrames )
-    matchRopeR:setFrame(2)
-    matchRopeR.anchorY = 1
-    matchRopeR.x = 510*mW
-    matchRopeR.y = cY-420*mW
+    local infoText3 = display.newText( "artists:", cX, cY-260*mW, "Mathlete-Skinny", 75*mW )
+    local infoText4 = display.newText( "matt seniour", cX, cY-200*mW, "Mathlete-Skinny", 75*mW )
+    local infoText5 = display.newText( "gene kelly", cX, cY-140*mW, "Mathlete-Skinny", 75*mW )
+    
+    local infoText6 = display.newText( "producer:", cX, cY-50*mW, "Mathlete-Skinny", 75*mW )
+    local infoText7 = display.newText( "mary mckenzie", cX, cY+10*mW, "Mathlete-Skinny", 75*mW )
+    
+    local infoText8 = display.newText( "programmer:", cX, cY+100*mW, "Mathlete-Skinny", 75*mW )
+    local infoText9 = display.newText( "gene kelly", cX, cY+160*mW, "Mathlete-Skinny", 75*mW )
 
-    local banner = display.newImageRect( "images/banner.png", 512*mW, 795*mW)
-    banner.x = cX+10*mW
-    banner.y = cY-60*mW
-
-    local infoText1 = display.newText( "where's my goblin?", cX+14*mW, cY-360*mW, "Mathlete-Skinny", 75*mW )
-    local infoText2 = display.newText( "© Volcano Bean, LLC", cX+14*mW, cY-300*mW, "Mathlete-Skinny", 75*mW )
-    local infoText3 = display.newText( "artists:", cX+14*mW, cY-210*mW, "Mathlete-Skinny", 75*mW )
-    local infoText4 = display.newText( "matt seniour", cX+14*mW, cY-150*mW, "Mathlete-Skinny", 75*mW )
-    local infoText5 = display.newText( "gene kelly", cX+14*mW, cY-90*mW, "Mathlete-Skinny", 75*mW )
-    local infoText6 = display.newText( "producer:", cX+14*mW, cY, "Mathlete-Skinny", 75*mW )
-    local infoText7 = display.newText( "mary mckenzie", cX+14*mW, cY+60*mW, "Mathlete-Skinny", 75*mW )
-    local infoText8 = display.newText( "programmer:", cX+14*mW, cY+150*mW, "Mathlete-Skinny", 75*mW )
-    local infoText9 = display.newText( "gene kelly", cX+14*mW, cY+210*mW, "Mathlete-Skinny", 75*mW )
+    local infoText10 = display.newText( "volcanobean.com", cX, cY+250*mW, "Mathlete-Skinny", 75*mW )
    
+   --[[
     infoText1:setFillColor( 74/255, 54/255, 22/255, 1)
     infoText2:setFillColor( 74/255, 54/255, 22/255, 1)
     infoText3:setFillColor( 74/255, 54/255, 22/255, 1)
@@ -488,81 +477,72 @@ function scene:create( event )
     infoText7:setFillColor( 74/255, 54/255, 22/255, 1)
     infoText8:setFillColor( 74/255, 54/255, 22/255, 1)
     infoText9:setFillColor( 74/255, 54/255, 22/255, 1)
+    infoText10:setFillColor( 74/255, 54/255, 22/255, 1)
+    ]]--
 
-    bannerGroup = display.newGroup()
-    bannerGroup:insert( banner )
-    bannerGroup:insert( matchRopeL )
-    bannerGroup:insert( matchRopeR )
-    bannerGroup:insert( infoText1 )
-    bannerGroup:insert( infoText2 )
-    bannerGroup:insert( infoText3 )
-    bannerGroup:insert( infoText4 )
-    bannerGroup:insert( infoText5 )
-    bannerGroup:insert( infoText6 )
-    bannerGroup:insert( infoText7 )
-    bannerGroup:insert( infoText8 )
-    bannerGroup:insert( infoText9 )
+    infoTextGroup = display.newGroup()
+    infoTextGroup:insert( infoText1 )
+    infoTextGroup:insert( infoText2 )
+    infoTextGroup:insert( infoText3 )
+    infoTextGroup:insert( infoText4 )
+    infoTextGroup:insert( infoText5 )
+    infoTextGroup:insert( infoText6 )
+    infoTextGroup:insert( infoText7 )
+    infoTextGroup:insert( infoText8 )
+    infoTextGroup:insert( infoText9 )
+    infoTextGroup:insert( infoText10 )
 
-    sceneGroup:insert( bannerGroup )
-
-    bannerUpY = -800*mW
-    bannerDownY = 0
-    bannerStretchY = 50*mW
-
-    bannerGroup.y = bannerUpY
+    sceneGroup:insert( infoTextGroup )
 
     -- animate banner
 
-    local function bannerStateDown()
-        bannerState = "down"
-        print( "bannerState down")
+    local function linkToSite( event )
+        system.openURL( "http://www.volcanobean.com" )
+        print( "open VB site" )
+        return true
     end
 
-    local function bannerStateUp()
-        bannerState = "up"
-        print( "bannerState up")
+    infoText10:addEventListener( "tap", linkToSite )
+
+    local function infoOn()
+        infoState = "on"
+        print( "infoState on")
     end
 
-    local function bannerPlayDown()
-        if ( bannerState == "up" ) then
-            print( bannerState )
-            playBannerFX()
-            transition.to( bannerGroup, { time=400, y=bannerDownY+bannerStretchY, yScale=1, transition=easing.outSine })
-            transition.to( bannerGroup, { delay=400, time=200, y=bannerDownY, transition=easing.outSine })
-            transition.to( shader, { time=350, alpha=0.5 } )
-            timer.performWithDelay( 350, bannerStateDown )
-        end
+    local function infoOff()
+        infoState = "off"
+        print( "infoState off")
     end
 
-    local function bannerPlayUp()
-        if ( bannerState == "down" ) then
-            print( bannerState )
-            playBannerFX()
-            transition.to( bannerGroup, { time=400, y=bannerUpY, yScale=0.5, transition=easing.outSine })
-            transition.to( shader, { time=300, alpha=0 } )
-            timer.performWithDelay( 400, bannerStateUp )
-        end
-    end
-
-    local function raiseBanner()
-        if( bannerState == "down" ) then
-            bannerPlayUp()
-        end
-    end
-
-    local function clickAbout( event )
-        print( "clickAbout" )
-        if( settingsActive == "true" ) then
-            bannerPlayDown()
+    local function infoShow( event )
+        if ( infoState == "off" ) then
+            print( infoState )
+            transition.to( levelsSignGroup, {time=300, alpha=0 })
+            transition.to( titleGroup, {time=300, alpha=0 })
+            transition.to( infoTextGroup, { time=600, y=40, alpha=1, transition=easing.outSine })
+            transition.to( shader, { time=350, alpha=0.65 } )
+            timer.performWithDelay( 350, infoOn )
         end
         return true
     end
 
+    local function infoHide( event )
+        if ( infoState == "on" ) then
+            print( bannerState )
+            transition.to( levelsSignGroup, {time=200, alpha=1 })
+            transition.to( titleGroup, {time=200, alpha=1 })
+            transition.to( infoTextGroup, { time=250, alpha=0, transition=easing.outSine })
+            transition.to( infoTextGroup, { delay=260, time=1, y=0 })
+            transition.to( shader, { time=300, alpha=0 } )
+            timer.performWithDelay( 400, infoOff )
+        end
+        return true
+    end
 
     -- event listeners
 
-    shader:addEventListener( "tap", raiseBanner )
-    aboutBtn:addEventListener( "tap", clickAbout )
+    shader:addEventListener( "tap", infoHide )
+    aboutBtn:addEventListener( "tap", infoShow )
 
 end
 
@@ -592,13 +572,15 @@ function scene:show( event )
         medText:setFillColor( 232/255, 1, 186/255, 1 )
         hardText:setFillColor( 232/255, 1, 186/255, 1 )
 
+        aboutBtn.alpha=1
+
         easyTextDark.alpha=0
         medTextDark.alpha=0
         hardTextDark.alpha=0
 
         shader.alpha=0
-        bannerGroup.y=bannerUpY
-        bannerGroup.yScale=0.5
+        infoTextGroup.alpha=0
+        infoTextGroup.y=0
 
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
