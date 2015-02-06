@@ -41,6 +41,8 @@ local playIntro
 local screenRatio = cW/cH
 print ("screenRatio " .. screenRatio)
 
+local kidAudio = "M"
+
 ---------------------------------------------------------------------------------
 -- SCENE:CREATE - Initialize the scene here.
 ---------------------------------------------------------------------------------
@@ -69,10 +71,10 @@ function scene:create( event )
 
     if( _myG.difficulty == "medium" ) then
         peeksPar = 2
-        timePar = 2400
+        timePar = 24
     elseif( _myG.difficulty == "hard" ) then
         peeksPar = 1
-        timePar = 1900
+        timePar = 19
     end
 
     -- Create table to hold data for goblin match
@@ -136,34 +138,55 @@ function scene:create( event )
 
     -- Voices
 
-    local whereGoblin = audio.loadSound( "audio/mason-where-goblin.wav" )
-    local notGoblin = audio.loadSound( "audio/mason-not-my-goblin.wav" )
-    local thatGoblin = audio.loadSound( "audio/mason-thats-my-goblin.wav" )
+    local whereGoblinM = audio.loadSound( "audio/mason-where-goblin.wav" )
+    local notGoblinM = audio.loadSound( "audio/mason-not-my-goblin.wav" )
+    local thatGoblinM = audio.loadSound( "audio/mason-thats-my-goblin.wav" )
+
+    local whereGoblinD = audio.loadSound( "audio/dori-where-goblin.wav" )
+    local notGoblinD = audio.loadSound( "audio/dori-not-my-goblin.wav" )
+    local thatGoblinD = audio.loadSound( "audio/dori-thats-my-goblin.wav" )
+
     local yayGoblin = audio.loadSound( "audio/yays.wav" )
 
     local function audioWheresMyGoblin()
         -- Play sound
         if( _myG.audioOn == "true" ) then
-            audio.play( whereGoblin )
+            if( kidAudio == "M" ) then
+                audio.play( whereGoblinM )
+            elseif( kidAudio == "D" ) then
+                audio.play( whereGoblinD )
+            end
         end
     end
 
     local function audioThatsMyGoblin()
         if( _myG.audioOn == "true" ) then
-            audio.play( thatGoblin )
+            if( kidAudio == "M" ) then
+                audio.play( thatGoblinM )
+            elseif( kidAudio == "D" ) then
+                audio.play( thatGoblinD )
+            end
         end
     end
 
     local function audioNotMyGoblin()
         if( _myG.audioOn == "true" ) and ( notGobPlayed == "false") then
-            audio.play( notGoblin )
+            if( kidAudio == "M" ) then
+                audio.play( notGoblinM )
+            elseif( kidAudio == "D" ) then
+                audio.play( notGoblinD )
+            end
             notGobPlayed = "true"
         end
     end
 
     local function audioYay()
         if( _myG.audioOn == "true" ) then
-            audio.play( yayGoblin )
+            if( kidAudio == "M" ) then
+                audio.play( yayGoblinM )
+            elseif( kidAudio == "D" ) then
+                audio.play( yayGoblinD )
+            end
         end
     end
 
@@ -878,6 +901,20 @@ function scene:show( event )
             _myG.blackFader.alpha=1
         end
 
+        if( _myG.firstPlay == "true") then
+            kidAudio = "M"
+        else
+            local randomAV = math.random( 2 )
+            if( randomAV == 1 ) then
+                kidAudio = "M"
+            else
+                kidAudio = "D"
+            end
+            print( "kidAudio: " .. kidAudio )
+        end
+        
+        notGobPlayed = "false"
+
     elseif ( event.phase == "did" ) then
         print( "DID show scene" )
         -- Called when the scene is now on screen.
@@ -889,6 +926,9 @@ function scene:show( event )
         else
             playIntro()
         end
+        
+        _myG.firstPlay = "false"
+
     end
 
 end

@@ -61,11 +61,11 @@ function scene:create( event )
         print("easy")
     elseif( _myG.difficulty == "medium" ) then
         _myG.blockCount = 12
-        _myG.poolCount = 12
+        _myG.poolCount = 14
         print("medium")
     elseif( _myG.difficulty == "hard" ) then
-        _myG.blockCount = 12
-        _myG.poolCount = 12
+        _myG.blockCount = 15
+        _myG.poolCount = 19
         print("hard")
     end
 
@@ -767,7 +767,7 @@ function scene:create( event )
 
     local headsSheetInfo = require("heads-sheet")
     local headsSheet = graphics.newImageSheet( "images/heads.png", headsSheetInfo:getSheet() )
-    local headsFrames = { start=1, count=14 }
+    local headsFrames = { start=1, count=15 }
 
     local headsArray
     local headsA = {}
@@ -811,15 +811,6 @@ function scene:create( event )
             local tC = t1[tCount]
             headsArray[tC] = display.newSprite( headsSheet, headsFrames )
             headsArray[tC]:setFrame(1)
-            if( i ~= 3 ) then
-                headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5           
-            end
-
-            -- head-cheshire (copy)
-            tCount = tCount+1; tC = t1[tCount]
-            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
-            headsArray[tC]:setFrame(1)
-            headsArray[tC]:setFillColor( 0, 1, 0, 1 ) -- green
             if( i ~= 3 ) then
                 headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5           
             end
@@ -934,19 +925,64 @@ function scene:create( event )
                 headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
+            -- head-viking
+            tCount = tCount+1; tC = t1[tCount]
+            headsArray[tC] = display.newSprite( headsSheet, headsFrames )
+            headsArray[tC]:setFrame(15)
+            if( i ~= 3 ) then
+                headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5           
+            end
+
             -- include bonus parts based on difficulty level
 
             if ( _myG.difficulty ~= "easy" ) then
+                -- include 3 color variants
 
-                -- head-skicap
+                -- head-classic 2
+                local headClassicTop2 = display.newSprite( headsSheet, headsFrames )
+                headClassicTop2:setFrame(3)
+
+                local headClassicBottom2 = display.newSprite( headsSheet, headsFrames )
+                headClassicBottom2:setFrame(2)
+                --headClassicBottom2:setFillColor( 102/255, 153/255, 204/255, 1 ) -- blue
+                --headClassicBottom2:setFillColor( 0, 204/255, 0, 1 ) -- green
+                headClassicBottom2:setFillColor( 228/255, 80/255, 80/255, 1 ) -- red
+
+                tCount = tCount+1; tC = t1[tCount]
+                headsArray[tC] = display.newGroup()
+                headsArray[tC]:insert( headClassicBottom2 )
+                headsArray[tC]:insert( headClassicTop2 )
+                if( i ~= 3 ) then
+                    headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- head-hood 2
+                local headHoodTop2 = display.newSprite( headsSheet, headsFrames )
+                headHoodTop2:setFrame(11)
+                --headHoodTop2:setFillColor( 229/255, 150/255, 92/255, 1 ) -- brown
+                headHoodTop2:setFillColor( 109/255, 179/255, 81/255, 1 ) -- green
+                --headHoodTop2:setFillColor( 1, 0, 0, 1 ) -- red
+
+                local headHoodBottom2 = display.newSprite( headsSheet, headsFrames )
+                headHoodBottom2:setFrame(10)
+
+                tCount = tCount+1; tC = t1[tCount]
+                headsArray[tC] = display.newGroup()
+                headsArray[tC]:insert( headHoodBottom2 )
+                headsArray[tC]:insert( headHoodTop2 )
+                if( i ~= 3 ) then
+                    headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- head-skicap 2
                 local headSkicapTop2 = display.newSprite( headsSheet, headsFrames )
                 headSkicapTop2:setFrame(13)
 
                 local headSkicapBottom2 = display.newSprite( headsSheet, headsFrames )
                 headSkicapBottom2:setFrame(12)
                 --headSkicapBottom2:setFillColor( 1, 0, 0, 1 ) -- red
-                --headSkicapBottom2:setFillColor( 204/255, 0, 1, 1 ) -- purple
-                headSkicapBottom2:setFillColor( 0, 1, 0, 1 ) -- green
+                headSkicapBottom2:setFillColor( 204/255, 0, 1, 1 ) -- purple
+                --headSkicapBottom2:setFillColor( 0, 1, 0, 1 ) -- green
 
                 tCount = tCount+1; tC = t1[tCount]
                 headsArray[tC] = display.newGroup()
@@ -955,11 +991,101 @@ function scene:create( event )
                 if( i ~= 3 ) then
                     headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
                 end
+
             end
 
-            -- if ( _myG.difficulty == "hard" ) then
-                --parts here
-            --end
+            if ( _myG.difficulty == "hard" ) then
+                -- include 5 more color variants
+
+                -- head-classic 3
+                local headClassicTop3 = display.newSprite( headsSheet, headsFrames )
+                headClassicTop3:setFrame(3)
+
+                local headClassicBottom3 = display.newSprite( headsSheet, headsFrames )
+                headClassicBottom3:setFrame(2)
+                --headClassicBottom3:setFillColor( 102/255, 153/255, 204/255, 1 ) -- blue
+                headClassicBottom3:setFillColor( 0, 204/255, 0, 1 ) -- green
+                --headClassicBottom3:setFillColor( 228/255, 80/255, 80/255, 1 ) -- red
+
+                tCount = tCount+1; tC = t1[tCount]
+                headsArray[tC] = display.newGroup()
+                headsArray[tC]:insert( headClassicBottom3 )
+                headsArray[tC]:insert( headClassicTop3 )
+                if( i ~= 3 ) then
+                    headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- head-hood 3
+                local headHoodTop3 = display.newSprite( headsSheet, headsFrames )
+                headHoodTop3:setFrame(11)
+                --headHoodTop3:setFillColor( 229/255, 150/255, 92/255, 1 ) -- brown
+                --headHoodTop3:setFillColor( 0, 204/255, 0, 1 ) -- green
+                headHoodTop3:setFillColor( 242/255, 47/255, 47/255, 1 ) -- red
+
+                local headHoodBottom3 = display.newSprite( headsSheet, headsFrames )
+                headHoodBottom3:setFrame(10)
+
+                tCount = tCount+1; tC = t1[tCount]
+                headsArray[tC] = display.newGroup()
+                headsArray[tC]:insert( headHoodBottom3 )
+                headsArray[tC]:insert( headHoodTop3 )
+                if( i ~= 3 ) then
+                    headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- head-skicap 3
+                local headSkicapTop3 = display.newSprite( headsSheet, headsFrames )
+                headSkicapTop3:setFrame(13)
+
+                local headSkicapBottom3 = display.newSprite( headsSheet, headsFrames )
+                headSkicapBottom3:setFrame(12)
+                --headSkicapBottom3:setFillColor( 1, 0, 0, 1 ) -- red
+                --headSkicapBottom3:setFillColor( 204/255, 0, 1, 1 ) -- purple
+                --headSkicapBottom3:setFillColor( 0, 1, 0, 1 ) -- green
+                headSkicapBottom3:setFillColor( 0, 0.5, 1, 1 ) -- blue
+
+                tCount = tCount+1; tC = t1[tCount]
+                headsArray[tC] = display.newGroup()
+                headsArray[tC]:insert( headSkicapBottom3 )
+                headsArray[tC]:insert( headSkicapTop3 )
+                if( i ~= 3 ) then
+                    headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- head-fool 2
+                local headFoolTop2 = display.newSprite( headsSheet, headsFrames )
+                headFoolTop2:setFrame(5)
+
+                local headFoolBottom2 = display.newSprite( headsSheet, headsFrames )
+                headFoolBottom2:setFrame(4)
+                headFoolBottom2:setFillColor( 13/255, 1, 0, 1 ) -- green
+                --headFoolBottom2:setFillColor( 1, 38/255, 0, 1 ) -- red
+
+                tCount = tCount+1; tC = t1[tCount]
+                headsArray[tC] = display.newGroup()
+                headsArray[tC]:insert( headFoolBottom2 )
+                headsArray[tC]:insert( headFoolTop2 )
+                if( i ~= 3 ) then
+                    headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- head-fool 3
+                local headFoolTop3 = display.newSprite( headsSheet, headsFrames )
+                headFoolTop3:setFrame(5)
+
+                local headFoolBottom3 = display.newSprite( headsSheet, headsFrames )
+                headFoolBottom3:setFrame(4)
+                --headFoolBottom3:setFillColor( 13/255, 1, 0, 1 ) -- green
+                headFoolBottom3:setFillColor( 1, 38/255, 0, 1 ) -- red
+
+                tCount = tCount+1; tC = t1[tCount]
+                headsArray[tC] = display.newGroup()
+                headsArray[tC]:insert( headFoolBottom3 )
+                headsArray[tC]:insert( headFoolTop3 )
+                if( i ~= 3 ) then
+                    headsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+            end
 
         end
 
@@ -1045,13 +1171,13 @@ function scene:create( event )
                 torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-            -- torso-hoodie - original (blue)
+            -- torso-hoodie
             local torsoHoodieTop = display.newSprite( torsoSheet, torsoFrames )
             torsoHoodieTop:setFrame(3)
 
             local torsoHoodieBottom = display.newSprite( torsoSheet2, torsoFrames2 )
             torsoHoodieBottom:setFrame(2)
-            torsoHoodieBottom:setFillColor( 1, 132/255, 239/255, 1 ) -- purple
+            --torsoHoodieBottom:setFillColor( 1, 132/255, 239/255, 1 ) -- purple
             --torsoHoodieBottom:setFillColor( 224/255, 215/255, 113/255, 1 ) -- green
 
             tCount = tCount+1; tC = t2[tCount]
@@ -1100,8 +1226,8 @@ function scene:create( event )
 
             local torsoKnightBottom = display.newSprite( torsoSheet, torsoFrames )
             torsoKnightBottom:setFrame(4)
-            --torsoKnightBottom:setFillColor( 1, 82/255, 0, 1 ) -- red
-            torsoKnightBottom:setFillColor( 101/255, 162/255, 43/255, 1 ) -- green
+            torsoKnightBottom:setFillColor( 1, 82/255, 0, 1 ) -- red
+            --torsoKnightBottom:setFillColor( 101/255, 162/255, 43/255, 1 ) -- green
 
             tCount = tCount+1; tC = t2[tCount]
             torsoArray[tC] = display.newGroup()
@@ -1157,7 +1283,41 @@ function scene:create( event )
 
             if ( _myG.difficulty ~= "easy" ) then
 
-                -- torso-wizard
+                -- torso-hoodie 2
+                local torsoHoodieTop2 = display.newSprite( torsoSheet, torsoFrames )
+                torsoHoodieTop2:setFrame(3)
+
+                local torsoHoodieBottom2 = display.newSprite( torsoSheet2, torsoFrames2 )
+                torsoHoodieBottom2:setFrame(2)
+                torsoHoodieBottom2:setFillColor( 1, 132/255, 239/255, 1 ) -- purple
+                --torsoHoodieBottom2:setFillColor( 224/255, 215/255, 113/255, 1 ) -- green
+
+                tCount = tCount+1; tC = t2[tCount]
+                torsoArray[tC] = display.newGroup()
+                torsoArray[tC]:insert( torsoHoodieBottom2 )
+                torsoArray[tC]:insert( torsoHoodieTop2 )
+                if( i ~= 3 ) then
+                    torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- torso-sweater 2
+                local torsoSweaterTop2 = display.newSprite( torsoSheet2, torsoFrames2 )
+                torsoSweaterTop2:setFrame(5)
+                --torsoSweaterTop2:setFillColor( 204/255, 0, 0, 1 ) -- red
+                torsoSweaterTop2:setFillColor( 15/255, 126/255, 204/255, 1 ) -- blue
+
+                local torsoSweaterBottom2 = display.newSprite( torsoSheet3, torsoFrames3 )
+                torsoSweaterBottom2:setFrame(2)
+
+                tCount = tCount+1; tC = t2[tCount]
+                torsoArray[tC] = display.newGroup()
+                torsoArray[tC]:insert( torsoSweaterBottom2 )
+                torsoArray[tC]:insert( torsoSweaterTop2 )
+                if( i ~= 3 ) then
+                    torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- torso-wizard 2
                 local torsoWizardTop2 = display.newSprite( torsoSheet2, torsoFrames2 )
                 torsoWizardTop2:setFrame(7)
 
@@ -1176,9 +1336,97 @@ function scene:create( event )
 
             end
 
-            -- if ( _myG.difficulty == "hard" ) then
-                --parts here
-            --end
+            if ( _myG.difficulty == "hard" ) then
+
+                -- torso-hoodie 3
+                local torsoHoodieTop3 = display.newSprite( torsoSheet, torsoFrames )
+                torsoHoodieTop3:setFrame(3)
+
+                local torsoHoodieBottom3 = display.newSprite( torsoSheet2, torsoFrames2 )
+                torsoHoodieBottom3:setFrame(2)
+                --torsoHoodieBottom3:setFillColor( 1, 132/255, 239/255, 1 ) -- purple
+                torsoHoodieBottom3:setFillColor( 224/255, 215/255, 113/255, 1 ) -- green
+
+                tCount = tCount+1; tC = t2[tCount]
+                torsoArray[tC] = display.newGroup()
+                torsoArray[tC]:insert( torsoHoodieBottom3 )
+                torsoArray[tC]:insert( torsoHoodieTop3 )
+                if( i ~= 3 ) then
+                    torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- torso-knight 2
+                local torsoKnightTop2 = display.newSprite( torsoSheet, torsoFrames )
+                torsoKnightTop2:setFrame(5)
+
+                local torsoKnightBottom2 = display.newSprite( torsoSheet, torsoFrames )
+                torsoKnightBottom2:setFrame(4)
+                --torsoKnightBottom2:setFillColor( 1, 82/255, 0, 1 ) -- red
+                torsoKnightBottom2:setFillColor( 101/255, 162/255, 43/255, 1 ) -- green
+
+                tCount = tCount+1; tC = t2[tCount]
+                torsoArray[tC] = display.newGroup()
+                torsoArray[tC]:insert( torsoKnightBottom2 )
+                torsoArray[tC]:insert( torsoKnightTop2 )
+                if( i ~= 3 ) then
+                    torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- torso-knight 3
+                local torsoKnightTop3 = display.newSprite( torsoSheet, torsoFrames )
+                torsoKnightTop3:setFrame(5)
+
+                local torsoKnightBottom3 = display.newSprite( torsoSheet, torsoFrames )
+                torsoKnightBottom3:setFrame(4)
+                --torsoKnightBottom3:setFillColor( 1, 82/255, 0, 1 ) -- red
+                --torsoKnightBottom3:setFillColor( 101/255, 162/255, 43/255, 1 ) -- green
+                torsoKnightBottom3:setFillColor( 143/255, 70/255, 167/255, 1 ) -- purple
+
+                tCount = tCount+1; tC = t2[tCount]
+                torsoArray[tC] = display.newGroup()
+                torsoArray[tC]:insert( torsoKnightBottom3 )
+                torsoArray[tC]:insert( torsoKnightTop3 )
+                if( i ~= 3 ) then
+                    torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- torso-sweater 3
+                local torsoSweaterTop3 = display.newSprite( torsoSheet2, torsoFrames2 )
+                torsoSweaterTop3:setFrame(5)
+                --torsoSweaterTop3:setFillColor( 204/255, 0, 0, 1 ) -- red
+                --torsoSweaterTop3:setFillColor( 15/255, 126/255, 204/255, 1 ) -- blue
+                torsoSweaterTop3:setFillColor( 1, 132/255, 239/255, 1 ) -- purple
+
+                local torsoSweaterBottom3 = display.newSprite( torsoSheet3, torsoFrames3 )
+                torsoSweaterBottom3:setFrame(2)
+
+                tCount = tCount+1; tC = t2[tCount]
+                torsoArray[tC] = display.newGroup()
+                torsoArray[tC]:insert( torsoSweaterBottom3 )
+                torsoArray[tC]:insert( torsoSweaterTop3 )
+                if( i ~= 3 ) then
+                    torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- torso-wizard 3
+                local torsoWizardTop3 = display.newSprite( torsoSheet2, torsoFrames2 )
+                torsoWizardTop3:setFrame(7)
+
+                local torsoWizardBottom3 = display.newSprite( torsoSheet2, torsoFrames2 )
+                torsoWizardBottom3:setFrame(6)
+                --torsoWizardBottom3:setFillColor( 15/255, 126/255, 204/255, 1 ) -- blue
+                --torsoWizardBottom3:setFillColor( 24/255, 183/255, 43/255, 1 ) -- green
+                torsoWizardBottom3:setFillColor( 204/255, 0, 0, 1 ) -- red
+
+                tCount = tCount+1; tC = t2[tCount]
+                torsoArray[tC] = display.newGroup()
+                torsoArray[tC]:insert( torsoWizardBottom3 )
+                torsoArray[tC]:insert( torsoWizardTop3 )
+                if( i ~= 3 ) then
+                    torsoArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+            end
 
         end
 
@@ -1247,7 +1495,6 @@ function scene:create( event )
             local tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet, legsFrames )
             legsArray[tC]:setFrame(1)
-            legsArray[tC].name = "legs-bermuda"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5           
             end
@@ -1256,24 +1503,22 @@ function scene:create( event )
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet, legsFrames )
             legsArray[tC]:setFrame(2)
-            legsArray[tC].name = "legs-buccaneer"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
 
-            -- legs-dancer - original (pink)
+            -- legs-dancer
             local legsDancerTop = display.newSprite( legsSheet, legsFrames )
             legsDancerTop:setFrame(4)
 
             local legsDancerBottom = display.newSprite( legsSheet, legsFrames )
             legsDancerBottom:setFrame(3)
-            legsDancerBottom:setFillColor( 139/255, 166/255, 1, 1 ) -- purple
+            --legsDancerBottom:setFillColor( 139/255, 166/255, 1, 1 ) -- purple
 
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newGroup()
             legsArray[tC]:insert( legsDancerBottom )
             legsArray[tC]:insert( legsDancerTop )
-            legsArray[tC].name = "legs-dancer"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1282,7 +1527,6 @@ function scene:create( event )
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet, legsFrames )
             legsArray[tC]:setFrame(6)
-            legsArray[tC].name = "legs-prisoner"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1300,7 +1544,6 @@ function scene:create( event )
             legsArray[tC] = display.newGroup()
             legsArray[tC]:insert( legsWizardBottom )
             legsArray[tC]:insert( legsWizardTop )
-            legsArray[tC].name = "legs-wizard"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1309,7 +1552,6 @@ function scene:create( event )
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
             legsArray[tC]:setFrame(7)
-            legsArray[tC].name = "legs-yeehaw"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1318,7 +1560,6 @@ function scene:create( event )
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
             legsArray[tC]:setFrame(1)
-            legsArray[tC].name = "legs-bigfoot"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1329,8 +1570,8 @@ function scene:create( event )
 
             local legsKiltBottom = display.newSprite( legsSheet2, legsFrames2 )
             legsKiltBottom:setFrame(2)
-            --legsKiltBottom:setFillColor( 238/255, 0, 0, 1 ) -- red
-            legsKiltBottom:setFillColor( 0, 140/255, 238/255, 1 ) -- blue
+            legsKiltBottom:setFillColor( 238/255, 0, 0, 1 ) -- red
+            --legsKiltBottom:setFillColor( 0, 153/255, 1, 1 ) -- blue
 
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newGroup()
@@ -1344,8 +1585,8 @@ function scene:create( event )
             -- legs-knight
             local legsKnightTop = display.newSprite( legsSheet, legsFrames )
             legsKnightTop:setFrame(5)
-            --legsKnightTop:setFillColor( 1, 82/255, 0, 1 ) -- red
-            legsKnightTop:setFillColor( 101/255, 162/255, 43/255, 1 ) -- green
+            legsKnightTop:setFillColor( 1, 82/255, 0, 1 ) -- red
+            --legsKnightTop:setFillColor( 101/255, 162/255, 43/255, 1 ) -- green
 
             local legsKnightBottom = display.newSprite( legsSheet2, legsFrames2 )
             legsKnightBottom:setFrame(4)
@@ -1354,7 +1595,6 @@ function scene:create( event )
             legsArray[tC] = display.newGroup()
             legsArray[tC]:insert( legsKnightBottom )
             legsArray[tC]:insert( legsKnightTop )
-            legsArray[tC].name = "legs-knight"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1363,7 +1603,6 @@ function scene:create( event )
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
             legsArray[tC]:setFrame(6)
-            legsArray[tC].name = "legs-traveler"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1372,7 +1611,6 @@ function scene:create( event )
             tCount = tCount+1; tC = t3[tCount]
             legsArray[tC] = display.newSprite( legsSheet2, legsFrames2 )
             legsArray[tC]:setFrame(5)
-            legsArray[tC].name = "legs-skates"
             if( i ~= 3 ) then
                 legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
             end
@@ -1380,6 +1618,40 @@ function scene:create( event )
             -- include bonus parts based on difficulty level
 
             if ( _myG.difficulty ~= "easy" ) then
+
+                -- legs-dancer 2
+                local legsDancerTop2 = display.newSprite( legsSheet, legsFrames )
+                legsDancerTop2:setFrame(4)
+
+                local legsDancerBottom2 = display.newSprite( legsSheet, legsFrames )
+                legsDancerBottom2:setFrame(3)
+                legsDancerBottom2:setFillColor( 139/255, 166/255, 1, 1 ) -- purple
+                --legsDancerBottom2:setFillColor( 238/255, 0, 0, 1 ) -- red
+
+                tCount = tCount+1; tC = t3[tCount]
+                legsArray[tC] = display.newGroup()
+                legsArray[tC]:insert( legsDancerBottom2 )
+                legsArray[tC]:insert( legsDancerTop2 )
+                if( i ~= 3 ) then
+                    legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- legs-kilt 2
+                local legsKiltTop2 = display.newSprite( legsSheet2, legsFrames2 )
+                legsKiltTop2:setFrame(3)
+
+                local legsKiltBottom2 = display.newSprite( legsSheet2, legsFrames2 )
+                legsKiltBottom2:setFrame(2)
+                --legsKiltBottom2:setFillColor( 238/255, 0, 0, 1 ) -- red
+                legsKiltBottom2:setFillColor( 11/255, 130/255, 214/255, 1 ) -- blue
+
+                tCount = tCount+1; tC = t3[tCount]
+                legsArray[tC] = display.newGroup()
+                legsArray[tC]:insert( legsKiltBottom2 )
+                legsArray[tC]:insert( legsKiltTop2 )
+                if( i ~= 3 ) then
+                    legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
                 
                 -- legs-wizard
                 local legsWizardTop2 = display.newSprite( legsSheet, legsFrames )
@@ -1394,16 +1666,104 @@ function scene:create( event )
                 legsArray[tC] = display.newGroup()
                 legsArray[tC]:insert( legsWizardBottom2 )
                 legsArray[tC]:insert( legsWizardTop2 )
-                legsArray[tC].name = "legs-skates2"
                 if( i ~= 3 ) then
                     legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
                 end
 
             end
 
-            -- if ( _myG.difficulty == "hard" ) then
-                --parts here
-            --end
+            if ( _myG.difficulty == "hard" ) then
+                -- legs-dancer 3
+                local legsDancerTop3 = display.newSprite( legsSheet, legsFrames )
+                legsDancerTop3:setFrame(4)
+
+                local legsDancerBottom3 = display.newSprite( legsSheet, legsFrames )
+                legsDancerBottom3:setFrame(3)
+                --legsDancerBottom3:setFillColor( 139/255, 166/255, 1, 1 ) -- purple
+                legsDancerBottom3:setFillColor( 238/255, 0, 0, 1 ) -- red
+                
+                tCount = tCount+1; tC = t3[tCount]
+                legsArray[tC] = display.newGroup()
+                legsArray[tC]:insert( legsDancerBottom3 )
+                legsArray[tC]:insert( legsDancerTop3 )
+                if( i ~= 3 ) then
+                    legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- legs-kilt 3
+                local legsKiltTop3 = display.newSprite( legsSheet2, legsFrames2 )
+                legsKiltTop3:setFrame(3)
+
+                local legsKiltBottom3 = display.newSprite( legsSheet2, legsFrames2 )
+                legsKiltBottom3:setFrame(2)
+                --legsKiltBottom3:setFillColor( 238/255, 0, 0, 1 ) -- red
+                --legsKiltBottom3:setFillColor( 11/255, 130/255, 214/255, 1 ) -- blue
+                legsKiltBottom3:setFillColor( 143/255, 70/255, 167/255, 1 ) -- purple
+
+                tCount = tCount+1; tC = t3[tCount]
+                legsArray[tC] = display.newGroup()
+                legsArray[tC]:insert( legsKiltBottom3 )
+                legsArray[tC]:insert( legsKiltTop3 )
+                legsArray[tC].name = "legs-kilt"
+                if( i ~= 3 ) then
+                    legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- legs-knight 2
+                local legsKnightTop2 = display.newSprite( legsSheet, legsFrames )
+                legsKnightTop2:setFrame(5)
+                --legsKnightTop2:setFillColor( 1, 82/255, 0, 1 ) -- red
+                legsKnightTop2:setFillColor( 101/255, 162/255, 43/255, 1 ) -- green
+
+                local legsKnightBottom2 = display.newSprite( legsSheet2, legsFrames2 )
+                legsKnightBottom2:setFrame(4)
+
+                tCount = tCount+1; tC = t3[tCount]
+                legsArray[tC] = display.newGroup()
+                legsArray[tC]:insert( legsKnightBottom2 )
+                legsArray[tC]:insert( legsKnightTop2 )
+                if( i ~= 3 ) then
+                    legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+                -- legs-knight 3
+                local legsKnightTop3 = display.newSprite( legsSheet, legsFrames )
+                legsKnightTop3:setFrame(5)
+                --legsKnightTop3:setFillColor( 1, 82/255, 0, 1 ) -- red
+                --legsKnightTop3:setFillColor( 101/255, 162/255, 43/255, 1 ) -- green
+                legsKnightTop3:setFillColor( 143/255, 70/255, 167/255, 1 ) -- purple
+
+                local legsKnightBottom3 = display.newSprite( legsSheet2, legsFrames2 )
+                legsKnightBottom3:setFrame(4)
+
+                tCount = tCount+1; tC = t3[tCount]
+                legsArray[tC] = display.newGroup()
+                legsArray[tC]:insert( legsKnightBottom3 )
+                legsArray[tC]:insert( legsKnightTop3 )
+                if( i ~= 3 ) then
+                    legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+
+                -- legs-wizard 3
+                local legsWizardTop3 = display.newSprite( legsSheet, legsFrames )
+                legsWizardTop3:setFrame(8)
+
+                local legsWizardBottom3 = display.newSprite( legsSheet, legsFrames )
+                legsWizardBottom3:setFrame(7)
+                --legsWizardBottom3:setFillColor( 15/255, 126/255, 204/255, 1 ) -- blue
+                --legsWizardBottom3:setFillColor( 24/255, 183/255, 43/255, 1 ) -- green
+                legsWizardBottom3:setFillColor( 238/255, 0, 0, 1 ) -- red
+
+                tCount = tCount+1; tC = t3[tCount]
+                legsArray[tC] = display.newGroup()
+                legsArray[tC]:insert( legsWizardBottom3 )
+                legsArray[tC]:insert( legsWizardTop3 )
+                if( i ~= 3 ) then
+                    legsArray[tC].x = (( _myG.blockMargin + _myG.blockWidth ) * tC ) - _myG.blockWidth*0.5
+                end
+
+            end
 
         end
 

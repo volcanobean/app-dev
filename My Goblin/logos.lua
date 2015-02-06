@@ -21,7 +21,13 @@ _myG.blackFader.alpha=0
 
 -- forward declarations
 
+-- this value needs to be set before start screen loads?
 _myG.fromReplay = "false"
+_myG.firstPlay = "true"
+
+-- Initial audio state is ON
+
+_myG.audioOn = "true"
 
 -- functions
 

@@ -19,11 +19,6 @@ _myG.blackFader = display.newRect( cX, cY, cW, cH )
 _myG.blackFader:setFillColor( 0, 0, 0, 1 )
 _myG.blackFader.alpha=0
 
--- Initial audio state is ON
-
-_myG.audioOn = "true"
-_myG.fromReplay = "false"
-
 -- Ad code
 
 local ads = require( "ads" )
@@ -474,14 +469,39 @@ function scene:create( event )
     banner.x = cX+10*mW
     banner.y = cY-60*mW
 
-    local matchGoblinText = display.newText( "about", cX+14*mW, cY-366*mW, "Mathlete-Skinny", 85*mW )
-    matchGoblinText:setFillColor( 74/255, 54/255, 22/255, 1)
+    local infoText1 = display.newText( "where's my goblin?", cX+14*mW, cY-360*mW, "Mathlete-Skinny", 75*mW )
+    local infoText2 = display.newText( "© Volcano Bean, LLC", cX+14*mW, cY-300*mW, "Mathlete-Skinny", 75*mW )
+    local infoText3 = display.newText( "artists:", cX+14*mW, cY-210*mW, "Mathlete-Skinny", 75*mW )
+    local infoText4 = display.newText( "matt seniour", cX+14*mW, cY-150*mW, "Mathlete-Skinny", 75*mW )
+    local infoText5 = display.newText( "gene kelly", cX+14*mW, cY-90*mW, "Mathlete-Skinny", 75*mW )
+    local infoText6 = display.newText( "producer:", cX+14*mW, cY, "Mathlete-Skinny", 75*mW )
+    local infoText7 = display.newText( "mary mckenzie", cX+14*mW, cY+60*mW, "Mathlete-Skinny", 75*mW )
+    local infoText8 = display.newText( "programmer:", cX+14*mW, cY+150*mW, "Mathlete-Skinny", 75*mW )
+    local infoText9 = display.newText( "gene kelly", cX+14*mW, cY+210*mW, "Mathlete-Skinny", 75*mW )
+   
+    infoText1:setFillColor( 74/255, 54/255, 22/255, 1)
+    infoText2:setFillColor( 74/255, 54/255, 22/255, 1)
+    infoText3:setFillColor( 74/255, 54/255, 22/255, 1)
+    infoText4:setFillColor( 74/255, 54/255, 22/255, 1)
+    infoText5:setFillColor( 74/255, 54/255, 22/255, 1)
+    infoText6:setFillColor( 74/255, 54/255, 22/255, 1)
+    infoText7:setFillColor( 74/255, 54/255, 22/255, 1)
+    infoText8:setFillColor( 74/255, 54/255, 22/255, 1)
+    infoText9:setFillColor( 74/255, 54/255, 22/255, 1)
 
     bannerGroup = display.newGroup()
     bannerGroup:insert( banner )
     bannerGroup:insert( matchRopeL )
     bannerGroup:insert( matchRopeR )
-    bannerGroup:insert( matchGoblinText )
+    bannerGroup:insert( infoText1 )
+    bannerGroup:insert( infoText2 )
+    bannerGroup:insert( infoText3 )
+    bannerGroup:insert( infoText4 )
+    bannerGroup:insert( infoText5 )
+    bannerGroup:insert( infoText6 )
+    bannerGroup:insert( infoText7 )
+    bannerGroup:insert( infoText8 )
+    bannerGroup:insert( infoText9 )
 
     sceneGroup:insert( bannerGroup )
 

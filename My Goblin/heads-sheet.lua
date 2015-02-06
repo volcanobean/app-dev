@@ -1,7 +1,7 @@
 --
 -- created with TexturePacker (http://www.codeandweb.com/texturepacker)
 --
--- $TexturePacker:SmartUpdate:06c2c143539b3b6b7b9c284d6419fad4:e84fa26064e441d7777d2ca4456c9192:b7a99079db8de5a3ff6948a2803acac4$
+-- $TexturePacker:SmartUpdate:d525f7b5be1294a460a6c9165dcf4ea7:67b1ae482245abe260f172e33a4ce1ad:b7a99079db8de5a3ff6948a2803acac4$
 --
 -- local sheetInfo = require("mysheet")
 -- local myImageSheet = graphics.newImageSheet( "mysheet.png", sheetInfo:getSheet() )
@@ -19,8 +19,8 @@ SheetInfo.sheet =
     
         {
             -- head-cheshire
-            x=308*mW,
-            y=224*mW,
+            x=2*mW,
+            y=480*mW,
             width=287*mW,
             height=241*mW,
 
@@ -31,8 +31,8 @@ SheetInfo.sheet =
         },
         {
             -- head-classic-bottom
-            x=776*mW,
-            y=465*mW,
+            x=817*mW,
+            y=751*mW,
             width=191*mW,
             height=88*mW,
 
@@ -55,8 +55,8 @@ SheetInfo.sheet =
         },
         {
             -- head-fool-bottom
-            x=776*mW,
-            y=259*mW,
+            x=576*mW,
+            y=751*mW,
             width=239*mW,
             height=204*mW,
 
@@ -67,8 +67,8 @@ SheetInfo.sheet =
         },
         {
             -- head-fool-top
-            x=290*mW,
-            y=467*mW,
+            x=745*mW,
+            y=259*mW,
             width=264*mW,
             height=236*mW,
 
@@ -103,8 +103,8 @@ SheetInfo.sheet =
         },
         {
             -- head-grump
-            x=2*mW,
-            y=193*mW,
+            x=347*mW,
+            y=224*mW,
             width=304*mW,
             height=265*mW,
 
@@ -115,8 +115,8 @@ SheetInfo.sheet =
         },
         {
             -- head-helmet
-            x=530*mW,
-            y=705*mW,
+            x=291*mW,
+            y=491*mW,
             width=244*mW,
             height=230*mW,
 
@@ -127,8 +127,8 @@ SheetInfo.sheet =
         },
         {
             -- head-hood-bottom
-            x=556*mW,
-            y=467*mW,
+            x=537*mW,
+            y=491*mW,
             width=206*mW,
             height=210*mW,
 
@@ -139,8 +139,8 @@ SheetInfo.sheet =
         },
         {
             -- head-hood-top
-            x=288*mW,
-            y=715*mW,
+            x=745*mW,
+            y=497*mW,
             width=240*mW,
             height=252*mW,
 
@@ -151,8 +151,8 @@ SheetInfo.sheet =
         },
         {
             -- head-skicap-bottom
-            x=764*mW,
-            y=555*mW,
+            x=817*mW,
+            y=841*mW,
             width=179*mW,
             height=125*mW,
 
@@ -164,7 +164,7 @@ SheetInfo.sheet =
         {
             -- head-skicap-top
             x=2*mW,
-            y=715*mW,
+            y=723*mW,
             width=284*mW,
             height=269*mW,
 
@@ -175,13 +175,25 @@ SheetInfo.sheet =
         },
         {
             -- head-tongue
-            x=2*mW,
-            y=460*mW,
+            x=288*mW,
+            y=723*mW,
             width=286*mW,
             height=253*mW,
 
             sourceX = 134*mW,
             sourceY = 47*mW,
+            sourceWidth = 512*mW,
+            sourceHeight = 313*mW
+        },
+        {
+            -- head-viking
+            x=2*mW,
+            y=193*mW,
+            width=343*mW,
+            height=285*mW,
+
+            sourceX = 97*mW,
+            sourceY = 0,
             sourceWidth = 512*mW,
             sourceHeight = 313*mW
         },
@@ -208,6 +220,7 @@ SheetInfo.frameIndex =
     ["head-skicap-bottom"] = 12,
     ["head-skicap-top"] = 13,
     ["head-tongue"] = 14,
+    ["head-viking"] = 15,
 }
 
 function SheetInfo:getSheet()
