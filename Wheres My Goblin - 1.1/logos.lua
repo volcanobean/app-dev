@@ -117,7 +117,7 @@ function scene:create( event )
     letterU = display.newSprite( letterSheet, letterFrames )
     letterU:setFrame(7)
     letterU:setFillColor( 1, 0.368, 0.368, 1 )
-    letterU.x = 155*mW
+    letterU.x = 154*mW
     letterU.y = textY
     
     letterN = display.newSprite( letterSheet, letterFrames )
@@ -295,7 +295,7 @@ function scene:show( event )
         timer.performWithDelay( 2000, playIntroTone )
 
         -- animate letters
-        transition.to( letterU, { delay=2066, time=366, x=155*mW, rotation=0, transition=easing.outQuad })
+        transition.to( letterU, { delay=2066, time=366, x=154*mW, rotation=0, transition=easing.outQuad })
         transition.to( letterN, { delay=2133, time=366, x=235*mW, rotation=0, transition=easing.outQuad })
         transition.to( letterI, { delay=1930, time=433, x=290*mW, rotation=0, transition=easing.outQuad })
         transition.to( letterC, { delay=1800, time=460, x=345*mW, rotation=0, transition=easing.outQuad })
