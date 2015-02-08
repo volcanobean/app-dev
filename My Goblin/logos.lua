@@ -154,7 +154,7 @@ function scene:create( event )
     letterG:setFrame(2)
     letterG:setFillColor( 1, 0.447, 0.369, 1)
     letterG.x = 582*mW
-    letterG.y = textY
+    letterG.y = textY-1*mW
     
     letterI2 = display.newSprite( letterSheet, letterFrames )
     letterI2:setFrame(3)
