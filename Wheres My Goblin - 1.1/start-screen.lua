@@ -452,20 +452,21 @@ function scene:create( event )
     shader:setFillColor( 0, 0, 0, 1 )
     sceneGroup:insert( shader )
 
-    local infoText1 = display.newText( "where's my goblin?", cX, cY-410*mW, "Mathlete-Skinny", 75*mW )
-    local infoText2 = display.newText( "© 2015 Volcano Bean, LLC", cX, cY-350*mW, "Mathlete-Skinny", 75*mW )
+    local infoText1 = display.newText( "where's my goblin?", cX, cY-460*mW, "Mathlete-Skinny", 75*mW )
+    local infoText2 = display.newText( "© 2015 Volcano Bean, LLC", cX, cY-400*mW, "Mathlete-Skinny", 75*mW )
     
-    local infoText3 = display.newText( "artists:", cX, cY-260*mW, "Mathlete-Skinny", 75*mW )
-    local infoText4 = display.newText( "matt seniour", cX, cY-200*mW, "Mathlete-Skinny", 75*mW )
-    local infoText5 = display.newText( "gene kelly", cX, cY-140*mW, "Mathlete-Skinny", 75*mW )
+    local infoText3 = display.newText( "artists:", cX, cY-310*mW, "Mathlete-Skinny", 75*mW )
+    local infoText4 = display.newText( "matt seniour", cX, cY-250*mW, "Mathlete-Skinny", 75*mW )
+    local infoText5 = display.newText( "gene kelly", cX, cY-190*mW, "Mathlete-Skinny", 75*mW )
     
-    local infoText6 = display.newText( "producer:", cX, cY-50*mW, "Mathlete-Skinny", 75*mW )
-    local infoText7 = display.newText( "mary mckenzie", cX, cY+10*mW, "Mathlete-Skinny", 75*mW )
+    local infoText6 = display.newText( "producer:", cX, cY-100*mW, "Mathlete-Skinny", 75*mW )
+    local infoText7 = display.newText( "mary mckenzie", cX, cY-40*mW, "Mathlete-Skinny", 75*mW )
     
-    local infoText8 = display.newText( "programmer:", cX, cY+100*mW, "Mathlete-Skinny", 75*mW )
-    local infoText9 = display.newText( "gene kelly", cX, cY+160*mW, "Mathlete-Skinny", 75*mW )
+    local infoText8 = display.newText( "programmer:", cX, cY+50*mW, "Mathlete-Skinny", 75*mW )
+    local infoText9 = display.newText( "gene kelly", cX, cY+110*mW, "Mathlete-Skinny", 75*mW )
 
-    local infoText10 = display.newText( "volcanobean.com", cX, cY+250*mW, "Mathlete-Skinny", 75*mW )
+    local infoText10 = display.newText( "wheresmygoblin.com", cX, cY+200*mW, "Mathlete-Skinny", 75*mW )
+    local infoText11 = display.newText( "volcanobean.com", cX, cY+260*mW, "Mathlete-Skinny", 75*mW )
    
    --[[
     infoText1:setFillColor( 74/255, 54/255, 22/255, 1)
@@ -491,18 +492,27 @@ function scene:create( event )
     infoTextGroup:insert( infoText8 )
     infoTextGroup:insert( infoText9 )
     infoTextGroup:insert( infoText10 )
+    infoTextGroup:insert( infoText11 )
 
     sceneGroup:insert( infoTextGroup )
 
     -- animate banner
 
-    local function linkToSite( event )
+    local function linkToVB( event )
         system.openURL( "http://www.volcanobean.com" )
         print( "open VB site" )
         return true
     end
 
-    infoText10:addEventListener( "tap", linkToSite )
+    infoText11:addEventListener( "tap", linkToVB )
+
+    local function linkToWMG( event )
+        system.openURL( "http://www.wheresmygoblin.com" )
+        print( "open WMG site" )
+        return true
+    end
+
+    infoText10:addEventListener( "tap", linkToWMG )
 
     local function infoOn()
         infoState = "on"
