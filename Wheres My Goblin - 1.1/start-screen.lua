@@ -466,7 +466,7 @@ function scene:create( event )
     local infoText9 = display.newText( "gene kelly", cX, cY+110*mW, "Mathlete-Skinny", 75*mW )
 
     local infoText10 = display.newText( "wheresmygoblin.com", cX, cY+200*mW, "Mathlete-Skinny", 75*mW )
-    local infoText11 = display.newText( "volcanobean.com", cX, cY+260*mW, "Mathlete-Skinny", 75*mW )
+    local infoText11 = display.newText( "volcanobean.com", cX, cY+280*mW, "Mathlete-Skinny", 75*mW )
    
    --[[
     infoText1:setFillColor( 74/255, 54/255, 22/255, 1)
@@ -491,8 +491,8 @@ function scene:create( event )
     infoTextGroup:insert( infoText7 )
     infoTextGroup:insert( infoText8 )
     infoTextGroup:insert( infoText9 )
-    infoTextGroup:insert( infoText10 )
     infoTextGroup:insert( infoText11 )
+    infoTextGroup:insert( infoText10 )
 
     sceneGroup:insert( infoTextGroup )
 
