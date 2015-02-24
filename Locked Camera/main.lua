@@ -10,9 +10,135 @@ local cH = display.contentHeight
 local cX = display.contentCenterX
 local cY = display.contentCenterY
 
--- Create camera function
+local stageHit = display.newRect( cX, cY, cW, cH)
+stageHit:setFillColor( 0, 1, 0, 0.4 )
 
-local xDirection
+local worldLayer = display.newGroup()
+--local stationaryLayer = display.newGroup() -- separate group for UI, etc
+
+local bgH = 1536
+local bgW = 2500
+local bgImage = display.newImageRect( worldLayer, "bg-grid-2500x1536.png", bgW, bgH )
+bgImage.x = cX
+bgImage.y = cY
+
+local tmp = display.newCircle( worldLayer, 250, 100, 10 )
+tmp:setFillColor(1,1,0)
+
+local tmp = display.newCircle( worldLayer, 250, 110, 10 )
+tmp:setFillColor(0,1,1)
+
+local player = display.newCircle( worldLayer, cX, cY, 20 )
+player:setFillColor(0,1,0)
+
+-- set initial variables
+local horzDir
+local vertDir
+local horzMove = false
+local vertMove = false
+
+local tapX
+local tapY
+local pX
+local pY
+local pDestX
+local pDestY
+local pSpeed = 6
+
+local distA
+local distB
+local distC
+local rateX
+local rateY
+
+local function stageTap( event )
+   -- get content (stage) coordinates for player
+   pX, pY = player:localToContent( 0, 0 )
+   tapX = event.x
+   tapY = event.y
+
+   -- get distance from point to point, generate travel time
+   distA = tapX - pX
+   distB = tapY - pY
+   distC = math.sqrt(distA*distA + distB*distB) -- a2+b2=c2 (finding "C")
+   travelTime = distC/pSpeed
+
+   -- get destination X and Y positions relative to the player's local position for use in enterFrame code
+   local tapOffsetX = player.x - pX
+   local tapOffsetY = player.y - pY
+   pDestX = tapOffsetX + tapX
+   pDestY = tapOffsetY + tapY
+
+   -- get per/frame rate of travel for each axis
+   rateX = distA/travelTime
+   rateY = distB/travelTime
+
+   -- get horzontal direction (left/right/center)
+   if pX < tapX then
+      horzDir = "right"
+   elseif pX > tapX then
+      horzDir = "left"
+   elseif pX == tapX then
+      horzDir = "center"
+   end
+   print(horzDir)
+
+   -- get vertical direction (up/down/center) variables
+   if pY > tapY then
+      vertDir = "up"
+   elseif pY < tapY then
+      vertDir = "down"
+   elseif pY == tapY then
+      vertDir = "center"
+   end
+   print(vertDir)
+
+   -- allow movement
+   horzMove=true
+   vertMove=true
+end
+
+stageHit:addEventListener( "tap", stageTap )
+
+-- Creat player movement function
+
+local function movePlayer(event)
+
+   -- horizontal movement
+   if horzMove==true then
+      player:translate( rateX, 0 )
+   end
+
+   -- vertical movement
+   if vertMove==true then
+      player:translate( 0, rateY )
+   end
+
+   -- if we have reached (or passed) our target x position, stop horz movement
+   if horzDir == "right" and player.x > pDestX then
+      horzMove=false
+   elseif horzDir == "left" and player.x < pDestX then
+      horzMove=false
+   elseif horzDir == "center" then
+      horzMove=false
+   end
+   --print( "horzMove: ", horzMove )
+
+   -- if we have reached (or passed) our target y position, stop vert movement
+   if vertDir == "up" and player.y < pDestY then
+      vertMove=false
+   elseif vertDir == "down" and player.y > pDestY then
+      vertMove=false
+   elseif vertDir == "center" then
+      vertMove=false
+   end
+   --print( "vertMove: ", vertMove )
+
+end
+
+Runtime:addEventListener( "enterFrame", movePlayer )
+
+-- Create camera function
 
 local function lockedCamera( target, world  )   
    -- record initial position of target object
@@ -55,102 +181,4 @@ local function lockedCamera( target, world  )
    Runtime:addEventListener( "enterFrame", world )
 end
 
-local stageHit = display.newRect( cX, cY, cW, cH)
-stageHit:setFillColor( 0, 1, 0, 0.4 )
-
-local worldLayer = display.newGroup()
---local stationaryLayer = display.newGroup() -- separate group for UI, etc
-
-local bgH = 1536
-local bgW = 2500
-local bgImage = display.newImageRect( worldLayer, "bg-grid-2500x1536.png", bgW, bgH )
-bgImage.x = cX
-bgImage.y = cY
-
-local tmp = display.newCircle( worldLayer, 250, 100, 10 )
-tmp:setFillColor(1,1,0)
-
-local tmp = display.newCircle( worldLayer, 250, 110, 10 )
-tmp:setFillColor(0,1,1)
-
-local player = display.newCircle( worldLayer, cX, cY, 20 )
-player:setFillColor(0,1,0)
-
-local function playerMover( obj )
-   if( obj.step == nil ) then 
-      obj.step = 1
-   end
-
-   if( obj.step == 1 ) then
-      if( obj.x < 300 ) then
-         obj.x = obj.x + 2
-      else
-         obj.step = 2
-      end
-   elseif( obj.step == 2 ) then
-      if( obj.y < 150 ) then
-         obj.y = obj.y + 2
-      else
-         obj.step = 3
-      end
-   elseif( obj.step == 3 ) then
-      if( obj.x > 100 ) then
-         obj.x = obj.x - 2
-      else
-         obj.step = 4
-      end
-   elseif( obj.step == 4 ) then
-      if( obj.y > 100 ) then
-         obj.y = obj.y - 2
-      else
-         obj.step = 1
-      end
-   end      
-end
-
-pStartX = player.x
-pStartY = player.y
-
-local function stageTap( event )
-   print( "------" )
-   print( "Stage tapped." )
-   print( "Event coordinates: ", event.x, event.y ) 
-   local playerScreenX, playerScreenY = player:localToContent( 0, 0 )
-   local newX = event.x - playerScreenX
-   print( "Player screen coordinates: ", playerScreenX, playerScreenY )
-   local playerLocalX, playerLocalY = player:contentToLocal( 0, 0 )
-   print( "Player local coordinates: ", playerLocalX, playerLocalY )
-   --transition.to( player, {time=400, x=playerScreenX + newX, y=event.y})
-   print( "player.x: " .. player.x )
-   print( "worldLayer.x: " .. worldLayer.x )
-   if( pStartX < event.x ) then
-      print( "Tap to right of player" )
-      xDirection = "right"
-      player:translate( 100, 0 )
-      --moveRight()
-   elseif( pStartX > event.x ) then
-      print( "Tap to left of player" )
-      xDirection = "left"
-      player:translate( -100, 0 )
-      --moveLeft()
-   elseif( pStartX == event.x ) then
-      print( "x center")
-   end
-   if( pStartY < event.y ) then
-      print( "Tap below player" )
-      --moveRight()
-   elseif( pStartY > event.y ) then
-      print( "Tap above player" )
-      --moveLeft()
-   elseif( pStartY == event.y ) then
-      print( "y center")
-   end
-   return true
-end
-
-stageHit:addEventListener( "tap", stageTap )
-
---player.enterFrame = playerMover
-
---Runtime:addEventListener( "enterFrame", player )
 lockedCamera( player, worldLayer )
