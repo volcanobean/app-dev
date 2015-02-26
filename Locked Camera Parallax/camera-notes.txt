@@ -1,0 +1,75 @@
+local forces = {} 
+local function forcesByAngle(totalForce, angle) 
+	local radians = -math.rad(angle) -- Converts an angle (given in degrees) to radians.
+	-- Radian is a pure measure based on the Radius of the circle. 
+	-- The radian is the standard unit of angular measure. One radian is just under 57.3 degrees.
+	forces.x = math.cos(radians) * totalForce -- Returns the cosine of x (the angle in radians).
+	-- Used to get X value based on angle of hypotenuse
+	forces.y = math.sin(radians) * totalForce -- Returns the sine of x (the angle in radians).
+	-- Used to get Y value based on angle of hypotenuse
+	--return forces
+end
+
+local function stageTap(event)
+	-- get positions
+	get event xy
+	get (converted) player xy
+
+	forces = forcesByAngle(player.moveSpeed, 360 - player.rotation)
+
+	-- 	get horzontal direction (left/right/center)
+	if player.x < event.x then
+		horzDir = "right"
+	elseif player.x < event.x then
+		horzDir = "left"
+	elseif player.x == event.x
+		horzDir = "center"
+	end
+
+	-- get vertical direction (up/down/center) variables
+	if player.y > event.y then
+		vertDir = "up"
+	elseif player.y < event.y then
+		vertDir = "left"
+	elseif player.y == event.y 
+		vertDir = "center"
+	end
+
+	-- allow movement
+	horzMove=true
+	vertMove=true
+end
+
+local function enterFrame(event)
+
+	-- horizontal movement
+	if horzMove==true then
+		--local forces = forcesByAngle(player.moveSpeed, 360 - player.rotation)
+		player:translate(forces.x, 0)
+	end
+
+	-- if we have reached (or passed) our target x position, stop horz movement
+	if horzDir == "right" and player.x > event.x then
+		horzMove=false
+	elseif horzDir == "left" and player.x < event.x then
+		horzMove=false
+	elseif horzDir == "center"
+		horzMove=false
+	end
+
+	-- vertical movement
+	if vertMove==true then
+		--local forces = forcesByAngle(player.moveSpeed, 360 - player.rotation)
+		player:translate(0, forces.y) 
+	end
+
+	-- if we have reached (or passed) our target y position, stop vert movement
+	if vertDir == "up" and player.y < event.y then
+		vertMove=false
+	elseif vertDir == "left" and player.y > event.y then
+		vertMove=false
+	elseif vertDir == "center"
+		vertMove=false
+	end
+
+end

@@ -10,26 +10,43 @@ local cH = display.contentHeight
 local cX = display.contentCenterX
 local cY = display.contentCenterY
 
+
 local stageHit = display.newRect( cX, cY, cW, cH)
 stageHit:setFillColor( 0, 1, 0, 0.4 )
 
-local worldLayer = display.newGroup()
---local stationaryLayer = display.newGroup() -- separate group for UI, etc
+local require = require -- localize global require function?
+local perspective = require("perspective")
+local camera = perspective.createView()
 
 local bgH = 1536
 local bgW = 2500
-local bgImage = display.newImageRect( worldLayer, "bg-grid-2500x1536.png", bgW, bgH )
+local bgImage = display.newImageRect( "bg-grid-2500x1536.png", bgW, bgH )
+bgImage.alpha = 0.5
 bgImage.x = cX
 bgImage.y = cY
 
-local tmp = display.newCircle( worldLayer, 250, 100, 10 )
-tmp:setFillColor(1,1,0)
+local stage3 = display.newRect(cX, 0, 400, 800)
+stage3:setFillColor( 0, 0, 1, 0.5 )
 
-local tmp = display.newCircle( worldLayer, 250, 110, 10 )
-tmp:setFillColor(0,1,1)
+local stage2 = display.newRect(cX, 0, 300, 650)
+stage2:setFillColor( 0, 1, 0, 0.5 )
 
-local player = display.newCircle( worldLayer, cX, cY, 20 )
+local stage1 = display.newRect(cX, 0, 200, 500)
+stage1:setFillColor( 1, 0, 0, 0.5 )
+
+
+camera:add( stage3, 3)
+camera:add( stage2, 4)
+camera:add( stage1, 5)
+camera:add( bgImage, 2)
+
+camera:setParallax(1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3) -- Here we set parallax for each layer in descending order
+
+
+local player = display.newCircle( cX, cY, 20 )
 player:setFillColor(0,1,0)
+
+camera:add(player, 1)
 
 -- set initial variables
 local horzDir
@@ -43,7 +60,7 @@ local pX
 local pY
 local pDestX
 local pDestY
-local pSpeed = 8
+local pSpeed = 16
 
 local distA
 local distB
@@ -137,47 +154,9 @@ end
 
 Runtime:addEventListener( "enterFrame", movePlayer )
 
--- Create camera function
+-- camera functions
 
-local function lockedCamera( target, world  )   
-   -- record initial position of target object
-   -- store it in our world group (which will also contain our target object)
-   world.lx = target.x
-   world.ly = target.y
-
-   -- Create enterFrame method and attach it to our world group
-   world.enterFrame = function( event )
-      -- calculate delta movement relative to stored target location
-      local dx = target.x - world.lx
-      local dy = target.y - world.ly
-
-      if(dx) then -- if dx is not nil
-
-         -- add condition to check for bg X boundaries
-         -- only move if not at edge
-
-         --if( xDirection == "right" and world.x > -1000) or ( xDirection == "left" and world.x < 1000)then
-            -- move target (and world) based on deltas
-            world:translate(-dx,0)
-            -- set lx to new current position
-            world.lx = target.x
-         --end
-      end
-      if(dy) then -- if dy is not nil
-
-         -- add condition to check for bg Y boundaries
-         -- only move if not at edge
-
-         -- move target (and world) based on deltas
-         world:translate(0,-dy)
-         -- set ly to new current position
-         world.ly = target.y
-      end
-      return true
-   end
-
-   -- Begin enterFrame code (runs on every frame)
-   Runtime:addEventListener( "enterFrame", world )
-end
-
-lockedCamera( player, worldLayer )
+camera.damping = 10 -- A bit more fluid tracking
+camera:setFocus(player) -- Set the focus to the player
+camera:track() -- Begin auto-tracking
+camera:setBounds(-512, 2000, 0, 780)
