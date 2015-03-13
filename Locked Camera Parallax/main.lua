@@ -76,11 +76,14 @@ stage2:setFillColor( 0, 1, 0, 0.5 )
 local stage1 = display.newRect(cX, cY, 200, 500)
 stage1:setFillColor( 1, 0, 0, 0.5 )
 
+local windTunnel = display.newRect(cX, 1000, 1000, 200)
+windTunnel:setFillColor( 0, 0.5, 0.5, 0.5 )
 
 camera:add( stage3, 3)
 camera:add( stage2, 4)
 camera:add( stage1, 5)
 camera:add( bgImage, 2)
+camera:add( windTunnel, 1)
 
 camera:setParallax(1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3) -- Here we set parallax for each layer in descending order
 
@@ -122,6 +125,8 @@ local distB
 local distC
 local rateX
 local rateY
+
+local oForce = 0 -- outside forces
 
 local function stageTap( event )
    -- get content (stage) coordinates for player
@@ -226,6 +231,16 @@ local function blockHitCheck( event )
    return true
 end
 
+-- outside forces detection
+
+local function oForceHitCheck( event )
+  oForce = 0
+  if ( hasCollided( player, windTunnel) ) then
+    oForce = 10
+  end
+  return true
+end
+
 
 -- Creat player movement function 
 
@@ -233,8 +248,10 @@ local function movePlayer(event)
 
    -- horizontal movement
    if horzMove==true then
-      player.x = player.x + rateX
+      player.x = player.x + rateX + oForce
       --player:translate( rateX, 0 )
+    else
+      player.x = player.x + oForce
    end
 
    -- vertical movement
@@ -267,9 +284,9 @@ local function movePlayer(event)
 
    glowHitCheck(event)
    blockHitCheck(event)
+   oForceHitCheck(event)
 
-   
-
+  
 end
 
 -- add this enterFrame code to player object later?
