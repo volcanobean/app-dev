@@ -72,7 +72,7 @@ function scene:create( event )
     end 
 
 
-
+lockedCamera( fairy, theWorld )
 
     -- Obstacles -- 
 
