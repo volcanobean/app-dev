@@ -18,19 +18,22 @@ local bgMaxX = cX + bgW*0.5 - cW*0.5
 local bgMinY = cY - bgH*0.5 + cH*0.5
 local bgMaxY = cY + bgH*0.5 - cH*0.5
 
-local pSpeed = 16
+local player
+local pSpeed = 12
+local playerSpeed = pSpeed
+local theStage
+local touching = false
 
+-- set initial variables
 local horzDir
 local vertDir
-local horzMove = false
-local vertMove = false
+local horzMove = true
+local vertMove = true
 
-local tapX
-local tapY
-local pX
-local pY
-local pDestX
-local pDestY
+local pStageX
+local pStageY
+local tapStageX
+local tapStageY
 
 local distA
 local distB
@@ -38,11 +41,16 @@ local distC
 local rateX
 local rateY
 
+--local tapOffsetX
+--local tapOffsetY
+--local pDestX
+--local pDestY
+
 -- stage
 
-local stageHit = display.newRect( cX, cY, cW, cH)
-stageHit.isVisible = false
-stageHit.isHitTestable = true
+local theStage = display.newRect( cX, cY, cW, cH)
+theStage.isVisible = false
+theStage.isHitTestable = true
 
 -- camera
 
@@ -54,6 +62,15 @@ local camera = perspective.createView()
 -- layer 1 (1) will move more, layer 5 (0.6) will move less
 camera:setParallax(1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3)
 --camera:setParallax(1, 0.9, 0.7, 0.5, 0.3)
+
+local staticGroup = display.newGroup()
+
+-- debug
+local txt1 = display.newText( staticGroup, "0, 0", cX, 50, native.systemFont, 30 )
+local txt2 = display.newText( staticGroup, "0, 0", cX, 100, native.systemFont, 30 )
+local txt3 = display.newText( staticGroup, "center", cX, 150, native.systemFont, 30 )
+local txt4 = display.newText( staticGroup, "center", cX, 200, native.systemFont, 30 )
+
 
 -- background
 
@@ -89,6 +106,7 @@ local bgSample5 = display.newImageRect( bg5, "images/bg-sample-5.png", bgW, bgH 
 bgSample5.x = cX
 bgSample5.y = cY
 
+
 --[[
 local bgImage = display.newImageRect( bg1, "images/bg-grid-2500x1536.png", bgW, bgH )
 bgImage.x = cX
@@ -115,98 +133,127 @@ local center = display.newCircle( bg1, cX, cY, 20 )
 center:setFillColor(0,1,0,1)
 ]]--
 
--- Movement functions
+local function getPath()
+  -- get content (stage) coordinates for player and for stage tap
+  pStageX, pStageY = player:localToContent(0, 0)
+  --tapStageX = eventX
+  --tapStageY = eventY
 
-local function stageTap( event )
+  -- get destination X and Y positions relative to the player's local position for use in enterFrame code
+  --tapOffsetX = player.x - pStageX
+  --tapOffsetY = player.y - pStageY
+  --pDestX = tapOffsetX + tapStageX
+  --pDestY = tapOffsetY + tapStageY
 
-   -- get content (stage) coordinates for player
-   pX, pY = player:localToContent( 0, 0 )
-   tapX = event.x
-   tapY = event.y
+  -- get distance from point to point
+  distA = tapStageX - pStageX
+  distB = tapStageY - pStageY
+  distC = math.sqrt(distA*distA + distB*distB) -- a2+b2=c2 (finding "C")
 
-   -- get destination X and Y positions relative to the player's local position for use in enterFrame code
-   local tapOffsetX = player.x - pX
-   local tapOffsetY = player.y - pY
-   pDestX = tapOffsetX + tapX
-   pDestY = tapOffsetY + tapY
+  -- get per/frame rate of travel for each axis
+  travelTime = distC/playerSpeed
+  rateX = distA/travelTime
+  rateY = distB/travelTime
 
-   -- get distance from point to point, generate travel time
-   distA = tapX - pX
-   distB = tapY - pY
-   distC = math.sqrt(distA*distA + distB*distB) -- a2+b2=c2 (finding "C")
-   travelTime = distC/pSpeed
+  -- get horzontal direction (left/right/center)
+  if pStageX < tapStageX then
+    horzDir = "right"
+  elseif pStageX > tapStageX then
+    horzDir = "left"
+  elseif pStageX == tapStageX then
+    horzDir = "center"
+  end
+  print(horzDir)
 
-   -- get per/frame rate of travel for each axis
-   rateX = distA/travelTime
-   rateY = distB/travelTime
+  -- get vertical direction (up/down/center) 
+  if pStageY > tapStageY then
+    vertDir = "up"
+  elseif pStageY < tapStageY then
+    vertDir = "down"
+  elseif pStageY == tapStageY then
+    vertDir = "center"
+  end
+  print(vertDir)
 
-   -- get horzontal direction (left/right/center)
-   if pX < tapX then
-      horzDir = "right"
-   elseif pX > tapX then
-      horzDir = "left"
-   elseif pX == tapX then
-      horzDir = "center"
-   end
-   print(horzDir)
 
-   -- get vertical direction (up/down/center) variables
-   if pY > tapY then
-      vertDir = "up"
-   elseif pY < tapY then
-      vertDir = "down"
-   elseif pY == tapY then
-      vertDir = "center"
-   end
-   print(vertDir)
+  txt1.text = pStageX .. ", " .. pStageY
+  txt2.text = tapStageX .. ", " .. tapStageY
+  txt3.text = horzDir
+  txt4.text = vertDir
 
-   -- allow movement
-   horzMove=true
-   vertMove=true
+  -- allow movement
+  --horzMove=true
+  --vertMove=true
 end
 
-stageHit:addEventListener( "tap", stageTap )
-
--- Creat player movement function 
-
-local function movePlayer(event)
-
-   -- horizontal movement
-   if horzMove==true then
-      player.x = player.x + rateX
-      --player:translate( rateX, 0 )
-   end
-
-   -- vertical movement
-   if vertMove==true then
-      player.y = player.y + rateY
-      --player:translate( 0, rateY )
-   end
-
-   -- if we have reached (or passed) our target x position, stop horz movement
-   if horzDir == "right" and player.x > pDestX then
-      horzMove=false
-   elseif horzDir == "left" and player.x < pDestX then
-      horzMove=false
-   elseif horzDir == "center" then
-      horzMove=false
-   end
-   --print( "horzMove: ", horzMove )
-
-   -- if we have reached (or passed) our target y position, stop vert movement
-   if vertDir == "up" and player.y < pDestY then
-      vertMove=false
-   elseif vertDir == "down" and player.y > pDestY then
-      vertMove=false
-   elseif vertDir == "center" then
-      vertMove=false
-   end
-   --print( "vertMove: ", vertMove )
-  
+local function stageTouch(event)
+  if event.phase == "began" then
+    touching = true
+    --getPath(event.x, event.y)
+    tapStageX = event.x
+    tapStageY = event.y
+  elseif event.phase == "moved" then
+    --getPath(event.x, event.y)
+    tapStageX = event.x
+    tapStageY = event.y
+  elseif event.phase == "ended" or event.phase == "cancelled" then
+    touching = false
+  end
+  return true
 end
 
--- add this enterFrame code to player object later?
-Runtime:addEventListener( "enterFrame", movePlayer )
+theStage:addEventListener("touch", stageTouch)
+
+local function playerMove()
+  -- on user touch
+  if touching == true then
+
+    getPath()
+
+    -- horizontal movement
+    if horzMove == true then
+      if pStageX < tapStageX-10 or pStageX > tapStageX+10 then
+        playerSpeed = pSpeed
+        player.x = player.x + rateX
+      end
+    end
+
+    -- vertical movement
+    if vertMove == true then
+       if pStageY < tapStageY-10 or pStageY > tapStageY+10 then
+        playerSpeed = pSpeed
+        player.y = player.y + rateY
+      end
+    end
+
+    -- if the player has reached (or passed) the tap x position, stop horz movement
+    if horzDir == "right" and pStageX > tapStageX then
+      horzMove = false
+    elseif horzDir == "left" and pStageX < tapStageX then
+      horzMove = false
+    elseif horzDir == "center" then
+      horzMove = false
+    else
+      horzMove = true
+    end
+
+    -- if the player has reached (or passed) the tap y position, stop vert movement
+    if vertDir == "up" and pStageY < tapStageY then
+      vertMove = false
+    elseif vertDir == "down" and pStageY > tapStageY then
+      vertMove = false
+    elseif vertDir == "center" then
+      vertMove = false
+    else
+      vertMove = true
+    end
+
+    -- Check for collisions (add functions here)
+  end
+end
+
+Runtime:addEventListener("enterFrame", playerMove)
+
 
 -- camera functions
 
