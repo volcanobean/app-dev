@@ -41,10 +41,9 @@ local distC
 local rateX
 local rateY
 
---local tapOffsetX
---local tapOffsetY
---local pDestX
---local pDestY
+local physics = require "physics"
+physics.start()
+physics.setGravity(0,0)
 
 -- stage
 
@@ -71,7 +70,6 @@ local txt2 = display.newText( staticGroup, "0, 0", cX, 100, native.systemFont, 3
 local txt3 = display.newText( staticGroup, "center", cX, 150, native.systemFont, 30 )
 local txt4 = display.newText( staticGroup, "center", cX, 200, native.systemFont, 30 )
 
-
 -- background
 
 local bg1 = display.newGroup() -- foreground, objects in front of player
@@ -86,65 +84,114 @@ camera:add(bg3, 3)
 camera:add(bg4, 4)
 camera:add(bg5, 5)
 
-local bgSample1 = display.newImageRect( bg2, "images/bg-grid-2500x1536.png", bgW, bgH )
+local bgSample1 = display.newImageRect( bg2, "assets/images/bg-grid-2500x1536.png", bgW, bgH )
 bgSample1.x = cX
 bgSample1.y = cY
 
+local blocker = {}
+blocker[1] = display.newRect( bg2, 0, 0, 400, 400 )
+blocker[1]:setFillColor( 0, 1, 0, 1 )
+physics.addBody( blocker[1], "static", { density=1, friction=0.1, bounce=0.2 } )
+
+blocker[2] = display.newRect( bg2, 400, 0, 100, 400 )
+blocker[2]:setFillColor( 1, 1, 0, 1 )
+physics.addBody( blocker[2], "static", { density=1, friction=0.1, bounce=0.2 } )
+
 --[[
-local bgSample2 = display.newImageRect( bg2, "images/bg-sample-2.png", bgW, bgH )
+local bgSample2 = display.newImageRect( bg2, "assets/images/bg-sample-2.png", bgW, bgH )
 bgSample2.x = cX
 bgSample2.y = cY
 
-local bgSample3 = display.newImageRect( bg3, "images/bg-sample-3.png", bgW, bgH )
+local bgSample3 = display.newImageRect( bg3, "assets/images/bg-sample-3.png", bgW, bgH )
 bgSample3.x = cX
 bgSample3.y = cY
 
-local bgSample4 = display.newImageRect( bg4, "images/bg-sample-4.png", bgW, bgH )
+local bgSample4 = display.newImageRect( bg4, "assets/images/bg-sample-4.png", bgW, bgH )
 bgSample4.x = cX
 bgSample4.y = cY
 
-local bgSample5 = display.newImageRect( bg5, "images/bg-sample-5.png", bgW, bgH )
+local bgSample5 = display.newImageRect( bg5, "assets/images/bg-sample-5.png", bgW, bgH )
 bgSample5.x = cX
 bgSample5.y = cY
-]]--
-
---[[
-local bgImage = display.newImageRect( bg1, "images/bg-grid-2500x1536.png", bgW, bgH )
-bgImage.x = cX
-bgImage.y = cY
-print(bg1.x,bg1.y)
-print(bgImage.x,bgImage.y)
-
-local bgImage2 = display.newImageRect( bg4, "images/bg-grid-2500x1536.png", bgW, bgH )
-bgImage2:setFillColor(0,1,1,0.5)
-bgImage2.x = cX
-bgImage2.y = cY
 ]]--
 
 -- player
 
 local player = display.newCircle( bg2, cX, cY, 40 )
 player:setFillColor(1,0,0,1)
+physics.addBody( player, "dynamic" )
 
---[[
-local zeroZero = display.newCircle( bg1, 0, 0, 20 )
-zeroZero:setFillColor(1,0,0,1)
+-- Color glowballs to collect
 
-local center = display.newCircle( bg1, cX, cY, 20 )
-center:setFillColor(0,1,0,1)
-]]--
+local colorGlow = {}
+
+-- Glow audio
+
+local chimeFX = audio.loadSound( "assets/audio/magic-chime-02.mp3" )
+
+local function sparkle()
+    audio.play( chimeFX )
+end
+
+local function onCollision( event )
+    event.target:removeSelf()
+    --sparkle()
+end 
+
+-- Define creation of Glow
+
+local function createGlow( number )
+  colorGlow[number] = display.newCircle( bg2, 0, 0, 10 )
+  colorGlow[number].x = math.random( 20, 2980 )
+  colorGlow[number].y = math.random( 10, 980 )
+  local r = math.random( 0, 100 )
+  local g = math.random( 0, 100 )
+  local b = math.random( 0, 100 )
+  colorGlow[number]:setFillColor( r/100, g/100, b/100 )
+  physics.addBody( colorGlow[number], "static" )
+  colorGlow[number]:addEventListener( "collision", onCollision )
+end
+
+-- Generate actual Glow objects
+
+for i=1, 15 do
+  createGlow(i)
+  --Moving Glow
+  local function moveGlow()
+      transition.to( colorGlow[i], { time=math.random(1000, 20000), x=math.random(50, 700), y=math.random(80, 1000), onComplete=moveGlow })
+  end
+  moveGlow()
+end 
+
+-- dusk motes
+
+local motes = {}
+
+-- Define creation of Glow
+
+local function createMote( number )
+  motes[number] = display.newCircle( bg2, 0, 0, 30 )
+  motes[number].x = math.random( 20, 2980 )
+  motes[number].y = math.random( 10, 980 )
+  motes[number]:setFillColor( 1, 1, 1, 0.7)
+  physics.addBody( motes[number], "static" )
+  --motes[number]:addEventListener( "collision", onCollision )
+end
+
+-- Generate actual Glow objects
+
+for i=1, 5 do
+  createMote(i)
+  --Moving Glow
+  local function moveMote()
+      transition.to( motes[i], { time=math.random(1000, 20000), x=math.random(50, 700), y=math.random(80, 1000), onComplete=moveMote })
+  end
+  moveMote()
+end 
 
 local function getPath()
   -- get content (stage) coordinates for player and for stage tap
   pStageX, pStageY = player:localToContent(0, 0)
-  --tapStageX = eventX
-  --tapStageY = eventY
-
-  -- get destination X and Y positions relative to the player's local position for use in enterFrame code
-  --tapOffsetX = player.x - pStageX
-  --tapOffsetY = player.y - pStageY
-  --pDestX = tapOffsetX + tapStageX
-  --pDestY = tapOffsetY + tapStageY
 
   -- get distance from point to point
   distA = tapStageX - pStageX
@@ -176,15 +223,11 @@ local function getPath()
   end
   print(vertDir)
 
-
+  --debug
   txt1.text = pStageX .. ", " .. pStageY
   txt2.text = tapStageX .. ", " .. tapStageY
   txt3.text = horzDir
   txt4.text = vertDir
-
-  -- allow movement
-  --horzMove=true
-  --vertMove=true
 end
 
 local function stageTouch(event)
