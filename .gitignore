@@ -1,5 +1,8 @@
 # Ignore any non-code asset folders and their contents
 */assets/*
+*/assets/audio/*
+*/assets/fonts/*
+*/assets/images/*
 */audio/*
 */fonts/*
 */images/*
