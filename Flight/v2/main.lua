@@ -127,7 +127,7 @@ bgSample5.y = cY
 
 -- player
 
-local player = display.newImageRect( bg2, "assets/images/fairy-player.png", 125, 200)
+local player = display.newImageRect( bg2, "assets/images/fairy-player.png", 75, 125)
 player.x = cX
 player.y = cY
 local playerShape = { 30,-100, 30,80, -30,80, -30,-100 }
@@ -162,7 +162,7 @@ local function createGlow( number )
   local g = math.random( 0, 100 )
   local b = math.random( 0, 100 )
   colorGlow[number]:setFillColor( r/100, g/100, b/100 )
-  physics.addBody( colorGlow[number], "static", { radius=20 })
+  physics.addBody( colorGlow[number], "static", { radius=20, isSensor=true })
   colorGlow[number]:addEventListener( "collision", onCollision )
 end
 
@@ -180,11 +180,12 @@ end
 -- dusk motes
 
 local motes = {}
+local motesBig = {}
 
 -- Define creation of Glow
 
 local function createMote( number )
-  motes[number] = display.newImageRect( bg2, "assets/images/dusk-mote.png", 75, 70)
+  motes[number] = display.newImageRect( bg2, "assets/images/dusk-mote.png", 45, 43)
   motes[number].x = math.random( 20, 2980 )
   motes[number].y = math.random( 10, 980 )
   local moteShape = { 0,-37, 37,-10, 23,34, -23,34, -37,-10 }
@@ -192,13 +193,31 @@ local function createMote( number )
   --motes[number]:addEventListener( "collision", onCollision )
 end
 
+local function createBigMote( number )
+  motesBig[number] = display.newImageRect( bg2, "assets/images/dusk-mote.png", 75, 70)
+  motesBig[number].x = math.random( 20, 2980 )
+  motesBig[number].y = math.random( 10, 980 )
+  local moteShape = { 0,-37, 37,-10, 23,34, -23,34, -37,-10 }
+  physics.addBody( motesBig[number], "static", {shape=moteShape} )
+  --motes[number]:addEventListener( "collision", onCollision )
+end
+
 -- Generate actual Glow objects
 
-for i=1, 5 do
+for i=1, 4 do
   createMote(i)
   --Moving Glow
   local function moveMote()
       transition.to( motes[i], { time=math.random(1000, 20000), x=math.random(50, 700), y=math.random(80, 1000), onComplete=moveMote })
+  end
+  moveMote()
+end 
+
+for i=1, 1 do
+  createBigMote(i)
+  --Moving Glow
+  local function moveMote()
+      transition.to( motesBig[i], { time=math.random(1000, 20000), x=math.random(50, 700), y=math.random(80, 1000), onComplete=moveMote })
   end
   moveMote()
 end 
