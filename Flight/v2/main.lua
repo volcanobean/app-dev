@@ -19,7 +19,7 @@ local bgMinY = cY - bgH*0.5 + cH*0.5
 local bgMaxY = cY + bgH*0.5 - cH*0.5
 
 local player
-local pSpeed = 12
+local pSpeed = 15
 local playerSpeed = pSpeed
 local theStage
 local touching = false
@@ -45,6 +45,10 @@ local physics = require "physics"
 physics.start()
 physics.setGravity(0,0)
 
+--physics.setDrawMode( "hybrid" )  --overlays collision outlines on normal display objects
+--physics.setDrawMode( "normal" )  --the default Corona renderer, with no collision outlines
+--physics.setDrawMode( "debug" )   --shows collision engine outlines only
+
 -- stage
 
 local theStage = display.newRect( cX, cY, cW, cH)
@@ -65,10 +69,12 @@ camera:setParallax(1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3)
 local staticGroup = display.newGroup()
 
 -- debug
+--[[
 local txt1 = display.newText( staticGroup, "0, 0", cX, 50, native.systemFont, 30 )
 local txt2 = display.newText( staticGroup, "0, 0", cX, 100, native.systemFont, 30 )
 local txt3 = display.newText( staticGroup, "center", cX, 150, native.systemFont, 30 )
 local txt4 = display.newText( staticGroup, "center", cX, 200, native.systemFont, 30 )
+]]--
 
 -- background
 
@@ -84,20 +90,25 @@ camera:add(bg3, 3)
 camera:add(bg4, 4)
 camera:add(bg5, 5)
 
-local bgSample1 = display.newImageRect( bg2, "assets/images/bg-grid-2500x1536.png", bgW, bgH )
-bgSample1.x = cX
-bgSample1.y = cY
+--[[
+local bgGrid = display.newImageRect( bg2, "assets/images/bg-grid-2500x1536.png", bgW, bgH )
+bgGrid.x = cX
+bgGrid.y = cY
+]]--
 
 local blocker = {}
-blocker[1] = display.newRect( bg2, 0, 0, 400, 400 )
+blocker[1] = display.newRect( bg2, 0, 0, 400, 300 )
 blocker[1]:setFillColor( 0, 1, 0, 1 )
 physics.addBody( blocker[1], "static", { density=1, friction=0.1, bounce=0.2 } )
 
-blocker[2] = display.newRect( bg2, 400, 0, 100, 400 )
+blocker[2] = display.newRect( bg2, 400, 0, 100, 300 )
 blocker[2]:setFillColor( 1, 1, 0, 1 )
 physics.addBody( blocker[2], "static", { density=1, friction=0.1, bounce=0.2 } )
 
---[[
+local bgSample1 = display.newImageRect( bg1, "assets/images/bg-sample-1.png", bgW, bgH )
+bgSample1.x = cX
+bgSample1.y = cY
+
 local bgSample2 = display.newImageRect( bg2, "assets/images/bg-sample-2.png", bgW, bgH )
 bgSample2.x = cX
 bgSample2.y = cY
@@ -113,13 +124,15 @@ bgSample4.y = cY
 local bgSample5 = display.newImageRect( bg5, "assets/images/bg-sample-5.png", bgW, bgH )
 bgSample5.x = cX
 bgSample5.y = cY
-]]--
 
 -- player
 
-local player = display.newCircle( bg2, cX, cY, 40 )
-player:setFillColor(1,0,0,1)
-physics.addBody( player, "dynamic" )
+local player = display.newImageRect( bg2, "assets/images/fairy-player.png", 125, 200)
+player.x = cX
+player.y = cY
+local playerShape = { 30,-100, 30,80, -30,80, -30,-100 }
+physics.addBody( player, "dynamic", {shape=playerShape} )
+player.isFixedRotation = true
 
 -- Color glowballs to collect
 
@@ -142,13 +155,14 @@ end
 
 local function createGlow( number )
   colorGlow[number] = display.newCircle( bg2, 0, 0, 10 )
+  colorGlow[number] = display.newImageRect( bg2, "assets/images/color-sparkle.png", 100, 99)
   colorGlow[number].x = math.random( 20, 2980 )
   colorGlow[number].y = math.random( 10, 980 )
   local r = math.random( 0, 100 )
   local g = math.random( 0, 100 )
   local b = math.random( 0, 100 )
   colorGlow[number]:setFillColor( r/100, g/100, b/100 )
-  physics.addBody( colorGlow[number], "static" )
+  physics.addBody( colorGlow[number], "static", { radius=20 })
   colorGlow[number]:addEventListener( "collision", onCollision )
 end
 
@@ -170,11 +184,11 @@ local motes = {}
 -- Define creation of Glow
 
 local function createMote( number )
-  motes[number] = display.newCircle( bg2, 0, 0, 30 )
+  motes[number] = display.newImageRect( bg2, "assets/images/dusk-mote.png", 75, 70)
   motes[number].x = math.random( 20, 2980 )
   motes[number].y = math.random( 10, 980 )
-  motes[number]:setFillColor( 1, 1, 1, 0.7)
-  physics.addBody( motes[number], "static" )
+  local moteShape = { 0,-37, 37,-10, 23,34, -23,34, -37,-10 }
+  physics.addBody( motes[number], "static", {shape=moteShape} )
   --motes[number]:addEventListener( "collision", onCollision )
 end
 
@@ -206,8 +220,10 @@ local function getPath()
   -- get horzontal direction (left/right/center)
   if pStageX < tapStageX then
     horzDir = "right"
+    player.xScale = -1
   elseif pStageX > tapStageX then
     horzDir = "left"
+    player.xScale = 1
   elseif pStageX == tapStageX then
     horzDir = "center"
   end
@@ -224,10 +240,12 @@ local function getPath()
   print(vertDir)
 
   --debug
+  --[[
   txt1.text = pStageX .. ", " .. pStageY
   txt2.text = tapStageX .. ", " .. tapStageY
   txt3.text = horzDir
   txt4.text = vertDir
+  ]]--
 end
 
 local function stageTouch(event)
