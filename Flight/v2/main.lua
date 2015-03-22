@@ -148,7 +148,7 @@ end
 
 local function onCollision( event )
     event.target:removeSelf()
-    --sparkle()
+    sparkle()
 end 
 
 -- Define creation of Glow
