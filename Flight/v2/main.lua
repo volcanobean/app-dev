@@ -130,7 +130,7 @@ bgSample5.y = cY
 local player = display.newImageRect( bg2, "assets/images/fairy-player.png", 75, 125)
 player.x = cX
 player.y = cY
-local playerShape = { 30,-100, 30,80, -30,80, -30,-100 }
+local playerShape = { 25,-50, 25,50, -25,50, -25,-50 }
 physics.addBody( player, "dynamic", {shape=playerShape} )
 player.isFixedRotation = true
 
