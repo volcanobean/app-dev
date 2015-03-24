@@ -267,18 +267,37 @@ local function getPath()
   ]]--
 end
 
+local startTime
+local endTime
+local totalTime = 0
+local startX
+local endX
+local startY
+local endY
+
 local function stageTouch(event)
   if event.phase == "began" then
     touching = true
+    startTime = event.time
     --getPath(event.x, event.y)
     tapStageX = event.x
     tapStageY = event.y
+
+    startX = event.x
+    endX = event.x
   elseif event.phase == "moved" then
     --getPath(event.x, event.y)
     tapStageX = event.x
     tapStageY = event.y
+    endX = event.x
   elseif event.phase == "ended" or event.phase == "cancelled" then
     touching = false
+    endTime = event.time
+    endX = event.x
+    totalTime = endTime - startTime
+    if ( totalTime < 400 ) and ( startX < endX+10 and startX > endX-10 ) then
+      -- this is a tap
+    end
   end
   return true
 end

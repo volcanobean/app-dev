@@ -1,3 +1,7 @@
+swipe to dash
+velocity increase (up to max) while touch is still active
+tap to affect motes
+
 --rectangle-based collision detection
 
 local function hasCollided( obj1, obj2 )
