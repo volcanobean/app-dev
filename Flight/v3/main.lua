@@ -19,8 +19,9 @@ local bgMinY = cY - bgH*0.5 + cH*0.5
 local bgMaxY = cY + bgH*0.5 - cH*0.5
 
 local player
-local pSpeed = 15
-local playerSpeed = pSpeed
+--local pSpeed = 20
+local gravity = 5
+--local playerSpeed = pSpeed
 local theStage
 local touching = false
 
@@ -99,39 +100,6 @@ local bgGrid = display.newImageRect( bg2, "images/bg-grid-2048x2048.png", 2048, 
 bgGrid.x = cX
 bgGrid.y = cY
 
---[[
-local blocker = {}
-blocker[1] = display.newRect( bg2, 0, 0, 400, 300 )
-blocker[1]:setFillColor( 0, 1, 0, 1 )
-physics.addBody( blocker[1], "static", { density=1, friction=0.1, bounce=0.2 } )
-
-blocker[2] = display.newRect( bg2, 400, 0, 100, 300 )
-blocker[2]:setFillColor( 1, 1, 0, 1 )
-physics.addBody( blocker[2], "static", { density=1, friction=0.1, bounce=0.2 } )
-]]--
-
---[[
-local bgSample1 = display.newImageRect( bg1, "images/bg-sample-1.png", bgW, bgH )
-bgSample1.x = cX
-bgSample1.y = cY
-
-local bgSample2 = display.newImageRect( bg2, "images/bg-sample-2.png", bgW, bgH )
-bgSample2.x = cX
-bgSample2.y = cY
-
-local bgSample3 = display.newImageRect( bg3, "images/bg-sample-3.png", bgW, bgH )
-bgSample3.x = cX
-bgSample3.y = cY
-
-local bgSample4 = display.newImageRect( bg4, "images/bg-sample-4.png", bgW, bgH )
-bgSample4.x = cX
-bgSample4.y = cY
-
-local bgSample5 = display.newImageRect( bg5, "images/bg-sample-5.png", bgW, bgH )
-bgSample5.x = cX
-bgSample5.y = cY
-]]--
-
 -- player
 
 -- sprite sheet
@@ -142,7 +110,7 @@ local playerFrames = { start=1, count=4 }
 
 --local yayHead = display.newSprite( yaySheet, yayHeadSequence )
 
-local player = display.newSprite( playerSheet, playerFrames )
+player = display.newSprite( playerSheet, playerFrames )
 player:setFrame(3)
 bg2:insert(player)
 player.x = cX
@@ -152,124 +120,40 @@ physics.addBody( player, "dynamic", {shape=playerShape} )
 player.isFixedRotation = true
 player.domAxis = "horizontal"
 
---[[
--- Color glowballs to collect
-
-local colorGlow = {}
-
--- Glow audio
-
-local chimeFX = audio.loadSound( "audio/magic-chime-02.mp3" )
-
-local function sparkle()
-    audio.play( chimeFX )
-end
-
-local function onCollision( event )
-    event.target:removeSelf()
-    sparkle()
-end 
-
--- Define creation of Glow
-
-local function createGlow( number )
-  colorGlow[number] = display.newCircle( bg2, 0, 0, 10 )
-  colorGlow[number] = display.newImageRect( bg2, "images/color-sparkle.png", 100, 99)
-  colorGlow[number].x = math.random( 20, 2980 )
-  colorGlow[number].y = math.random( 10, 980 )
-  local r = math.random( 0, 100 )
-  local g = math.random( 0, 100 )
-  local b = math.random( 0, 100 )
-  colorGlow[number]:setFillColor( r/100, g/100, b/100 )
-  physics.addBody( colorGlow[number], "static", { radius=20, isSensor=true })
-  colorGlow[number]:addEventListener( "collision", onCollision )
-end
-
--- Generate actual Glow objects
-
-for i=1, 15 do
-  createGlow(i)
-  --Moving Glow
-  local function moveGlow()
-      transition.to( colorGlow[i], { time=math.random(1000, 20000), x=math.random(50, 700), y=math.random(80, 1000), onComplete=moveGlow })
-  end
-  moveGlow()
-end 
-
--- dusk motes
-
-local motes = {}
-local motesBig = {}
-
--- Define creation of motes
-
-local whichMote = motes[1]
-
-local function removeMote()
-  whichMote:removeSelf()
-  return true
-end
-
-local function moteShake(event)
-  print("mote tap")
-  transition.to( event.target, {time=100, x=event.x+10} )
-  transition.to( event.target, {delay=100, time=100, x=event.x-10} )
-  transition.to( event.target, {delay=200, time=100, x=event.x+10} )
-  transition.to( event.target, {delay=300, time=100, x=event.x-10} )
-  transition.to( event.target, {delay=300, time=100, x=event.x-10} )
-  if horzDir == "right" then
-    transition.to( event.target, {delay=400, time=200, x=event.x+500} )
-  else
-    transition.to( event.target, {delay=400, time=200, x=event.x-500} )
-  end
-  whichMote = event.target
-  timer.performWithDelay( 600, removeMote )
-  return true
-end
-
-local function createMote( number )
-  motes[number] = display.newImageRect( bg2, "images/dusk-mote.png", 45, 43)
-  motes[number].x = math.random( 20, 2980 )
-  motes[number].y = math.random( 10, 980 )
-  local moteShape = { 0,-37, 37,-10, 23,34, -23,34, -37,-10 }
-  physics.addBody( motes[number], "static", {shape=moteShape} )
-  motes[number]:addEventListener( "tap", moteShake )
-end
-
-local function createBigMote( number )
-  motesBig[number] = display.newImageRect( bg2, "images/dusk-mote.png", 75, 70)
-  motesBig[number].x = math.random( 20, 2980 )
-  motesBig[number].y = math.random( 10, 980 )
-  local moteShape = { 0,-37, 37,-10, 23,34, -23,34, -37,-10 }
-  physics.addBody( motesBig[number], "static", {shape=moteShape} )
-  --motes[number]:addEventListener( "collision", onCollision )
-end
-
--- Generate actual mote objects
-
-for i=1, 6 do
-  createMote(i)
-  --Moving Glow
-  local function moveMote()
-    transition.to( motes[i], { time=math.random(1000, 20000), x=math.random(50, 700), y=math.random(80, 1000), onComplete=moveMote })
-  end
-  moveMote()
-end 
-
-for i=1, 1 do
-  createBigMote(i)
-  --Moving Glow
-  local function moveMote()
-      transition.to( motesBig[i], { time=math.random(1000, 20000), x=math.random(50, 700), y=math.random(80, 1000), onComplete=moveMote })
-  end
-  moveMote()
-end 
-
-]]--
+player.moveSpeed = 15                 -- Current movement speed, default is 0, no movement
+player.linearDamping = 0.9             -- Linear damping rate, 0 is dead stop, increase for a more gradual deceleration
+player.linearAcceleration = 1.25     -- Linear acceleration rate, increase speed of movement by 5%
+player.linearMax = 30                -- Max linear velocity, to cap accelration
+player.linearMin = player.moveSpeed  -- Min linear velocity, to cap deceleration
+player.boost = false
 
 local function getSprite()
   if touching == true then
     -- if moving
+
+    -- which is "dominant axis"? Horz or vert?
+    -- for use in logic to decide whether to play horz or vert quick turn animation
+    if (pathAngle >= 0 and pathAngle <= 65) or (pathAngle <= 0 and pathAngle >= -65 ) or (pathAngle >= -180 and pathAngle <= -115) or (pathAngle <= 180 and pathAngle >= 115 ) then
+      -- if angle is between 315-360,0-45 or 135-225 we're vertical
+      player.domAxis = "horizontal"
+      -- tilt player slightly at certain angles for smoother animation
+      if(pathAngle <= -45 and pathAngle >= -65) then
+        player.rotation = -20
+      elseif (pathAngle <= -115 and pathAngle >= -135) then
+        player.rotation = 20
+      elseif(pathAngle <= 65 and pathAngle >= 45) then
+        player.rotation = 20
+      elseif(pathAngle <= 135 and pathAngle >= 115) then
+        player.rotation = -20
+      else
+        player.rotation = 0
+      end
+    elseif (pathAngle >= 66 and pathAngle <= 114) or (pathAngle <= -66 and pathAngle >= -114 ) then
+      -- if angle if between 45-135 or 225-315 we're horizontal
+      player.domAxis = "vertical"
+      player.rotation = 0
+    end
+
     if player.domAxis == "vertical" then
       if vertDir == "up" then
         player:setFrame(4)
@@ -283,6 +167,7 @@ local function getSprite()
   elseif touching == false then
     -- if not moving, play hover
     player:setFrame(3)
+    player.rotation = 0
   end
 end
 
@@ -300,50 +185,22 @@ local function getPath()
   --pathAngle = (distB/distA)*57.2957795
   pathAngle = math.atan2(distB, distA)*180/3.14
 
-  -- which is "dominant axis"? Horz or vert?
-  -- for use in logic to decide whether to play horz or vert quick turn animation
-  if (pathAngle >= 0 and pathAngle <= 65)
-    or (pathAngle <= 0 and pathAngle >= -65 ) 
-    or (pathAngle >= -180 and pathAngle <= -115)
-    or (pathAngle <= 180 and pathAngle >= 115 ) then
-    -- if angle is between 315-360,0-45 or 135-225 we're vertical
-    player.domAxis = "horizontal"
-  elseif (pathAngle >= 66 and pathAngle <= 114)
-    or (pathAngle <= -66 and pathAngle >= -114 ) then
-    -- if angle if between 45-135 or 225-315 we're horizontal
-    player.domAxis = "vertical"
-  end
-
   -- debug
   --angleText.text = pathAngle
   --axisText.text = player.domAxis
 
+  if player.boost == true then
+    player.moveSpeed = player.moveSpeed * player.linearAcceleration
+    player.moveSpeed = math.min(player.moveSpeed, player.linearMax)
+  elseif player.boost == false then
+    player.moveSpeed = player.moveSpeed * player.linearDamping
+    player.moveSpeed = math.max(player.moveSpeed, player.linearMin)
+  end
+
   -- get per/frame rate of travel for each axis
-  travelTime = distC/playerSpeed
+  travelTime = distC/player.moveSpeed
   rateX = distA/travelTime
   rateY = distB/travelTime
-
-  -- get horzontal direction (left/right/center)
-  if pStageX < tapStageX then
-    horzDir = "right"
-    player.xScale = 1
-  elseif pStageX > tapStageX then
-    horzDir = "left"
-    player.xScale = -1
-  elseif pStageX == tapStageX then
-    horzDir = "center"
-  end
-  print(horzDir)
-
-  -- get vertical direction (up/down/center) 
-  if pStageY > tapStageY then
-    vertDir = "up"
-  elseif pStageY < tapStageY then
-    vertDir = "down"
-  elseif pStageY == tapStageY then
-    vertDir = "center"
-  end
-  print(vertDir)
 
   --debug
 
@@ -359,38 +216,70 @@ local startTime
 local endTime
 local totalTime = 0
 local startX
-local endX
 local startY
+local endX
 local endY
+
+local function dashRight()
+  transition.to(player, {time=150,x=player.x+400})
+end
 
 local function stageTouch(event)
   if event.phase == "began" then
     touching = true
+
     startTime = event.time
-    --getPath(event.x, event.y)
+
     tapStageX = event.x
     tapStageY = event.y
 
     startX = event.x
+    startY = event.y
     endX = event.x
+    endY = event.y
   elseif event.phase == "moved" then
-    --getPath(event.x, event.y)
     tapStageX = event.x
     tapStageY = event.y
+
     endX = event.x
+    endY = event.y
   elseif event.phase == "ended" or event.phase == "cancelled" then
     touching = false
     endTime = event.time
+
     endX = event.x
+    endY = event.y
     totalTime = endTime - startTime
-    if ( totalTime < 400 ) and ( startX < endX+10 and startX > endX-10 ) then
-      -- this is a tap
+
+    -- SWIPING
+    if ( totalTime < 200 ) then
+      local difX = endX - startX
+      local difY = endY - startY
+
+      if endX > startX and difX > difY then
+        print( "Swipe RIGHT")
+        player.xScale = 1
+        transition.to(player, {time=200,x=player.x+400})
+      elseif endX < startX and difX < difY then 
+        print( "Swipe LEFT")
+        player.xScale = -1
+        transition.to(player, {time=200,x=player.x-400})
+      elseif endY > startY and difY > difX then
+        print( "Swipe DOWN")
+        transition.to(player, {time=200,y=player.y+400})
+      elseif endY < startY and difY < difX then
+        print( "Swipe UP")
+        transition.to(player, {time=200,y=player.y-400})
+      end
+
     end
   end
   return true
 end
 
 theStage:addEventListener("touch", stageTouch)
+
+-- enter frame movement function
 
 local function playerMove()
   -- on user touch
@@ -401,17 +290,40 @@ local function playerMove()
     -- horizontal movement
     if horzMove == true then
       if pStageX < tapStageX-10 or pStageX > tapStageX+10 then
-        playerSpeed = pSpeed
+        --playerSpeed = pSpeed
         player.x = player.x + rateX
+        --player:applyForce(rateX,0)
       end
     end
 
     -- vertical movement
     if vertMove == true then
        if pStageY < tapStageY-10 or pStageY > tapStageY+10 then
-        playerSpeed = pSpeed
+        --playerSpeed = pSpeed
         player.y = player.y + rateY
+        --player:applyForce(0,rateY)
       end
+    end
+
+    -- get horzontal direction (left/right/center)
+    if pStageX < tapStageX then
+      horzDir = "right"
+      player.xScale = 1
+    elseif pStageX > tapStageX then
+      horzDir = "left"
+      player.xScale = -1
+    elseif pStageX == tapStageX then
+      horzDir = "center"
+    end
+    --print(horzDir)
+
+    -- get vertical direction (up/down/center) 
+    if pStageY > tapStageY then
+      vertDir = "up"
+    elseif pStageY < tapStageY then
+      vertDir = "down"
+    elseif pStageY == tapStageY then
+      vertDir = "center"
     end
 
     -- if the player has reached (or passed) the tap x position, stop horz movement
@@ -441,9 +353,26 @@ local function playerMove()
 
   -- display appropriate sprite based on current movement
   getSprite()
+
 end
 
 Runtime:addEventListener("enterFrame", playerMove)
+
+-- other stuff
+
+local function boostButton(event)
+  if event.phase == "began" then
+    player.boost = true
+  elseif event.phase == "moved" then
+    -- nuthin
+  elseif event.phase == "ended" or event.phase == "cancelled" then
+    player.boost = false
+  end
+  return true
+end
+
+local button = display.newCircle( 60, cH-60, 75 )
+button:addEventListener( "touch", boostButton )
 
 
 -- camera functions
@@ -455,5 +384,4 @@ Runtime:addEventListener("enterFrame", playerMove)
 camera.damping = 10 -- A bit more fluid tracking
 camera:setFocus(player) -- Set the focus to the player
 camera:track() -- Begin auto-tracking
---camera:setBounds(x1, x2, y1, y2)
-camera:setBounds( bgMinX, bgMaxX, bgMinY, bgMaxY)
+camera:setBounds( bgMinX, bgMaxX, bgMinY, bgMaxY) -- camera:setBounds(x1, x2, y1, y2)
