@@ -19,7 +19,9 @@ local cY = display.contentCenterY
 
 -- Forward declarations
 
+_myG.currentLevel = 2
 
+local startTalk
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- "scene:create()"
@@ -30,10 +32,16 @@ local cY = display.contentCenterY
 function scene:create( event )
     local sceneGroup = self.view
 
+    local bgImage = display.newImageRect( sceneGroup, "images/bg-sample-5.png", cW, cH)
+    bgImage.x = cX
+    bgImage.y = cY
 
---
+    local titleTxt = display.newText( "Level 2", cX, 50, native.systemFont, 30 )
+    titleTxt:setFillColor( 0,0,1,1 )
 
-local titleTxt = display.newText( "Level 2", cX, 100, native.systemFont, 75 )
+    function startTalk()
+        composer.showOverlay( "talking" )
+    end
 
 end
 
@@ -49,6 +57,8 @@ function scene:show( event )
 
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
+
+        timer.performWithDelay( 600, startTalk )
 
     end
 end

@@ -19,6 +19,10 @@ local cY = display.contentCenterY
 
 -- Forward declarations
 
+_myG.currentLevel = 1
+
+local startTalk
+
 -- -----------------------------------------------------------------------------------------------------------------
 -- "scene:create()"
 -- -----------------------------------------------------------------------------------------------------------------
@@ -27,8 +31,6 @@ local cY = display.contentCenterY
 
 function scene:create( event )
   local sceneGroup = self.view
-
-
 
 -- set H and W of background area
 
@@ -414,6 +416,11 @@ camera:setBounds( bgMinX, bgMaxX, bgMinY, bgMaxY) -- camera:setBounds(x1, x2, y1
 
 local titleTxt = display.newText( "Level 1", cX, 100, native.systemFont, 75 )
 
+
+    function startTalk()
+        composer.showOverlay( "talking" )
+    end
+    
 end
 
 -- -----------------------------------------------------------------------------------------------------------------
@@ -428,6 +435,8 @@ function scene:show( event )
 
     elseif ( event.phase == "did" ) then
         -- Called when the scene is now on screen.
+
+                timer.performWithDelay( 600, startTalk )
 
     end
 end

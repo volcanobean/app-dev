@@ -26,3 +26,5 @@ local _myG = composer.myGlobals
 
 --composer.gotoScene( "start-screen" )
 composer.gotoScene( "world-map" )
+--composer.gotoScene( "level-2" )
+--composer.gotoScene( "talking" )

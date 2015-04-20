@@ -19,6 +19,7 @@ local cY = display.contentCenterY
 
 -- Forward declarations
 
+_myG.currentLevel = 0
 
 
 -- -----------------------------------------------------------------------------------------------------------------
