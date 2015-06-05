@@ -1,0 +1,9 @@
+# Large asset files #
+###################
+audio/*
+fonts/*
+images/*
+
+# OS generated files #
+######################
+.DS_Store
